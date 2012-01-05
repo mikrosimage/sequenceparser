@@ -1,0 +1,14 @@
+# temporary files
+*~
+.*.swp # vim
+*.flc # xemacs
+.DS_Store # MacOS
+Thumbs.db # Windows
+
+
+# removing dist folder : folder receiving the compilation products
+/dist
+/.build
+
+/python/sequenceParser.py
+/python/sequenceParser_wrap.cxx

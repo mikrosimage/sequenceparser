@@ -1,0 +1,83 @@
+
+import type ;
+
+local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+
+use-project /boost : $(BOOST_ROOT) ;
+use-project /test  : test ;
+
+if ! [ type.registered BINDINGPYTHON ]
+{
+	type.register BINDINGPYTHON : : SHARED_LIB ;
+	type.change-generated-target-prefix BINDINGPYTHON  : : "_" ;
+}
+
+project
+	: requirements
+		<include>src
+		<include>include
+		<library>/boost//system
+		<library>/boost//filesystem
+		<library>/boost//regex
+	: usage-requirements
+		<include>include
+		<library>/boost//system
+		<library>/boost//filesystem
+		<library>/boost//regex
+	:
+		build-dir .build/
+	;
+
+lib sequence
+	:
+		[ glob src/*.cpp ]
+	;
+
+make buildBindingSwig : python/sequenceParser.i : @swigCpptoPython ;
+actions swigCpptoPython
+{
+	swig -c++ -python -I. $(>)
+}
+
+bindingpython sequenceParser
+	:
+		[ glob python/*.cxx ]
+		sequence
+		/python
+	:
+		<include>.
+	;
+
+install sequenceLibrary
+	:
+		sequence
+	:
+		<install-dependencies>on
+		<install-type>SHARED_LIB
+		<variant>debug:<location>dist/debug
+		<variant>release:<location>dist/release
+	;
+
+install bindingPython
+	:
+		[ glob python/sequenceParser.py ]
+	:
+		<variant>debug:<location>dist/debug
+		<variant>release:<location>dist/release
+	;
+
+install bindingPythonLibrary
+	:
+		sequenceParser
+	:
+		<variant>debug:<location>dist/debug
+		<variant>release:<location>dist/release
+		<install-dependencies>off
+		<install-type>BINDINGPYTHON
+
+	;
+
+
+
+
+explicit test ;

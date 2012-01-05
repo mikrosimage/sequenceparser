@@ -1,0 +1,52 @@
+SequenceParser version 0.0.1
+
+	SequenceParser library is a C++ library to detect sequences, files and folders
+
+Licence
+=======
+
+   see COPYING files
+
+Compilation
+===========
+
+   * Getting the source
+        git clone git://github.com/mikrosimage/SequenceParser.git
+        cd SerquenceParser
+
+   * Compilation
+        see INSTALL file
+
+Tested compilers
+================
+
+    * Linux
+        - GCC 4.4.1 on OpenSUSE 11.2 64bits
+
+    * MacOS
+        
+    * Windows
+        
+
+
+External Libraries
+==================
+    * Boost
+	- version 1.48.0
+    * Swig ( for Python Binding )
+	- 1.3.36
+    * Python
+	- version 2.6
+
+
+Definitions
+===========
+
+Sequence:
+it's many files with a common pattern of numbers
+
+File:
+it's all file without numbers in the filname and sequences with only one file
+
+Folders:
+Just folders

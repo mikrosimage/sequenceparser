@@ -1,0 +1,14 @@
+
+import testing ;
+
+use-project /sequence  : ../ ;
+
+run 	main.cpp
+	/sequence
+	/boost//unit_test_framework
+	/boost//filesystem
+	: : :
+	<define>BOOST_TEST_MAIN
+		<define>BOOST_TEST_DYN_LINK
+	;
+
