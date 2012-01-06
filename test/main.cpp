@@ -49,13 +49,13 @@ void clearTmp()
 
 void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	SequenceParser::Detector detector;
-	std::list<boost::shared_ptr<SequenceParser::FileObject > > listFileObject;
-	std::list<boost::shared_ptr<SequenceParser::Folder     > > listFolder;
-	std::list<boost::shared_ptr<SequenceParser::File       > > listFile;
-	std::list<boost::shared_ptr<SequenceParser::Sequence   > > listSequence;
+	sequenceParser::Detector detector;
+	std::list<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
+	std::list<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
+	std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
+	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
-	listFileObject = detector.fileObjectsInDir ( path, (SequenceParser::EMaskType) ( SequenceParser::eMaskTypeDirectory | SequenceParser::eMaskTypeFile | SequenceParser::eMaskTypeSequence ) );
+	listFileObject = detector.fileObjectsInDir ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
 	listFolder     = detector.folderInDir  ( path );
 	listFile       = detector.fileInDir    ( path );
 	listSequence   = detector.sequenceInDir( path );
@@ -68,15 +68,15 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
 	BOOST_CHECK( listSequence.size()   == numberOfSequences   );
 }
 
-void testFindObjectInDiretory ( const char* path, const SequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
+void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	SequenceParser::Detector detector;
-	std::list<boost::shared_ptr<SequenceParser::FileObject > > listFileObject;
-	std::list<boost::shared_ptr<SequenceParser::Folder     > > listFolder;
-	std::list<boost::shared_ptr<SequenceParser::File       > > listFile;
-	std::list<boost::shared_ptr<SequenceParser::Sequence   > > listSequence;
+	sequenceParser::Detector detector;
+	std::list<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
+	std::list<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
+	std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
+	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
-	listFileObject = detector.fileObjectsInDir ( path, (SequenceParser::EMaskType) ( SequenceParser::eMaskTypeDirectory | SequenceParser::eMaskTypeFile | SequenceParser::eMaskTypeSequence ) ,  options );
+	listFileObject = detector.fileObjectsInDir ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) ,  options );
 	listFolder     = detector.folderInDir      ( path, options );
 	listFile       = detector.fileInDir        ( path, options );
 	listSequence   = detector.sequenceInDir    ( path, options );
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(TestSequence)
 	testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/"  , 0, 1, 0, 1 );
 	testFindObjectInDiretory ( "tmpTestSequence/root/film/"       , 0, 0, 3, 3 );
 
-	testFindObjectInDiretory ( "tmpTestSequence/root/film/"       , SequenceParser::eMaskOptionsDotFile, 0, 0, 4, 4 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/"       , sequenceParser::eMaskOptionsDotFile, 0, 0, 4, 4 );
 
 	clearTmp();
 }

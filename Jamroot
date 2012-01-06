@@ -1,16 +1,27 @@
-
 import type ;
 
 local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 
-use-project /boost : $(BOOST_ROOT) ;
-use-project /test  : test ;
+use-project /boost            : $(BOOST_ROOT) ;
+use-project /test             : test ;
+
+path-constant DIST      : ./dist ;
+
 
 if ! [ type.registered BINDINGPYTHON ]
 {
-	type.register BINDINGPYTHON : : SHARED_LIB ;
+	type.register BINDINGPYTHON                        : : SHARED_LIB ;
 	type.change-generated-target-prefix BINDINGPYTHON  : : "_" ;
 }
+
+make sequenceParser_wrap.cxx : python/sequenceParser.i : @swigCpptoPython ;
+make sequenceParser.py       : python/sequenceParser.i : @swigCpptoPython ;
+actions swigCpptoPython
+{
+	swig -c++ -python -I. -fcompact -o $(<) $(>)
+}
+IMPORT $(__name__) : swigCpptoPython : : swigCpptoPython ;
+
 
 project
 	: requirements
@@ -33,51 +44,45 @@ lib sequence
 		[ glob src/*.cpp ]
 	;
 
-make buildBindingSwig : python/sequenceParser.i : @swigCpptoPython ;
-actions swigCpptoPython
-{
-	swig -c++ -python -I. $(>)
-}
-
-bindingpython sequenceParser
-	:
-		[ glob python/*.cxx ]
-		sequence
-		/python
-	:
-		<include>.
-	;
-
 install sequenceLibrary
 	:
 		sequence
 	:
 		<install-dependencies>on
 		<install-type>SHARED_LIB
-		<variant>debug:<location>dist/debug
-		<variant>release:<location>dist/release
+		<variant>debug:<location>$(DIST)/debug
+		<variant>release:<location>$(DIST)/release
+	;
+
+
+
+bindingpython sequenceParser
+	:
+		sequence
+		/python
+	:
+		<include>.
+		<implicit-dependency>sequenceParser_wrap.cxx
 	;
 
 install bindingPython
 	:
-		[ glob python/sequenceParser.py ]
+		sequenceParser.py
 	:
-		<variant>debug:<location>dist/debug
-		<variant>release:<location>dist/release
+		<variant>debug:<location>$(DIST)/debug
+		<variant>release:<location>$(DIST)/release
 	;
 
 install bindingPythonLibrary
 	:
 		sequenceParser
 	:
-		<variant>debug:<location>dist/debug
-		<variant>release:<location>dist/release
+		<variant>debug:<location>$(DIST)/debug
+		<variant>release:<location>$(DIST)/release
 		<install-dependencies>off
 		<install-type>BINDINGPYTHON
-
 	;
 
-
-
-
 explicit test ;
+explicit sequenceParser_wrap.cxx ;
+explicit sequenceParser.py ;
