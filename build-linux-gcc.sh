@@ -10,6 +10,14 @@ then
 	exit 1;
 fi
 
+
+if [ `getconf LONG_BIT` = "64" ]
+then
+    ADDRESS_MODEL=64
+else
+    ADDRESS_MODEL=32
+fi
+
 # boost build configuration
 export BOOST_BUILD_PATH=$BOOST_ROOT/tools/build/v2
-$BOOST_ROOT/bjam --toolset=gcc cflags=-fPIC cxxflags=-fPIC python=2.6  $*
+$BOOST_ROOT/bjam --toolset=gcc cflags=-fPIC cxxflags=-fPIC python=2.6 address-model=$ADDRESS_MODEL $*
