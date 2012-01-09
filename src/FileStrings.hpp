@@ -4,6 +4,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+#include <boost/functional/hash.hpp>
 #include <vector>
 
 namespace bfs = boost::filesystem;

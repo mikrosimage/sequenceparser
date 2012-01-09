@@ -11,6 +11,8 @@ local rule check-required-env ( var ) {
 local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ; 
 check-required-env BOOST_ROOT ;
 
+use-project /boost            : $(BOOST_ROOT) ;
+
 #########################
 # Python configuration. #
 #########################

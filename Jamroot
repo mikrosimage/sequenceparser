@@ -1,8 +1,5 @@
 import type ;
 
-local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
-
-use-project /boost            : $(BOOST_ROOT) ;
 use-project /test             : test ;
 
 path-constant DIST      : ./dist ;
@@ -31,6 +28,7 @@ project
 		<library>/boost//filesystem
 		<library>/boost//regex
 	: usage-requirements
+		<include>src
 		<include>include
 		<library>/boost//system
 		<library>/boost//filesystem

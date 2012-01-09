@@ -8,6 +8,7 @@
 #include <File.hpp>
 #include <Folder.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 #include <iomanip>
 
 namespace sequenceParser {
