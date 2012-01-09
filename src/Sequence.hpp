@@ -1,5 +1,5 @@
-#ifndef _SEQUENCE_HPP_
-#define _SEQUENCE_HPP_
+#ifndef _SEQUENCE_PARSER_SEQUENCE_HPP_
+#define _SEQUENCE_PARSER_SEQUENCE_HPP_
 
 #include <FileObject.hpp>
 #include <FileNumbers.hpp>

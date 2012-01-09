@@ -1,5 +1,5 @@
-#ifndef _FILE_STRINGS_HPP_
-#define _FILE_STRINGS_HPP_
+#ifndef _SEQUENCE_PARSER_FILE_STRINGS_HPP_
+#define _SEQUENCE_PARSER_FILE_STRINGS_HPP_
 
 #include <boost/lambda/lambda.hpp>
 #include <boost/filesystem.hpp>

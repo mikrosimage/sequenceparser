@@ -1,5 +1,5 @@
-#ifndef _FILE_NUMBERS_HPP_
-#define _FILE_NUMBERS_HPP_
+#ifndef _SEQUENCE_PARSER_FILE_NUMBERS_HPP_
+#define _SEQUENCE_PARSER_FILE_NUMBERS_HPP_
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>

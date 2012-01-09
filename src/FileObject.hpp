@@ -1,5 +1,5 @@
-#ifndef _FILEOBJECT_HPP_
-#define _FILEOBJECT_HPP_
+#ifndef _SEQUENCE_PARSER_FILEOBJECT_HPP_
+#define _SEQUENCE_PARSER_FILEOBJECT_HPP_
 
 #include <boost/filesystem.hpp>
 #include <commonDefinitions.hpp>

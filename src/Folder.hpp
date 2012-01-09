@@ -1,5 +1,5 @@
-#ifndef _FOLDER_HPP_
-#define _FOLDER_HPP_
+#ifndef _SEQUENCE_PARSER_FOLDER_HPP_
+#define _SEQUENCE_PARSER_FOLDER_HPP_
 
 #include <FileObject.hpp>
 
