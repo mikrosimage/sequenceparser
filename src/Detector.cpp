@@ -35,7 +35,13 @@ Detector::~Detector()
 {
 }
 
-std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<sequenceParser::File> >       Detector::fileInDirectory                 ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    return fileInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<File> >                       Detector::fileInDirectory                 ( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<File> >  outputFiles;
     bfs::path directory;
@@ -123,8 +129,54 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& 
 
     return outputFiles;
 }
+#ifdef SWIG
+std::vector<std::string>                                  Detector::fileInDirectory                 ( std::string path )
+{
+    boost::filesystem::path p (path);
+    std::list<boost::shared_ptr<sequenceParser::File> > outputFiles;
+    std::vector<std::string> filenames;
 
-std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+    outputFiles = fileInDirectory ( p );
+    for (std::list<boost::shared_ptr<sequenceParser::File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::File> f = *it;
+	filenames.push_back( f->getAbsoluteFilename().c_str() );
+    }
+    return filenames;
+}
+#endif
+void                                                      Detector::printFileInDirectory            ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    printFileInDirectory( directory, filters, desc );
+}
+
+void                                                      Detector::printFileInDirectory            ( const boost::filesystem::path& directory, std::vector<std::string>& filters, const sequenceParser::EMaskOptions desc )
+{
+    std::list<boost::shared_ptr<sequenceParser::File> > outputFiles;
+    std::vector<std::string> filenames;
+
+    outputFiles = fileInDirectory ( directory, filters, desc );
+    for (std::list<boost::shared_ptr<sequenceParser::File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::File> f = *it;
+	std::cout << *f << std::endl;
+    }
+}
+#ifdef SWIG
+void                                                      Detector::printFileInDirectory            ( std::string path )
+{
+    boost::filesystem::path p (path);
+    printFileInDirectory( p );
+}
+#endif
+std::list<boost::shared_ptr<Sequence> >                   Detector::sequenceInDirectory             ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    return sequenceInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<Sequence> >                   Detector::sequenceInDirectory             ( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<Sequence> >  outputSequences;
     bfs::path directory;
@@ -205,8 +257,54 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs
 
     return outputSequences;
 }
+#ifdef SWIG
+std::vector<std::string>                                  Detector::sequenceInDirectory             ( std::string path )
+{
+    boost::filesystem::path p (path);
+    std::list<boost::shared_ptr<sequenceParser::Sequence> > outputFiles;
+    std::vector<std::string> filenames;
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+    outputFiles = sequenceInDirectory ( p );
+    for (std::list<boost::shared_ptr<sequenceParser::Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::Sequence> f = *it;
+	filenames.push_back( f->getAbsoluteStandardPattern().c_str() );
+    }
+    return filenames;
+}
+#endif
+void                                                      Detector::printSequenceInDirectory        ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    printSequenceInDirectory( directory, filters, desc );
+}
+
+void                                                      Detector::printSequenceInDirectory        ( const boost::filesystem::path& directory, std::vector<std::string>& filters, const sequenceParser::EMaskOptions desc )
+{
+    std::list<boost::shared_ptr<sequenceParser::Sequence> > outputFiles;
+
+    outputFiles = sequenceInDirectory ( directory, sequenceParser::eMaskOptionsColor );
+    for (std::list<boost::shared_ptr<sequenceParser::Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::Sequence> f = *it;
+	std::cout << *f << std::endl;
+    }
+}
+
+#ifdef SWIG
+void                                                      Detector::printSequenceInDirectory        ( std::string path )
+{
+    boost::filesystem::path p (path);
+    printSequenceInDirectory( p );
+}
+#endif
+std::list<boost::shared_ptr<FileObject> >                 Detector::fileAndSequenceInDirectory      ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    return fileAndSequenceInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<FileObject> >                 Detector::fileAndSequenceInDirectory      ( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<FileObject> >  output;
     std::list<boost::shared_ptr<FileObject> >  outputFiles;
@@ -302,8 +400,53 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
     output.merge(outputSequences);
     return output;
 }
+#ifdef SWIG
+std::vector<std::string>                                  Detector::fileAndSequenceInDirectory      ( std::string path )
+{
+    boost::filesystem::path p (path);
+    std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+    std::vector<std::string> filenames;
 
-std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+    outputFiles = fileAndSequenceInDirectory ( p );
+    for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	//boost::shared_ptr<sequenceParser::FileObject> f = *it;
+	//filenames.push_back( f->getAbsoluteStandardPattern().c_str() );
+    }
+    return filenames;
+}
+#endif
+void                                                      Detector::printFileAndSequenceInDirectory ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    printFileAndSequenceInDirectory( directory, filters, desc );
+}
+
+void                                                      Detector::printFileAndSequenceInDirectory ( const boost::filesystem::path& directory, std::vector<std::string>& filters, const sequenceParser::EMaskOptions desc )
+{
+    std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+
+    outputFiles = fileAndSequenceInDirectory ( directory, filters, desc );
+    for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::FileObject> f = *it;
+	std::cout << *f << std::endl;
+    }
+}
+#ifdef SWIG
+void                                                      Detector::printFileAndSequenceInDirectory ( std::string path )
+{
+    boost::filesystem::path p (path);
+    printFileAndSequenceInDirectory( p );
+}
+#endif
+std::list<boost::shared_ptr<Folder> >                     Detector::folderInDirectory               ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    return folderInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<Folder> >                     Detector::folderInDirectory               ( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<Folder> >  outputFolders;
     bfs::path directory;
@@ -338,8 +481,54 @@ std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const bfs::pa
     }
     return outputFolders;
 }
+#ifdef SWIG
+std::vector<std::string>                                  Detector::folderInDirectory               ( std::string path )
+{
+    boost::filesystem::path p (path);
+    std::list<boost::shared_ptr<sequenceParser::Folder> > outputFiles;
+    std::vector<std::string> filenames;
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+    outputFiles = folderInDirectory ( p );
+    for (std::list<boost::shared_ptr<sequenceParser::Folder> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::Folder> f = *it;
+	std::vector<boost::filesystem::path> pathDir = f->getFiles ();
+	filenames.push_back( pathDir.at(0).c_str() );
+    }
+    return filenames;
+}
+#endif
+void                                                      Detector::printFolderInDirectory          ( const boost::filesystem::path& directory, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    printFolderInDirectory( directory, filters, desc );
+}
+
+void                                                      Detector::printFolderInDirectory          ( const boost::filesystem::path& directory, std::vector<std::string>& filters, const sequenceParser::EMaskOptions desc )
+{
+    std::list<boost::shared_ptr<sequenceParser::Folder> > outputFiles;
+
+    outputFiles = folderInDirectory ( directory, filters, desc );
+    for (std::list<boost::shared_ptr<sequenceParser::Folder> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::Folder> f = *it;
+	std::cout << *f << std::endl;
+    }
+}
+#ifdef SWIG
+void                                                      Detector::printFolderInDirectory          ( std::string path )
+{
+    boost::filesystem::path p ( path );
+    printFolderInDirectory( p );
+}
+#endif
+std::list<boost::shared_ptr<FileObject> >                 Detector::fileObjectInDirectory           ( const boost::filesystem::path& directory, const sequenceParser::EMaskType mask, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    return fileObjectInDirectory ( directory, filters, mask, desc );
+}
+
+std::list<boost::shared_ptr<FileObject> >                 Detector::fileObjectInDirectory           ( const bfs::path& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<FileObject> >  output;
     std::list<boost::shared_ptr<FileObject> >  outputFolders;
@@ -452,8 +641,48 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
     }
     return output;
 }
+#ifdef SWIG
+std::vector<std::string>                                  Detector::fileObjectInDirectory           ( std::string path )
+{
+    boost::filesystem::path p (path);
+    std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+    std::vector<std::string> filenames;
 
-bool Detector::isNotFilter(std::string filename, std::vector<std::string>& filters)
+    outputFiles = fileObjectInDirectory ( p );
+    for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::FileObject> f = *it;
+	std::vector<boost::filesystem::path> pathDir = f->getFiles ();
+	filenames.push_back( pathDir.at(0).c_str() );
+    }
+    return filenames;
+}
+#endif
+void                                                      Detector::printFileObjectInDirectory      ( const boost::filesystem::path& directory, const sequenceParser::EMaskType mask, const sequenceParser::EMaskOptions desc )
+{
+    std::vector<std::string> filters;
+    printFileObjectInDirectory ( directory, filters, mask, desc );
+}
+
+void                                                      Detector::printFileObjectInDirectory      ( const boost::filesystem::path& directory, std::vector<std::string>& filters, const sequenceParser::EMaskType mask, const sequenceParser::EMaskOptions desc )
+{
+    std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+
+    outputFiles = fileObjectInDirectory ( directory, filters, mask, desc );
+    for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+    {
+	boost::shared_ptr<sequenceParser::FileObject> f = *it;
+	std::cout << *f << std::endl;
+    }
+}
+#ifdef SWIG
+void                                                      Detector::printFileObjectInDirectory      ( std::string path )
+{
+    boost::filesystem::path p ( path );
+    printFileObjectInDirectory( p );
+}
+#endif
+bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filters )
 {
     if (filters.size() == 0)
 	return true;
