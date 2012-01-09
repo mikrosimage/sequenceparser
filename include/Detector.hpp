@@ -1,5 +1,5 @@
-#ifndef _DETECTOR_HPP_
-#define _DETECTOR_HPP_
+#ifndef _SEQUENCE_PARSER_DETECTOR_HPP_
+#define _SEQUENCE_PARSER_DETECTOR_HPP_
 
 #include <FileObject.hpp>
 #include <FileStrings.hpp>
@@ -18,62 +18,220 @@ public :
 	Detector();
 	~Detector();
 
-	std::list<boost::shared_ptr<sequenceParser::File> >       fileInDir              ( const boost::filesystem::path& directory,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
+	/**
+	  * fileInDirectory methods
+	  *
+	  **/
+#ifndef SWIG
+	std::list<boost::shared_ptr<sequenceParser::File> >       fileInDirectory              ( const boost::filesystem::path& directory,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
 	{
 		std::vector<std::string> filters;
-		return fileInDir( directory, filters, desc );
+		return fileInDirectory( directory, filters, desc );
 	}
 
-	std::list<boost::shared_ptr<sequenceParser::File> >       fileInDir              ( const boost::filesystem::path& directory,
-											   std::vector<std::string>& filters,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+	std::list<boost::shared_ptr<sequenceParser::File> >       fileInDirectory              ( const boost::filesystem::path& directory,
+												 std::vector<std::string>& filters,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+#else
+	std::vector<std::string>                                  fileInDirectory              ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::File> > outputFiles;
+		std::vector<std::string> filenames;
 
-	std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDir          ( const boost::filesystem::path& directory,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
+		outputFiles = fileInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::File> f = *it;
+			filenames.push_back( f->getAbsoluteFilename().c_str() );
+		}
+		return filenames;
+	}
+#endif
+	void                                                      printFileInDirectory         ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::File> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = fileInDirectory ( p, sequenceParser::eMaskOptionsColor );
+		for (std::list<boost::shared_ptr<sequenceParser::File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::File> f = *it;
+			std::cout << *f << std::endl;
+		}
+	}
+
+
+#ifndef SWIG
+	std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDirectory          ( const boost::filesystem::path& directory,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
 	{
 		std::vector<std::string> filters;
-		return sequenceInDir( directory, filters, desc );
+		return sequenceInDirectory( directory, filters, desc );
 	}
 
-	std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDir          ( const boost::filesystem::path& directory,
-											   std::vector<std::string>& filters,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+	std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDirectory          ( const boost::filesystem::path& directory,
+												 std::vector<std::string>& filters,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+#else
+	std::vector<std::string>                                  sequenceInDirectory          ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::Sequence> > outputFiles;
+		std::vector<std::string> filenames;
 
-	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDir   ( const boost::filesystem::path& directory,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
+		outputFiles = sequenceInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::Sequence> f = *it;
+			filenames.push_back( f->getAbsoluteStandardPattern().c_str() );
+		}
+		return filenames;
+	}
+#endif
+	void                                                      printSequenceInDirectory     ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::Sequence> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = sequenceInDirectory ( p, sequenceParser::eMaskOptionsColor );
+		for (std::list<boost::shared_ptr<sequenceParser::Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::Sequence> f = *it;
+			std::cout << *f << std::endl;
+		}
+	}
+
+
+#ifndef SWIG
+	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDirectory   ( const boost::filesystem::path& directory,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
 	{
 		std::vector<std::string> filters;
-		return fileAndSequenceInDir( directory, filters, desc );
+		return fileAndSequenceInDirectory( directory, filters, desc );
 	}
 
-	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDir   ( const boost::filesystem::path& directory,
-											   std::vector<std::string>& filters,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDirectory   ( const boost::filesystem::path& directory,
+												 std::vector<std::string>& filters,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+#else
+	std::vector<std::string>                                  fileAndSequenceInDirectory   ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+		std::vector<std::string> filenames;
 
-	std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDir            ( const boost::filesystem::path& directory,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
+		outputFiles = fileAndSequenceInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			//boost::shared_ptr<sequenceParser::FileObject> f = *it;
+			//filenames.push_back( f->getAbsoluteStandardPattern().c_str() );
+		}
+		return filenames;
+	}
+#endif
+	void                                                      printFileAndSequenceInDirectory ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = fileAndSequenceInDirectory ( p, sequenceParser::eMaskOptionsColor );
+		for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::FileObject> f = *it;
+			std::cout << *f << std::endl;
+		}
+	}
+
+#ifndef SWIG
+	std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDirectory            ( const boost::filesystem::path& directory,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
 	{
 		std::vector<std::string> filters;
-		return folderInDir( directory, filters, desc );
+		return folderInDirectory( directory, filters, desc );
 	}
 
-	std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDir            ( const boost::filesystem::path& directory,
-											   std::vector<std::string>& filters,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+	std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDirectory            ( const boost::filesystem::path& directory,
+												 std::vector<std::string>& filters,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+#else
+	std::vector<std::string>                                  folderInDirectory            ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::Folder> > outputFiles;
+		std::vector<std::string> filenames;
 
-	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectsInDir       ( const boost::filesystem::path& directory,
-											   const sequenceParser::EMaskType mask = eMaskTypeDefault,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
+		outputFiles = folderInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::Folder> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::Folder> f = *it;
+			std::vector<boost::filesystem::path> pathDir = f->getFiles ();
+			filenames.push_back( pathDir.at(0).c_str() );
+		}
+		return filenames;
+	}
+#endif
+	void                                                      printFolderInDirectory       ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::Folder> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = folderInDirectory ( p, sequenceParser::eMaskOptionsColor );
+		for (std::list<boost::shared_ptr<sequenceParser::Folder> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::Folder> f = *it;
+			std::cout << *f << std::endl;
+		}
+	}
+
+#ifndef SWIG
+	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectInDirectory        ( const boost::filesystem::path& directory,
+												 const sequenceParser::EMaskType mask = eMaskTypeDefault,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault )
 	{
 		std::vector<std::string> filters;
-		return fileObjectsInDir( directory, filters, mask, desc );
+		return fileObjectInDirectory ( directory, filters, mask, desc );
 	}
 
-	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectsInDir       ( const boost::filesystem::path& directory,
-											   std::vector<std::string>& filters,
-											   const sequenceParser::EMaskType mask = eMaskTypeDefault,
-											   const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+	std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectInDirectory        ( const boost::filesystem::path& directory,
+												 std::vector<std::string>& filters,
+												 const sequenceParser::EMaskType mask = eMaskTypeDefault,
+												 const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+
+	std::vector<std::string>                                  fileObjectInDirectory        ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = fileObjectInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::FileObject> f = *it;
+			//std::vector<boost::filesystem::path> pathDir = f->getFiles ();
+			//filenames.push_back( pathDir.at(0).c_str() );
+		}
+		return filenames;
+	}
+#endif
+	void                                                      printFileObjectInDirectory  ( std::string path )
+	{
+		boost::filesystem::path p (path);
+		std::list<boost::shared_ptr<sequenceParser::FileObject> > outputFiles;
+		std::vector<std::string> filenames;
+
+		outputFiles = fileObjectInDirectory ( p );
+		for (std::list<boost::shared_ptr<sequenceParser::FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
+		{
+			boost::shared_ptr<sequenceParser::FileObject> f = *it;
+			std::cout << *f << std::endl;
+		}
+	}
 
 private:
 	/**

@@ -35,12 +35,24 @@ Detector::~Detector()
 {
 }
 
-std::list<boost::shared_ptr<File> > Detector::fileInDir( const bfs::path& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<File> >  outputFiles;
+    bfs::path directory;
 
-    if ( ! exists ( directory ) )
-	return outputFiles;
+    if ( exists( dir ) )
+    {
+	directory = bfs::path( dir.string() );
+    }
+    else
+    {
+	if( ! exists( dir.parent_path() ) )
+	{
+		return outputFiles;
+	}
+	filters.push_back( dir.filename().string() );
+	directory = bfs::path( dir.parent_path().string() );
+    }
 
     // variables for sequence detection
     typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -112,12 +124,24 @@ std::list<boost::shared_ptr<File> > Detector::fileInDir( const bfs::path& direct
     return outputFiles;
 }
 
-std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDir( const bfs::path& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<Sequence> >  outputSequences;
+    bfs::path directory;
 
-    if ( !exists( directory ) )
-	return outputSequences;
+    if ( exists( dir ) )
+    {
+	directory = bfs::path( dir.string() );
+    }
+    else
+    {
+	if( ! exists( dir.parent_path() ) )
+	{
+		return outputSequences;
+	}
+	filters.push_back( dir.filename().string() );
+	directory = bfs::path( dir.parent_path().string() );
+    }
 
     // variables for sequence detection
     typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -182,14 +206,26 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDir( const bfs::path
     return outputSequences;
 }
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDir( const bfs::path& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<FileObject> >  output;
     std::list<boost::shared_ptr<FileObject> >  outputFiles;
     std::list<boost::shared_ptr<FileObject> >  outputSequences;
+    bfs::path directory;
 
-    if (!exists(directory))
-	return output;
+    if ( exists( dir ) )
+    {
+	directory = bfs::path( dir.string() );
+    }
+    else
+    {
+	if( ! exists( dir.parent_path() ) )
+	{
+		return output;
+	}
+	filters.push_back( dir.filename().string() );
+	directory = bfs::path( dir.parent_path().string() );
+    }
 
     // variables for sequence detection
     typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -267,12 +303,24 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDir( const 
     return output;
 }
 
-std::list<boost::shared_ptr<Folder> > Detector::folderInDir( const bfs::path& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<Folder> >  outputFolders;
+    bfs::path directory;
 
-    if ( ! exists( directory ) )
-	return outputFolders;
+    if ( exists( dir ) )
+    {
+	directory = bfs::path( dir.string() );
+    }
+    else
+    {
+	if( ! exists( dir.parent_path() ) )
+	{
+		return outputFolders;
+	}
+	filters.push_back( dir.filename().string() );
+	directory = bfs::path( dir.parent_path().string() );
+    }
 
     // for all files in the directory
     bfs::directory_iterator itEnd;
@@ -291,15 +339,27 @@ std::list<boost::shared_ptr<Folder> > Detector::folderInDir( const bfs::path& di
     return outputFolders;
 }
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileObjectsInDir( const bfs::path& directory, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
 {
     std::list<boost::shared_ptr<FileObject> >  output;
     std::list<boost::shared_ptr<FileObject> >  outputFolders;
     std::list<boost::shared_ptr<FileObject> >  outputFiles;
     std::list<boost::shared_ptr<FileObject> >  outputSequences;
+    bfs::path directory;
 
-    if (!exists(directory))
-	return output;
+    if ( exists( dir ) )
+    {
+	directory = bfs::path( dir.string() );
+    }
+    else
+    {
+	if( ! exists( dir.parent_path() ) )
+	{
+		return output;
+	}
+	filters.push_back( dir.filename().string() );
+	directory = bfs::path( dir.parent_path().string() );
+    }
 
     // variables for sequence detection
     typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;

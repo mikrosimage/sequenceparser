@@ -10,6 +10,12 @@
 
 using boost::unit_test::test_suite;
 
+void copyFile( std::string src, std::string dst )
+{
+	if ( ! boost::filesystem::exists( dst ) )
+		boost::filesystem::copy_file(src, dst);
+}
+
 void createTmpDiretoriesFilesAndSequences()
 {
 	boost::filesystem::create_directories( "tmpTestSequence/root/film/" );
@@ -25,21 +31,21 @@ void createTmpDiretoriesFilesAndSequences()
 	dummyFile << "This is a dummy Dpx file.\n";
 	dummyFile.close();
 
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0000.dpx");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0001.dpx");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0002.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0000.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0001.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/img.0002.dpx");
 
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0000.dpx");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0001.dpx");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0002.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0000.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0001.dpx");
+	copyFile("tmpTestSequence/root/trash/dpx/img.dpx", "tmpTestSequence/root/film/.img.0002.dpx");
 
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0000.jpg");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0001.jpg");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0002.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0000.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0001.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/img.0002.jpg");
 
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0000.jpg");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0001.jpg");
-	boost::filesystem::copy_file("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0010.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0000.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0001.jpg");
+	copyFile("tmpTestSequence/root/trash/img.jpg", "tmpTestSequence/root/film/imgBroken.0010.jpg");
 }
 
 void clearTmp()
@@ -55,10 +61,10 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
 	std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
 	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
-	listFileObject = detector.fileObjectsInDir ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
-	listFolder     = detector.folderInDir  ( path );
-	listFile       = detector.fileInDir    ( path );
-	listSequence   = detector.sequenceInDir( path );
+	listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
+	listFolder     = detector.folderInDirectory      ( path );
+	listFile       = detector.fileInDirectory        ( path );
+	listSequence   = detector.sequenceInDirectory    ( path );
 
 	std::cout << "test path: " << std::left << std::setw(50) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
 
@@ -76,10 +82,10 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
 	std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
 	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
-	listFileObject = detector.fileObjectsInDir ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) ,  options );
-	listFolder     = detector.folderInDir      ( path, options );
-	listFile       = detector.fileInDir        ( path, options );
-	listSequence   = detector.sequenceInDir    ( path, options );
+	listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) ,  options );
+	listFolder     = detector.folderInDirectory      ( path, options );
+	listFile       = detector.fileInDirectory        ( path, options );
+	listSequence   = detector.sequenceInDirectory    ( path, options );
 
 	std::cout << "test path: " << std::left << std::setw(50) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
 
@@ -95,13 +101,22 @@ BOOST_AUTO_TEST_CASE(TestSequence)
 
 	std::cout << std::setw(61) << " " << " Folder  |   File   | Sequence | FileObjects" << std::endl;
 
-	testFindObjectInDiretory ( "tmpTestSequence"                  , 1, 0, 0, 1 );
-	testFindObjectInDiretory ( "tmpTestSequence/root"             , 2, 0, 0, 2 );
-	testFindObjectInDiretory ( "tmpTestSequence/root/trash/"      , 1, 1, 0, 2 );
-	testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/"  , 0, 1, 0, 1 );
-	testFindObjectInDiretory ( "tmpTestSequence/root/film/"       , 0, 0, 3, 3 );
+	testFindObjectInDiretory ( "tmpTestSequence"                                                                    , 1, 0, 0, 1 );
+	testFindObjectInDiretory ( "tmpTestSequence/root"                                                               , 2, 0, 0, 2 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/trash/"                                                        , 1, 1, 0, 2 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/"                                                    , 0, 1, 0, 1 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/"                                                         , 0, 0, 3, 3 );
 
-	testFindObjectInDiretory ( "tmpTestSequence/root/film/"       , sequenceParser::eMaskOptionsDotFile, 0, 0, 4, 4 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/img.####.dpx"                                             , 0, 0, 1, 1 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/img.@.dpx"                                                , 0, 0, 1, 1 );
+
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/img.####.dpx"        , sequenceParser::eMaskOptionsDotFile, 0, 0, 1, 1 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/img.@.dpx"           , sequenceParser::eMaskOptionsDotFile, 0, 0, 1, 1 );
+
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/.img.####.dpx"                                            , 0, 0, 0, 0 );
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/.img.####.dpx"       , sequenceParser::eMaskOptionsDotFile, 0, 0, 1, 1 );
+
+	testFindObjectInDiretory ( "tmpTestSequence/root/film/"                    , sequenceParser::eMaskOptionsDotFile, 0, 0, 4, 4 );
 
 	clearTmp();
 }
