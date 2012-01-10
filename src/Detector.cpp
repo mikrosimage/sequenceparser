@@ -121,7 +121,7 @@ std::list<boost::shared_ptr<File> >                       Detector::fileInDirect
 	    {
 		if ( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 		{
-		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 		    outputFiles.push_back(file);
 		}
 	   }
@@ -344,7 +344,7 @@ std::list<boost::shared_ptr<FileObject> >                 Detector::fileAndSeque
 	    {
 		if (s.getNbFiles() == 1) // if it's a sequence of 1 file, it isn't a sequence but only a file
 		{
-		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 		    outputFiles.push_back(file);
 		}
 		else
@@ -415,7 +415,7 @@ std::list<boost::shared_ptr<Folder> >                     Detector::folderInDire
 	    if ( bfs::is_directory( iter->status() ) )
 	    {
 		boost::shared_ptr<Folder> d(new Folder(directory, iter->path().filename().string(), desc));
-		outputFolders.push_back(d);
+		outputFolders.push_back( d );
 	    }
 	}
     }
@@ -532,7 +532,7 @@ std::list<boost::shared_ptr<FileObject> >                 Detector::fileObjectIn
 	    {
 		if (s.getNbFiles() == 1) // if it's a sequence of 1 file, it isn't a sequence but only a file
 		{
-		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+		    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 		    outputFiles.push_back( file );
 		}
 		else
