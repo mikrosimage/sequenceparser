@@ -1,9 +1,10 @@
 import type ;
 
-use-project /test             : test ;
+use-project /test : test ;
 
-path-constant DIST      : ./dist ;
-
+path-constant DIST : ./dist ;
+path-constant DIST_RELEASE : $(DIST)/release ;
+path-constant DIST_DEBUG   : $(DIST)/debug ;
 
 if ! [ type.registered BINDINGPYTHON ]
 {
@@ -11,13 +12,23 @@ if ! [ type.registered BINDINGPYTHON ]
 	type.change-generated-target-prefix BINDINGPYTHON  : : "_" ;
 }
 
-make sequenceParser_wrap.cxx : python/sequenceParser.i : @swigCpptoPython ;
-make sequenceParser.py       : python/sequenceParser.i : @swigCpptoPython ;
-actions swigCpptoPython
+make sequenceParser_wrap.cxx : python/sequenceParser.i : @swigCpptoPythonWrap ;
+actions swigCpptoPythonWrap
 {
-	swig -c++ -python -I. -fcompact -o $(<) $(>)
+	swig -c++ -python -I. -o $(<) $(>)
 }
-IMPORT $(__name__) : swigCpptoPython : : swigCpptoPython ;
+IMPORT $(__name__) : swigCpptoPythonWrap : : swigCpptoPythonWrap ;
+
+make sequenceParser.py : python/sequenceParser.i : @swigCpptoPythonRelease : <variant>release ;
+make sequenceParser.py : python/sequenceParser.i : @swigCpptoPythonDebug   : <variant>debug ;
+actions swigCpptoPythonRelease
+{
+	swig -c++ -python -I. -outdir $(DIST_RELEASE) $(>)
+}
+actions swigCpptoPythonDebug
+{
+	swig -c++ -python -I. -outdir $(DIST_DEBUG) $(>)
+}
 
 
 project
@@ -27,12 +38,15 @@ project
 		<library>/boost//system
 		<library>/boost//filesystem
 		<library>/boost//regex
+
+		<os>LINUX:<define>__LINUX__
 	: usage-requirements
 		<include>src
 		<include>include
 		<library>/boost//system
 		<library>/boost//filesystem
 		<library>/boost//regex
+		<os>LINUX:<define>__LINUX__
 	:
 		build-dir .build/
 	;
@@ -48,8 +62,8 @@ install sequenceLibrary
 	:
 		<install-dependencies>on
 		<install-type>SHARED_LIB
-		<variant>debug:<location>$(DIST)/debug
-		<variant>release:<location>$(DIST)/release
+		<variant>debug:<location>$(DIST_DEBUG)
+		<variant>release:<location>$(DIST_RELEASE)
 	;
 
 
@@ -58,25 +72,26 @@ bindingpython sequenceParser
 	:
 		sequence
 		/python
+		sequenceParser_wrap.cxx
 	:
 		<include>.
-		<implicit-dependency>sequenceParser_wrap.cxx
 	;
 
 install bindingPython
 	:
 		sequenceParser.py
+		[ glob examples/*.py ]
 	:
-		<variant>debug:<location>$(DIST)/debug
-		<variant>release:<location>$(DIST)/release
+		<variant>debug:<location>$(DIST_DEBUG)
+		<variant>release:<location>$(DIST_RELEASE)
 	;
 
 install bindingPythonLibrary
 	:
 		sequenceParser
 	:
-		<variant>debug:<location>$(DIST)/debug
-		<variant>release:<location>$(DIST)/release
+		<variant>debug:<location>$(DIST_DEBUG)
+		<variant>release:<location>$(DIST_RELEASE)
 		<install-dependencies>off
 		<install-type>BINDINGPYTHON
 	;
