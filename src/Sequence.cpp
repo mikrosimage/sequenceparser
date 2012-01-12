@@ -7,48 +7,51 @@
 #include <boost/foreach.hpp>
 #include <set>
 
+
+#include <iostream>
+
 namespace bfs = boost::filesystem;
 
 namespace sequenceParser {
 
 /// All regex to recognize a pattern
 // common used pattern with # or @
-static const boost::regex regexPatternStandard("(.*?)" // anything but without priority
-						   "\\[?" // if pattern is myimage[####].jpg, don't capture []
-						   "(#+|@+)" // we capture all # or @
-						   "\\]?" // possible end of []
-						   "(.*?)" // anything
+static const boost::regex regexPatternStandard(    "(.*?)"           // anything but without priority
+						   "\\[?"            // if pattern is myimage[####].jpg, don't capture []
+						   "(#+|@+)"         // we capture all # or @
+						   "\\]?"            // possible end of []
+						   "(.*?)"           // anything
 		);
 // C style pattern
-static const boost::regex regexPatternCStyle("(.*?)" // anything but without priority
-						 "\\[?" // if pattern is myimage[%04d].jpg, don't capture []
-						 "%([0-9]*)d" // we capture the padding value (eg. myimage%04d.jpg)
-						 "\\]?" // possible end of []
-						 "(.*?)" // anything
+static const boost::regex regexPatternCStyle(    "(.*?)"             // anything but without priority
+						 "\\[?"              // if pattern is myimage[%04d].jpg, don't capture []
+						 "%([0-9]*)d"        // we capture the padding value (eg. myimage%04d.jpg)
+						 "\\]?"              // possible end of []
+						 "(.*?)"             // anything
 		);
 // image name
-static const boost::regex regexPatternFrame("(.*?" // anything but without priority
-						"[_\\.]?)" // if multiple numbers, the number surround with . _ get priority (eg. seq1shot04myimage.0123.jpg -> 0123)
-						"\\[?" // if pattern is myimage[0001].jpg, don't capture []
-						"([\\-\\+]?[0-9]+)" // one frame number, can be positive or negative values ( -0012 or +0012 or 0012)
-						"\\]?" // possible end of []
-						"([_\\.]?" // if multiple numbers, the number surround with . _ get priority (eg. seq1shot04myimage.0123.jpg -> 0123)
-						".*\\.?" //
-						".*?)" // anything
+static const boost::regex regexPatternFrame(    "(.*?"               // anything but without priority
+						"[_\\.]?)"           // if multiple numbers, the number surround with . _ get priority (eg. seq1shot04myimage.0123.jpg -> 0123)
+						"\\[?"               // if pattern is myimage[0001].jpg, don't capture []
+						"([\\-\\+]?[0-9]+)"  // one frame number, can be positive or negative values ( -0012 or +0012 or 0012)
+						"\\]?"               // possible end of []
+						"([_\\.]?"           // if multiple numbers, the number surround with . _ get priority (eg. seq1shot04myimage.0123.jpg -> 0123)
+						".*\\.?"             //
+						".*?)"               // anything
 		);
 
 Sequence::~Sequence()
 {
 }
 
-Sequence::Sequence(const boost::filesystem::path& directory, const EMaskOptions options, const EPattern accept) :
+Sequence::Sequence( const boost::filesystem::path& directory, const EMaskOptions options, const EPattern accept ) :
     FileObject(directory, eMaskTypeSequence, options)
 {
     clear();
     initFromDetection(accept);
 }
 
-bool Sequence::isIn(const std::string& filename, Time& time, std::string& timeStr)
+bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeStr )
 {
     std::size_t min = _prefix.size() + _suffix.size();
 
@@ -70,7 +73,7 @@ bool Sequence::isIn(const std::string& filename, Time& time, std::string& timeSt
     return true;
 }
 
-Sequence::EPattern Sequence::checkPattern(const std::string& pattern)
+Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
 {
     if ( regex_match( pattern.c_str(), regexPatternStandard ) )
     {
@@ -97,9 +100,11 @@ Sequence::EPattern Sequence::checkPattern(const std::string& pattern)
  * @param[out] padding
  * @param[out] strictPadding
  */
-bool Sequence::retrieveInfosFromPattern(const std::string& filePattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding) const {
+bool Sequence::retrieveInfosFromPattern( const std::string& filePattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding ) const
+{
     boost::cmatch matches;
-    if ((accept & ePatternStandard) && regex_match(filePattern.c_str(), matches, regexPatternStandard))
+    //std::cout << filePattern << " / " << prefix << " + " << padding << " + " << suffix << std::endl;
+    if ((accept & ePatternStandard) && regex_match( filePattern.c_str(), matches, regexPatternStandard ) )
     {
         std::string paddingStr(matches[2].first, matches[2].second);
 	padding       = paddingStr.size();

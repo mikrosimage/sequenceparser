@@ -198,20 +198,20 @@ std::list<boost::shared_ptr<Sequence> >                   Detector::sequenceInDi
 		if ( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
 		{
 		    // if at least one number detected
-		    if (seqConstruct(iter->path().filename().string(), id, nums))
+		    if ( seqConstruct(iter->path().filename().string(), id, nums) )
 		    {
-			const SeqIdMap::iterator it(sequences.find(id));
-			if (it != sequences.end()) // is already in map
+			const SeqIdMap::iterator it( sequences.find( id ) );
+			if ( it != sequences.end() ) // is already in map
 			{
 			    // append the list of numbers
-			    sequences.at(id).push_back(nums);
+			    sequences.at( id ).push_back( nums );
 			}
 			else
 			{
 			    // create an entry in the map
 			    std::list<FileNumbers> li;
-			    li.push_back(nums);
-			    sequences.insert(SeqIdMap::value_type(id, li));
+			    li.push_back( nums );
+			    sequences.insert( SeqIdMap::value_type( id, li ) );
 			}
 		    }
 		}
@@ -229,8 +229,8 @@ std::list<boost::shared_ptr<Sequence> >                   Detector::sequenceInDi
 	    {
 		if ( ! ( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 		{
-		    boost::shared_ptr<Sequence> seq(new Sequence(directory, s, desc));
-		    outputSequences.push_back(seq);
+		    boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
+		    outputSequences.push_back( seq );
 		}
 	   }
        }
@@ -586,12 +586,22 @@ bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filt
 
     for (std::size_t i = 0; i < filters.size(); i++)
     {
-	std::string filter(filters.at(i));
-	filter = boost::regex_replace(filter, boost::regex("\\*"), "(.*)");
-	filter = boost::regex_replace(filter, boost::regex("\\@"), "(.*)");
-	filter = boost::regex_replace(filter, boost::regex("\\?"), "(.)");
-	filter = boost::regex_replace(filter, boost::regex("\\#"), "(.)");
-	if (regex_match(filename, boost::regex(filter)))
+	std::string filter( filters.at( i ) );
+	boost::cmatch match;
+	boost::regex expression(".*([%]{1})(\\d{2})([d]{1}).*"); // match to pattern like : %04d
+	if( boost::regex_match( filter.c_str(), match, expression ) )
+	{
+	    int patternWidth = atoi( match[2].first );
+	    std::string replacing ( patternWidth+2, '.' );
+	    replacing[0]='(';
+	    replacing[replacing.size()-1]=')';
+	    filter = boost::regex_replace( filter, boost::regex("([%]{1})(\\d{2})([d]{1})"), replacing );
+	}
+	filter = boost::regex_replace( filter, boost::regex("\\*"), "(.*)");
+	filter = boost::regex_replace( filter, boost::regex("\\@"), "(.*)");
+	filter = boost::regex_replace( filter, boost::regex("\\?"), "(.)");
+	filter = boost::regex_replace( filter, boost::regex("\\#"), "(.)");
+	if ( regex_match( filename, boost::regex( filter ) ) )
 	    return true;
     }
     return false;
@@ -639,7 +649,7 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	idChangeBegin = allIds.front();
 	idChangeEnd   = allIds.back();
     }
-    Sequence seqCommon(directory, desc);
+    Sequence seqCommon( directory, desc );
     // fill information in the sequence...
     for (std::size_t i = 0; i < idChangeBegin; ++i) {
 	seqCommon._prefix += id[i];
@@ -729,24 +739,28 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
  * @param[out] nums: list of integers
  * @return number of decteted numbers
  */
-std::size_t Detector::seqConstruct(const std::string& str, FileStrings& id, FileNumbers& nums)
+std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums )
 {
     static const std::size_t     max = std::numeric_limits<std::size_t>::digits10;
     static const boost::regex    re ( "[\\-\\+]?\\d*?\\d{1," + boost::lexical_cast<std::string>(max) + "}" );
     static const int             subs[] = { -1, 0, }; // get before match and current match
     boost::sregex_token_iterator m ( str.begin(), str.end(), re, subs );
     boost::sregex_token_iterator end;
+    //std::cout << str << std::endl;
+    while ( m != end )
+    {
 
-    while (m != end) {
 	// begin with string id, can be an empty string if str begins with a number
 	id.getId().push_back(*m++);
-	if (m != end) { // if end with a string and not a number
+	if ( m != end ) // if end with a string and not a number
+	{
 	    nums.push_back(*m++);
 	}
     }
     if (id.getId().size() == nums.size()) {
 	id.getId().push_back(""); // we end with an empty string
     }
+    //std::cout << nums.size() << std::endl;
     return nums.size();
 }
 
