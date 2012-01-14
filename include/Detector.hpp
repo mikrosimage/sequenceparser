@@ -115,10 +115,11 @@ private:
      *
      * @param[in] filename filename need to be check if it filtered
      * @param[in] filters vector of filters
+     * @param[in] desc enable research options (Cf. EMaskOptions in commonDefinitions.hpp )
      *
      * @return return true if the filename is filtered by filter(s)
      */
-    bool isNotFilter( std::string filename, std::vector<std::string>& filters );
+    bool isNotFilter( std::string filename, std::vector<std::string>& filters, const EMaskOptions desc );
 
     /**
      * @brief Create a sequence

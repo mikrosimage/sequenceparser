@@ -41,14 +41,15 @@ enum EMaskType {
 };
 
 enum EMaskOptions {
-    eMaskOptionsNone         = 0,                                       // 0
-    eMaskOptionsProperties   = 1,                                       // show type of FileObject
-    eMaskOptionsPath         = eMaskOptionsProperties   * 2,            // show path of FileObject
-    eMaskOptionsAbsolutePath = eMaskOptionsPath         * 2,            // show absolute path of FileObject
-    eMaskOptionsResucursive  = eMaskOptionsAbsolutePath * 2,            // show recurssive listing
-    eMaskOptionsDotFile      = eMaskOptionsResucursive  * 2,            // show files which start with a dot (hidden files)
-    eMaskOptionsColor        = eMaskOptionsDotFile      * 2,            // output with color
-    eMaskOptionsDefault      = ( eMaskOptionsPath | eMaskOptionsColor )
+    eMaskOptionsNone                     = 0,                                                   // 0
+    eMaskOptionsProperties               = 1,                                                   // show type of FileObject
+    eMaskOptionsPath                     = eMaskOptionsProperties               * 2,            // show path of FileObject
+    eMaskOptionsAbsolutePath             = eMaskOptionsPath                     * 2,            // show absolute path of FileObject
+    eMaskOptionsRecursive                = eMaskOptionsAbsolutePath             * 2,            // show recurssive listing
+    eMaskOptionsSequenceBasedOnFilename  = eMaskOptionsRecursive                * 2,            // list sequence based on a filename of the sequence
+    eMaskOptionsDotFile                  = eMaskOptionsSequenceBasedOnFilename  * 2,            // show files which start with a dot (hidden files)
+    eMaskOptionsColor                    = eMaskOptionsDotFile                  * 2,            // output with color
+    eMaskOptionsDefault                  = ( eMaskOptionsPath | eMaskOptionsColor )
 };
 
 inline EMaskType operator~( const EMaskType& a )

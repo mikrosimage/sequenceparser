@@ -17,18 +17,18 @@ class FileObject
 public:
     FileObject()
     {
-	_directory.clear();
-	_type    = eMaskTypeUndefined;
-	_options = eMaskOptionsNone;
-	setColorActive(_options & eMaskOptionsColor);
+        _directory.clear();
+        _type    = eMaskTypeUndefined;
+        _options = eMaskOptionsNone;
+        setColorActive(_options & eMaskOptionsColor);
     }
 
     FileObject(const EMaskOptions options)
     {
-	_directory.clear();
-	_type    = eMaskTypeUndefined;
-	_options = options;
-	setColorActive(_options & eMaskOptionsColor);
+        _directory.clear();
+        _type    = eMaskTypeUndefined;
+        _options = options;
+        setColorActive(_options & eMaskOptionsColor);
     }
 
     /**
@@ -36,7 +36,7 @@ public:
      */
     FileObject(const boost::filesystem::path& directory, const EMaskType& type, const EMaskOptions& options)
     {
-	init(directory, type, options);
+        init(directory, type, options);
     }
 
     virtual ~FileObject();
@@ -59,65 +59,65 @@ public:
 
     inline boost::filesystem::path getDirectory() const
     {
-	return _directory;
+        return _directory;
     }
 
     inline boost::filesystem::path getAbsoluteDirectory() const
     {
-	return boost::filesystem::absolute(_directory);
+        return boost::filesystem::absolute(_directory);
     }
 
     inline void setDirectory(const boost::filesystem::path& p)
     {
-	_directory = p;
+        _directory = p;
     }
 
     void setDirectoryFromPath(const boost::filesystem::path& p);
 
     EMaskOptions getMaskOptions() const
     {
-	return _options;
+        return _options;
     }
 
     EMaskType getMaskType() const
     {
-	return _type;
+        return _type;
     }
 
     virtual inline void clear()
     {
-	_directory.clear();
-	_type    = eMaskTypeDefault;
-	_options = eMaskOptionsDefault;
+        _directory.clear();
+        _type    = eMaskTypeDefault;
+        _options = eMaskOptionsDefault;
     }
 
 private:
     void init(const boost::filesystem::path& directory, const EMaskType& type, const EMaskOptions& options)
     {
-	_directory = directory;
-	_type      = type;
-	_options   = options;
-	setColorActive( _options & eMaskOptionsColor );
+        _directory = directory;
+        _type      = type;
+        _options   = options;
+        setColorActive( _options & eMaskOptionsColor );
     }
 
     void setColorActive(bool activate = false)
     {
-	if (activate)
-	{
-	    _kColorStd      = kColorStd;
-	    _kColorFolder   = kColorFolder;
-	    _kColorFile     = kColorFile;
-	    _kColorSequence = kColorSequence;
-	    _kColorError    = kColorError;
-	}
-	else
-	{
-	    _kColorStd      = "";
-	    _kColorFolder   = "";
-	    _kColorFile     = "";
-	    _kColorSequence = "";
-	    _kColorError    = "";
-	}
+        if (activate)
+        {
+            _kColorStd      = kColorStd;
+            _kColorFolder   = kColorFolder;
+            _kColorFile     = kColorFile;
+            _kColorSequence = kColorSequence;
+            _kColorError    = kColorError;
+        }
+        else
+        {
+            _kColorStd      = "";
+            _kColorFolder   = "";
+            _kColorFile     = "";
+            _kColorSequence = "";
+            _kColorError    = "";
+        }
     }
 
 protected:

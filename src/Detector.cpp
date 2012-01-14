@@ -71,51 +71,51 @@ std::list<boost::shared_ptr<File> >                       Detector::fileInDirect
 
         if ( ! bfs::is_directory( iter->status() ) ) // detect if isn't a folder
         {
-        // it's a file or a file of a sequence
-        if ( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
-        {
-            // if at least one number detected
-            if ( seqConstruct(iter->path().filename().string(), id, nums ) )
+            // it's a file or a file of a sequence
+            if ( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
             {
-            // need to construct sequence to detect file with a pattern but with only one image
-            const SeqIdMap::iterator it( sequences.find( id ) );
-            if (it != sequences.end()) // is already in map
-            {
-                // append the list of numbers
-                sequences.at(id).push_back(nums);
+                // if at least one number detected
+                if ( seqConstruct(iter->path().filename().string(), id, nums ) )
+                {
+                    // need to construct sequence to detect file with a pattern but with only one image
+                    const SeqIdMap::iterator it( sequences.find( id ) );
+                    if (it != sequences.end()) // is already in map
+                    {
+                        // append the list of numbers
+                        sequences.at(id).push_back(nums);
+                    }
+                    else
+                    {
+                        // create an entry in the map
+                        std::list<FileNumbers> li;
+                        li.push_back(nums);
+                        sequences.insert(SeqIdMap::value_type(id, li));
+                    }
+                }
+                else
+                {
+                    boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
+                    outputFiles.push_back(f);
+                }
             }
-            else
-            {
-                // create an entry in the map
-                std::list<FileNumbers> li;
-                li.push_back(nums);
-                sequences.insert(SeqIdMap::value_type(id, li));
-            }
-            }
-            else
-            {
-            boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-            outputFiles.push_back(f);
-            }
-        }
         }
     }
     }
     // add sequences in the output list
     BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
     {
-    const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
-    BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
-    {
-        // don't detect sequence of directories
-        if ( ! bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+        const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+        BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
         {
-        if ( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
-        {
-            boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
-            outputFiles.push_back(file);
-        }
-       }
+            // don't detect sequence of directories
+            if ( ! bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+            {
+                if ( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+                {
+                    boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
+                    outputFiles.push_back(file);
+                }
+            }
        }
     }
 
@@ -136,8 +136,8 @@ void                                                      Detector::printFileInD
     outputFiles = fileInDirectory ( directory, filters, desc );
     for (std::list<boost::shared_ptr<sequenceParser::File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
     {
-    boost::shared_ptr<sequenceParser::File> f = *it;
-    std::cout << *f << std::endl;
+        boost::shared_ptr<sequenceParser::File> f = *it;
+        std::cout << *f << std::endl;
     }
 }
 
@@ -168,54 +168,54 @@ std::list<boost::shared_ptr<Sequence> >                   Detector::sequenceInDi
     bfs::directory_iterator itEnd;
     for (bfs::directory_iterator iter(directory); iter != itEnd; ++iter)
     {
-    // clear previous infos
-    id.clear();
-    nums.clear(); // (clear but don't realloc the vector inside)
+        // clear previous infos
+        id.clear();
+        nums.clear(); // (clear but don't realloc the vector inside)
 
-    if (!(iter->path().filename().string()[0] == '.') || (desc & eMaskOptionsDotFile)) // if we ask to show hidden files and if it is hidden
-    {
-        // detect if isn't a folder
-        if ( ! bfs::is_directory( iter->status() ) )
-        { // it's a file or a file of a sequence
-        if ( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+        if (!(iter->path().filename().string()[0] == '.') || (desc & eMaskOptionsDotFile)) // if we ask to show hidden files and if it is hidden
         {
-            // if at least one number detected
-            if ( seqConstruct(iter->path().filename().string(), id, nums) )
-            {
-            const SeqIdMap::iterator it( sequences.find( id ) );
-            if ( it != sequences.end() ) // is already in map
-            {
-                // append the list of numbers
-                sequences.at( id ).push_back( nums );
-            }
-            else
-            {
-                // create an entry in the map
-                std::list<FileNumbers> li;
-                li.push_back( nums );
-                sequences.insert( SeqIdMap::value_type( id, li ) );
-            }
+            // detect if isn't a folder
+            if ( ! bfs::is_directory( iter->status() ) )
+            { // it's a file or a file of a sequence
+                if ( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
+                {
+                    // if at least one number detected
+                    if ( seqConstruct(iter->path().filename().string(), id, nums) )
+                    {
+                        const SeqIdMap::iterator it( sequences.find( id ) );
+                        if ( it != sequences.end() ) // is already in map
+                        {
+                            // append the list of numbers
+                            sequences.at( id ).push_back( nums );
+                        }
+                        else
+                        {
+                            // create an entry in the map
+                            std::list<FileNumbers> li;
+                            li.push_back( nums );
+                            sequences.insert( SeqIdMap::value_type( id, li ) );
+                        }
+                    }
+                }
             }
         }
-        }
-    }
     }
     // add sequences in the output list
     BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
     {
-    const std::list<Sequence> ss = buildSequence(directory, p.first, p.second, desc);
-    BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
-    {
-        // don't detect sequence of directories
-        if (!bfs::is_directory(s.getAbsoluteFirstFilename()))
+        const std::list<Sequence> ss = buildSequence(directory, p.first, p.second, desc);
+        BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
         {
-        if ( ! ( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
-        {
-            boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
-            outputSequences.push_back( seq );
+            // don't detect sequence of directories
+            if (!bfs::is_directory(s.getAbsoluteFirstFilename()))
+            {
+                if ( ! ( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+                {
+                    boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
+                    outputSequences.push_back( seq );
+                }
+            }
         }
-       }
-       }
     }
 
     return outputSequences;
@@ -234,8 +234,8 @@ void                                                      Detector::printSequenc
     outputFiles = sequenceInDirectory ( directory, sequenceParser::eMaskOptionsColor );
     for (std::list<boost::shared_ptr<sequenceParser::Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++)
     {
-    boost::shared_ptr<sequenceParser::Sequence> f = *it;
-    std::cout << *f << std::endl;
+        boost::shared_ptr<sequenceParser::Sequence> f = *it;
+        std::cout << *f << std::endl;
     }
 }
 
@@ -278,7 +278,7 @@ std::list<boost::shared_ptr<FileObject> >                 Detector::fileAndSeque
         if ( ! bfs::is_directory( iter->status() ) )
         { // it's a file or a file of a sequence
 
-        if ( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+        if ( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
         {
             // if at least one number detected
             if (seqConstruct(iter->path().filename().string(), id, nums))
@@ -458,7 +458,7 @@ std::list<boost::shared_ptr<FileObject> >                 Detector::fileObjectIn
         }
         else // it's a file or a file of a sequence
         {
-        if ( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+        if ( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
         {
             // if at least one number detected
             if (seqConstruct(iter->path().filename().string(), id, nums))
@@ -576,7 +576,7 @@ bool Detector::detectDirectoryInResearch ( std::string& researchPath, std::vecto
     return true;
 }
 
-bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filters )
+bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filters, const EMaskOptions desc )
 {
     if (filters.size() == 0)
     return true;
@@ -594,10 +594,14 @@ bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filt
             replacing[replacing.size()-1]=')';
             filter = boost::regex_replace( filter, boost::regex("([%]{1})(\\d{2})([d]{1})"), replacing );
         }
+        // for detect sequence based on a single file
+        if( ( desc & eMaskOptionsSequenceBasedOnFilename ) )
+          filter = boost::regex_replace( filter, boost::regex("\\d"), "[0-9]");
+
         filter = boost::regex_replace( filter, boost::regex("\\*"), "(.*)");
-        filter = boost::regex_replace( filter, boost::regex("\\@"), "(.*)");
+        filter = boost::regex_replace( filter, boost::regex("\\@"), "[0-9]+");
         filter = boost::regex_replace( filter, boost::regex("\\?"), "(.)");
-        filter = boost::regex_replace( filter, boost::regex("\\#"), "(.)");
+        filter = boost::regex_replace( filter, boost::regex("\\#"), "[0-9]");
         if ( regex_match( filename, boost::regex( filter ) ) )
             return true;
     }
