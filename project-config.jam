@@ -39,5 +39,24 @@ using python
 	<address-model>32
   ;
 
+using python
+  : 2.7                     # version
+  : /usr/bin/python2.7      # bin directory
+  : /usr/include/python2.7  # includes
+  : /usr/lib64              # libs
+  :
+	<os>LINUX
+	<address-model>64
+  ;
 
+using python
+  : 2.7                     # version
+  : /usr/bin/python2.7      # bin directory
+  : /usr/include/python2.7  # includes
+  : /usr/lib                # libs
+  :
+	<os>LINUX
+	<address-model>32
+  ;
+  
 
