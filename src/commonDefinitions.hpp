@@ -13,6 +13,8 @@
 #define NAME_WIDTH_WITH_DIR 80
 #endif
 
+#ifndef SEQUENCE_PARSER_OUTPUT_COLOR_FILES
+#define SEQUENCE_PARSER_OUTPUT_COLOR_FILES
 #ifdef __LINUX__
 static const std::string kColorStd      ( "\E[0;0m" );
 static const std::string kColorFolder   ( "\E[1;34m" );
@@ -25,6 +27,7 @@ static const std::string kColorFolder   ("");
 static const std::string kColorFile     ("");
 static const std::string kColorSequence ("");
 static const std::string kColorError    ("");
+#endif
 #endif
 
 namespace sequenceParser {
@@ -91,8 +94,8 @@ T greatestCommonDivisor(T a, T b)
     if( b == 0 ) return 0;
     while ((r = a % b) != 0)
     {
-	a = b;
-	b = r;
+    a = b;
+    b = r;
     }
     return b;
 }
