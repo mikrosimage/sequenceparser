@@ -30,6 +30,8 @@ static const std::string kColorError    ("");
 #endif
 #endif
 
+#include <cstddef>
+
 namespace sequenceParser {
 
 /**
@@ -85,17 +87,18 @@ inline EMaskOptions remove( EMaskOptions& a, const EMaskOptions& b )
     return a;
 }
 
-typedef std::size_t Time;
+typedef int Time;
 
 template<typename T>
 T greatestCommonDivisor(T a, T b)
 {
     T r;
-    if( b == 0 ) return 0;
+    if( b == 0 )
+        return 0;
     while ((r = a % b) != 0)
     {
-    a = b;
-    b = r;
+        a = b;
+        b = r;
     }
     return b;
 }
