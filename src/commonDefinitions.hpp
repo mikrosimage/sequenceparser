@@ -32,6 +32,21 @@ static const std::string kColorError    ("");
 
 #include <cstddef>
 
+#ifdef _MSC_VER
+#include <BaseTsd.h>
+#else
+#include <unistd.h>
+#endif
+
+// compatibility problems...
+namespace std {
+#ifdef _MSC_VER
+    typedef SSIZE_T ssize_t;
+#else
+    typedef ::ssize_t ssize_t;
+#endif
+}
+
 namespace sequenceParser {
 
 /**
@@ -87,7 +102,7 @@ inline EMaskOptions remove( EMaskOptions& a, const EMaskOptions& b )
     return a;
 }
 
-typedef int Time;
+typedef ssize_t Time;
 
 template<typename T>
 T greatestCommonDivisor(T a, T b)
