@@ -14,8 +14,8 @@ if ! [ type.registered BINDINGPYTHON ]
 	type.change-generated-target-prefix BINDINGPYTHON  : : "_" ;
 }
 
-make sequenceParser_wrap.cxx : python/sequenceParser.i : @swigCpptoPython ;
-make sequenceParser.py       : python/sequenceParser.i : @swigCpptoPython ;
+make sequenceParser_wrap.cxx : src/sequenceParser.i : @swigCpptoPython ;
+make sequenceParser.py       : src/sequenceParser.i : @swigCpptoPython ;
 actions swigCpptoPython
 {
 	swig -c++ -python -I. -fcompact -o $(<) $(>)
@@ -26,12 +26,11 @@ IMPORT $(__name__) : swigCpptoPython : : swigCpptoPython ;
 project
 	: requirements
 		<include>src
-		<include>include
 		<library>/boost//system
 		<library>/boost//filesystem
 		<library>/boost//regex
 	: usage-requirements
-		<include>include
+		<include>src
 		<library>/boost//system
 		<library>/boost//filesystem
 		<library>/boost//regex

@@ -7,10 +7,10 @@
 
 %{
 #include <Python.h>
-#include <include/Detector.hpp>
-#include <src/File.hpp>
-#include <src/Folder.hpp>
-#include <src/Sequence.hpp>
+#include "Detector.hpp"
+#include "File.hpp"
+#include "Folder.hpp"
+#include "Sequence.hpp"
 %}
 
 
@@ -19,6 +19,6 @@ namespace std {
 %template(StringList) list<string>;
 }
 
-%include <include/Detector.hpp>
+%include "Detector.hpp"
 
 

@@ -1,15 +1,18 @@
-#include <Sequence.hpp>
-#include <Folder.hpp>
-#include <File.hpp>
+#include "Sequence.hpp"
+#include "Folder.hpp"
+#include "File.hpp"
+
+#include "detail/FileNumbers.hpp"
+
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/foreach.hpp>
 #include <set>
 
-namespace bfs = boost::filesystem;
-
 namespace sequenceParser {
+
+namespace bfs = boost::filesystem;
 
 /// All regex to recognize a pattern
 // common used pattern with # or @
@@ -239,7 +242,7 @@ void Sequence::extractStep( const std::list<Time>& times )
 /**
  * @brief Extract step from a sorted list of time values.
  */
-void Sequence::extractStep( const std::list<FileNumbers>& times, const std::size_t i )
+void Sequence::extractStep( const std::list<detail::FileNumbers>& times, const std::size_t i )
 {
     if ( times.size() <= 1 )
     {
@@ -247,7 +250,7 @@ void Sequence::extractStep( const std::list<FileNumbers>& times, const std::size
 	return;
     }
     std::set<std::size_t> allSteps;
-    for ( std::list<FileNumbers>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
+    for ( std::list<detail::FileNumbers>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
     {
 	allSteps.insert( itB->getTime(i) - itA->getTime(i) );
     }
@@ -287,12 +290,12 @@ void Sequence::extractPadding( const std::list<std::string>& timesStr )
     _padding = padding;
 }
 
-void Sequence::extractPadding( const std::list<FileNumbers>& times, const std::size_t i )
+void Sequence::extractPadding( const std::list<detail::FileNumbers>& times, const std::size_t i )
 {
     BOOST_ASSERT( times.size() > 0 );
     const std::size_t padding = times.front().getString(i).size();
 
-    BOOST_FOREACH( const FileNumbers& s, times )
+    BOOST_FOREACH( const detail::FileNumbers& s, times )
     {
 	if ( padding != s.getString(i).size() )
 	{
@@ -327,7 +330,7 @@ void Sequence::extractIsStrictPadding( const std::list<std::string>& timesStr, c
     _strictPadding = false;
 }
 
-void Sequence::extractIsStrictPadding( const std::list<FileNumbers>& times, const std::size_t i, const std::size_t padding )
+void Sequence::extractIsStrictPadding( const std::list<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
 {
     if (padding == 0)
     {
@@ -335,7 +338,7 @@ void Sequence::extractIsStrictPadding( const std::list<FileNumbers>& times, cons
 	return;
     }
 
-    BOOST_FOREACH( const FileNumbers& s, times )
+    BOOST_FOREACH( const detail::FileNumbers& s, times )
     {
 	if ( s.getString(i)[0] == '0' )
 	{

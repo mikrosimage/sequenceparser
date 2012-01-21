@@ -1,7 +1,8 @@
-#include <FileNumbers.hpp>
+#include "FileNumbers.hpp"
 
-namespace sequenceParser
-{
+namespace sequenceParser {
+namespace detail {
+
 
 std::ostream& operator<<(std::ostream& os, const FileNumbers& p)
 {
@@ -14,4 +15,5 @@ std::ostream& operator<<(std::ostream& os, const FileNumbers& p)
     return os;
 }
 
+}
 }

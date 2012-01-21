@@ -1,16 +1,19 @@
 #ifndef _SEQUENCE_PARSER_SEQUENCE_HPP_
 #define _SEQUENCE_PARSER_SEQUENCE_HPP_
 
-#include <FileObject.hpp>
-#include <FileNumbers.hpp>
-#include <commonDefinitions.hpp>
+#include "FileObject.hpp"
+#include "commonDefinitions.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <iomanip>
 #include <set>
 
-namespace sequenceParser
-{
+namespace sequenceParser {
+
+namespace detail {
+class FileNumbers;
+}
+class Detector;
 
 /**
  * @brief A sequence of numbered files.
@@ -18,7 +21,8 @@ namespace sequenceParser
 class Sequence : public FileObject
 {
 public:
-
+	friend class Detector;
+	
     /**
      * List all recognized pattern types.
      */
@@ -131,22 +135,21 @@ public:
      */
     void                           extractStep                  ( const std::list<Time>& times );
 
+private:
     /**
      * @brief Extract step from a sorted list of time values.
      */
-    void                           extractStep                  ( const std::list<FileNumbers>& times, const std::size_t i );
+    void                           extractStep                  ( const std::list<detail::FileNumbers>& times, const std::size_t i );
 
-private:
     std::size_t                    getPaddingFromStringNumber   ( const std::string& timeStr );
 
-public:
     /**
      * @brief extract the padding from a list of frame numbers
      * @param[in] timesStr list of frame numbers in string format
      */
     void                           extractPadding               ( const std::list<std::string>& timesStr );
 
-    void                           extractPadding               ( const std::list<FileNumbers>& times, const std::size_t i );
+    void                           extractPadding               ( const std::list<detail::FileNumbers>& times, const std::size_t i );
 
     /**
      * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
@@ -155,60 +158,60 @@ public:
      */
     void                           extractIsStrictPadding       ( const std::list<std::string>& timesStr, const std::size_t padding );
 
-    void                           extractIsStrictPadding       ( const std::list<FileNumbers>& times, const std::size_t i, const std::size_t padding );
+    void                           extractIsStrictPadding       ( const std::list<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
 
-
+public:
     inline std::string             getAbsoluteFilenameAt        ( const Time time ) const;
 
     inline std::string             getFilenameAt                ( const Time time ) const;
 
-    inline std::string             getFirstFilename             ( ) const;
+    inline std::string             getFirstFilename             () const;
 
-    inline std::string             getAbsoluteFirstFilename     ( ) const;
+    inline std::string             getAbsoluteFirstFilename     () const;
 
-    inline std::string             getAbsoluteLastFilename      ( ) const;
+    inline std::string             getAbsoluteLastFilename      () const;
 
     /// @return pattern character in standard style
-    inline char                    getPatternCharacter          ( ) const;
+    inline char                    getPatternCharacter          () const;
 
     /// @return a string pattern using standard style
-    inline std::string             getStandardPattern           ( ) const;
+    inline std::string             getStandardPattern           () const;
 
-    inline std::string             getAbsoluteStandardPattern   ( ) const;
+    inline std::string             getAbsoluteStandardPattern   () const;
 
     /// @return a string pattern using C Style
-    inline std::string             getCStylePattern             ( ) const;
+    inline std::string             getCStylePattern             () const;
 
-    inline std::string             getAbsoluteCStylePattern     ( ) const;
+    inline std::string             getAbsoluteCStylePattern     () const;
 
-    inline std::pair<Time, Time>   getRange                     ( ) const;
+    inline std::pair<Time, Time>   getRange                     () const;
 
-    inline std::size_t             getStep                      ( ) const;
+    inline std::size_t             getStep                      () const;
 
-    inline Time                    getFirstTime                 ( ) const;
+    inline Time                    getFirstTime                 () const;
 
-    inline Time                    getLastTime                  ( ) const;
+    inline Time                    getLastTime                  () const;
 
-    inline std::size_t             getDuration                  ( ) const;
+    inline std::size_t             getDuration                  () const;
 
-    inline Time                    getNbFiles                   ( ) const;
+    inline Time                    getNbFiles                   () const;
 
-    inline std::size_t             getPadding                   ( ) const;
+    inline std::size_t             getPadding                   () const;
 
-    inline bool                    isStrictPadding              ( ) const;
+    inline bool                    isStrictPadding              () const;
 
-    inline bool                    hasMissingFile               ( ) const;
+    inline bool                    hasMissingFile               () const;
 
-    inline std::size_t             getNbMissingFiles            ( ) const;
+    inline std::size_t             getNbMissingFiles            () const;
 
     /// @brief filename without frame number
-    inline std::string             getIdentification            ( ) const;
+    inline std::string             getIdentification            () const;
 
-    inline std::string             getPrefix                    ( ) const;
+    inline std::string             getPrefix                    () const;
 
-    inline std::string             getSuffix                    ( ) const;
+    inline std::string             getSuffix                    () const;
 
-    inline void                    setFirstAndLastTime          ( );
+    inline void                    setFirstAndLastTime          ();
 
     /**
      * @brief Check if the filename is inside the sequence and return it's time value.
@@ -236,7 +239,7 @@ private:
 
     std::ostream&                        getCout  ( std::ostream& os ) const ;
 
-    std::vector<boost::filesystem::path> getFiles ( ) const;
+    std::vector<boost::filesystem::path> getFiles () const;
 
 protected:
     inline void clear()

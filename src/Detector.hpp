@@ -1,16 +1,22 @@
 #ifndef _SEQUENCE_PARSER_DETECTOR_HPP_
 #define _SEQUENCE_PARSER_DETECTOR_HPP_
 
-#include <FileObject.hpp>
-#include <FileStrings.hpp>
-#include <FileNumbers.hpp>
-#include <Sequence.hpp>
-#include <File.hpp>
-#include <Folder.hpp>
+#include "FileObject.hpp"
+#include "Sequence.hpp"
+#include "File.hpp"
+#include "Folder.hpp"
+
 #include <boost/lexical_cast.hpp>
+
+#include <iostream>
 #include <iomanip>
 
 namespace sequenceParser {
+
+namespace detail {
+class FileStrings;
+class FileNumbers;
+}
 
 class Detector
 {
@@ -252,7 +258,7 @@ private:
 	 *          so there is no reason to create a copy.
 	 * @return a sequence object with all informations
 	 */
-	std::list<sequenceParser::Sequence> buildSequence( const boost::filesystem::path& directory, const sequenceParser::FileStrings& id, std::list<sequenceParser::FileNumbers>& nums, const sequenceParser::EMaskOptions& desc );
+	std::list<sequenceParser::Sequence> buildSequence( const boost::filesystem::path& directory, const sequenceParser::detail::FileStrings& id, std::list<sequenceParser::detail::FileNumbers>& nums, const sequenceParser::EMaskOptions& desc );
 
 	/**
 	 * @brief Construct id and nums from a filename.
@@ -261,7 +267,7 @@ private:
 	 * @param[out] nums: list of integers
 	 * @return number of decteted numbers
 	 */
-	std::size_t seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums );
+	std::size_t seqConstruct( const std::string& str, detail::FileStrings& id, detail::FileNumbers& nums );
 };
 
 }

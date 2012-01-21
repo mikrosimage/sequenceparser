@@ -4,7 +4,7 @@ import os, sys
 import sequenceParser
 
 if len(sys.argv) > 2:
-	print( 'lsFile took only one path' )
+	print( 'lsFile takes only one path.' )
 	sys.exit()
 
 detector = sequenceParser.Detector()
