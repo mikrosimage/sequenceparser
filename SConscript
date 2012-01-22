@@ -14,7 +14,7 @@ project.StaticLibrary(
 	)
 
 
-pythonOutputDir = project.inOutputDir('python/sequenceParser')
+pythonOutputDir = project.inOutputDir('python/pySequenceParser')
 
 envSwig = project.createEnv( [libs.python, libs.sequenceParser, libs.pthread], name='pySequenceParser' )
 envSwig.AppendUnique( SWIGFLAGS = ['-python','-c++','-Wall']) # ,'-shadow','-docstring'] )
@@ -25,7 +25,7 @@ if project.macos:
 	envSwig.Replace( SHLIBSUFFIX = '.so' ) # .dyLib not recognized
 
 seqPython = project.SharedLibrary(
-		target = 'pySequenceParser',
+		target = 'sequenceParser',
 		sources = ['src/sequenceParser.i'],
 		env = envSwig,
 		installDir = pythonOutputDir,
@@ -37,6 +37,7 @@ initFile = envSwig.Command( os.path.join( pythonOutputDir, '__init__.py' ), '',
                             ])
 envSwig.Requires( seqPython, initFile )
 
+envSwig.Alias( 'pySequenceParser', seqPython )
 envSwig.Alias( 'python', seqPython )
 
 
