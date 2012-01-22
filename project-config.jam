@@ -11,6 +11,8 @@ local rule check-required-env ( var ) {
 local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ; 
 check-required-env BOOST_ROOT ;
 
+use-project /boost            : $(BOOST_ROOT) ;
+
 #########################
 # Python configuration. #
 #########################
@@ -37,5 +39,24 @@ using python
 	<address-model>32
   ;
 
+using python
+  : 2.7                     # version
+  : /usr/bin/python2.7      # bin directory
+  : /usr/include/python2.7  # includes
+  : /usr/lib64              # libs
+  :
+	<os>LINUX
+	<address-model>64
+  ;
 
+using python
+  : 2.7                     # version
+  : /usr/bin/python2.7      # bin directory
+  : /usr/include/python2.7  # includes
+  : /usr/lib                # libs
+  :
+	<os>LINUX
+	<address-model>32
+  ;
+  
 

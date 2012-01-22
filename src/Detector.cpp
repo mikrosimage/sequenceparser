@@ -40,27 +40,25 @@ Detector::~Detector()
 {
 }
 
-std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	return fileInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
 	std::list<boost::shared_ptr<File> > outputFiles;
-	bfs::path directory;
+	std::string tmpDir( dir );
 
-	if( exists( dir ) )
+	if( !detectDirectoryInResearch( tmpDir, filters ) )
 	{
-		directory = bfs::path( dir.string() );
-	}
-	else
-	{
-		if( !exists( dir.parent_path() ) )
-		{
-			return outputFiles;
-		}
-		filters.push_back( dir.filename().string() );
-		directory = bfs::path( dir.parent_path().string() );
+		return outputFiles;
 	}
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
+	bfs::path directory( tmpDir );
 	SeqIdMap sequences;
 	FileStrings id; // an object uniquely identify a sequence
 	FileNumbers nums; // the list of numbers inside one filename
@@ -79,7 +77,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& 
 			if( !bfs::is_directory( iter->status() ) ) // detect if isn't a folder
 			{
 				// it's a file or a file of a sequence
-				if( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 				{
 					// if at least one number detected
 					if( seqConstruct( iter->path().filename().string(), id, nums ) )
@@ -121,7 +119,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& 
 			{
 				if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
-					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 					outputFiles.push_back( file );
 				}
 			}
@@ -131,27 +129,44 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const bfs::path& 
 	return outputFiles;
 }
 
-std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+void Detector::printFileInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	printFileInDirectory( directory, filters, desc );
+}
+
+void Detector::printFileInDirectory( const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+{
+	std::list<boost::shared_ptr<File> > outputFiles;
+	std::vector<std::string> filenames;
+
+	outputFiles = fileInDirectory( directory, filters, desc );
+	for( std::list<boost::shared_ptr<File> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++ )
+	{
+		boost::shared_ptr<File> f = *it;
+		std::cout << *f << std::endl;
+	}
+}
+
+std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	return sequenceInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
 	std::list<boost::shared_ptr<Sequence> > outputSequences;
-	bfs::path directory;
+	std::string tmpDir( dir );
 
-	if( exists( dir ) )
+	if( !detectDirectoryInResearch( tmpDir, filters ) )
 	{
-		directory = bfs::path( dir.string() );
-	}
-	else
-	{
-		if( !exists( dir.parent_path() ) )
-		{
-			return outputSequences;
-		}
-		filters.push_back( dir.filename().string() );
-		directory = bfs::path( dir.parent_path().string() );
+		return outputSequences;
 	}
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
+	bfs::path directory( tmpDir );
 	SeqIdMap sequences;
 	FileStrings id; // an object uniquely identify a sequence
 	FileNumbers nums; // the list of numbers inside one filename
@@ -169,7 +184,7 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs
 			// detect if isn't a folder
 			if( !bfs::is_directory( iter->status() ) )
 			{ // it's a file or a file of a sequence
-				if( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 				{
 					// if at least one number detected
 					if( seqConstruct( iter->path().filename().string(), id, nums ) )
@@ -215,29 +230,45 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const bfs
 	return outputSequences;
 }
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+void Detector::printSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	printSequenceInDirectory( directory, filters, desc );
+}
+
+void Detector::printSequenceInDirectory( const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+{
+	std::list<boost::shared_ptr<Sequence> > outputFiles;
+
+	outputFiles = sequenceInDirectory( directory, eMaskOptionsColor );
+	for( std::list<boost::shared_ptr<Sequence> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++ )
+	{
+		boost::shared_ptr<Sequence> f = *it;
+		std::cout << *f << std::endl;
+	}
+}
+
+std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	return fileAndSequenceInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
 	std::list<boost::shared_ptr<FileObject> > output;
 	std::list<boost::shared_ptr<FileObject> > outputFiles;
 	std::list<boost::shared_ptr<FileObject> > outputSequences;
-	bfs::path directory;
+	std::string tmpDir( dir );
 
-	if( exists( dir ) )
+	if( !detectDirectoryInResearch( tmpDir, filters ) )
 	{
-		directory = bfs::path( dir.string() );
-	}
-	else
-	{
-		if( !exists( dir.parent_path() ) )
-		{
-			return output;
-		}
-		filters.push_back( dir.filename().string() );
-		directory = bfs::path( dir.parent_path().string() );
+		return output;
 	}
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
+	bfs::path directory( tmpDir );
 	SeqIdMap sequences;
 	FileStrings id; // an object uniquely identify a sequence
 	FileNumbers nums; // the list of numbers inside one filename
@@ -256,7 +287,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 			if( !bfs::is_directory( iter->status() ) )
 			{ // it's a file or a file of a sequence
 
-				if( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 				{
 					// if at least one number detected
 					if( seqConstruct( iter->path().filename().string(), id, nums ) )
@@ -297,7 +328,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 			{
 				if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
-					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 					outputFiles.push_back( file );
 				}
 				else
@@ -314,23 +345,49 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 	return output;
 }
 
-std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+void Detector::printFileAndSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	printFileAndSequenceInDirectory( directory, filters, desc );
+}
+
+void Detector::printFileAndSequenceInDirectory( const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+{
+	std::list<boost::shared_ptr<FileObject> > outputFiles;
+
+	outputFiles = fileAndSequenceInDirectory( directory, filters, desc );
+	for( std::list<boost::shared_ptr<FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++ )
+	{
+		boost::shared_ptr<FileObject> f = *it;
+		std::cout << *f << std::endl;
+	}
+}
+
+std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	return folderInDirectory( directory, filters, desc );
+}
+
+std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
 	std::list<boost::shared_ptr<Folder> > outputFolders;
 	bfs::path directory;
 
-	if( exists( dir ) )
+	if( bfs::exists( dir ) )
 	{
-		directory = bfs::path( dir.string() );
-	}
-	else
-	{
-		if( !exists( dir.parent_path() ) )
+		if( bfs::is_directory( dir ) )
+		{
+			directory = bfs::path( dir );
+		}
+		else
 		{
 			return outputFolders;
 		}
-		filters.push_back( dir.filename().string() );
-		directory = bfs::path( dir.parent_path().string() );
+	}
+	else
+	{
+		return outputFolders;
 	}
 
 	// for all files in the directory
@@ -350,30 +407,46 @@ std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const bfs::pa
 	return outputFolders;
 }
 
-std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const bfs::path& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+void Detector::printFolderInDirectory( const std::string& directory, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	printFolderInDirectory( directory, filters, desc );
+}
+
+void Detector::printFolderInDirectory( const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc )
+{
+	std::list<boost::shared_ptr<Folder> > outputFiles;
+
+	outputFiles = folderInDirectory( directory, filters, desc );
+	for( std::list<boost::shared_ptr<Folder> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++ )
+	{
+		boost::shared_ptr<Folder> f = *it;
+		std::cout << *f << std::endl;
+	}
+}
+
+std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const std::string& directory, const EMaskType mask, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	return fileObjectInDirectory( directory, filters, mask, desc );
+}
+
+std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
 {
 	std::list<boost::shared_ptr<FileObject> > output;
 	std::list<boost::shared_ptr<FileObject> > outputFolders;
 	std::list<boost::shared_ptr<FileObject> > outputFiles;
 	std::list<boost::shared_ptr<FileObject> > outputSequences;
-	bfs::path directory;
+	std::string tmpDir( dir );
 
-	if( exists( dir ) )
+	if( !detectDirectoryInResearch( tmpDir, filters ) )
 	{
-		directory = bfs::path( dir.string() );
-	}
-	else
-	{
-		if( !exists( dir.parent_path() ) )
-		{
-			return output;
-		}
-		filters.push_back( dir.filename().string() );
-		directory = bfs::path( dir.parent_path().string() );
+		return outputFiles;
 	}
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
+	bfs::path directory( tmpDir );
 	SeqIdMap sequences;
 	FileStrings id; // an object uniquely identify a sequence
 	FileNumbers nums; // the list of numbers inside one filename
@@ -396,7 +469,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 			}
 			else // it's a file or a file of a sequence
 			{
-				if( isNotFilter( iter->path().filename().string(), filters ) ) // filtering of entries with filters strings
+				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 				{
 					// if at least one number detected
 					if( seqConstruct( iter->path().filename().string(), id, nums ) )
@@ -424,7 +497,6 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 			}
 		}
 	}
-
 	// add sequences in the output list
 
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
@@ -438,7 +510,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 			{
 				if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
-					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), s.getMaskOptions() ) );
+					boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
 					outputFiles.push_back( file );
 				}
 				else
@@ -467,7 +539,57 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 	return output;
 }
 
-bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filters )
+void Detector::printFileObjectInDirectory( const std::string& directory, const EMaskType mask, const EMaskOptions desc )
+{
+	std::vector<std::string> filters;
+	printFileObjectInDirectory( directory, filters, mask, desc );
+}
+
+void Detector::printFileObjectInDirectory( const std::string& directory, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+{
+	std::list<boost::shared_ptr<FileObject> > outputFiles;
+
+	outputFiles = fileObjectInDirectory( directory, filters, mask, desc );
+	for( std::list<boost::shared_ptr<FileObject> >::iterator it = outputFiles.begin(); it != outputFiles.end(); it++ )
+	{
+		boost::shared_ptr<FileObject> f = *it;
+		std::cout << *f << std::endl;
+	}
+}
+
+bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters )
+{
+	if( bfs::exists( researchPath ) )
+	{
+		if( !bfs::is_directory( researchPath ) )
+		{
+			// the researchPath is an existing file, we search into the parent directory with filtering these filename
+			// warning: can find a sequence based on a filename
+			bfs::path tmpPath( researchPath );
+			filters.push_back( tmpPath.filename().string() );
+			researchPath = tmpPath.parent_path().string();
+
+		}
+		// else
+		// the researchPath is a directory, we search into the directory without filtering
+	}
+	else
+	{
+		bfs::path tmpPath( researchPath );
+		if( !bfs::exists( tmpPath.parent_path() ) )
+		{
+			// researchPath and it parent don't exists, could not find file/sequence/folder
+			return false;
+		}
+		// the researchPath is not a directory, but it parent is a directory
+		// we search in this parent directory, with the filtering pattern
+		filters.push_back( tmpPath.filename().string() );
+		researchPath = tmpPath.parent_path().string();
+	}
+	return true;
+}
+
+bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filters, const EMaskOptions desc )
 {
 	if( filters.size() == 0 )
 		return true;
@@ -475,49 +597,42 @@ bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filt
 	for( std::size_t i = 0; i < filters.size(); i++ )
 	{
 		std::string filter( filters.at( i ) );
+		boost::cmatch match;
+		boost::regex expression( ".*([%]{1})(\\d{2})([d]{1}).*" ); // match to pattern like : %04d
+		if( boost::regex_match( filter.c_str(), match, expression ) )
+		{
+			int patternWidth = atoi( match[2].first );
+			std::string replacing( patternWidth + 2, '.' );
+			replacing[0] = '(';
+			replacing[replacing.size() - 1] = ')';
+			filter = boost::regex_replace( filter, boost::regex( "([%]{1})(\\d{2})([d]{1})" ), replacing );
+		}
+		// for detect sequence based on a single file
+		if( ( desc & eMaskOptionsSequenceBasedOnFilename ) )
+			filter = boost::regex_replace( filter, boost::regex( "\\d" ), "[0-9]" );
+
 		filter = boost::regex_replace( filter, boost::regex( "\\*" ), "(.*)" );
-		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "(.*)" );
+		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[0-9]+" );
 		filter = boost::regex_replace( filter, boost::regex( "\\?" ), "(.)" );
-		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "(.)" );
+		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[0-9]" );
 		if( regex_match( filename, boost::regex( filter ) ) )
 			return true;
 	}
 	return false;
 }
 
-/**
- * @brief Create a sequence
- * @param[in] id: the sequence identifier
- * @param[inout] nums: the list of sequence of number inside each filename
- * @warning We modify nums in place, because we don't use it after
- *          so there is no reason to create a copy.
- * @return a sequence object with all informations
- */
 std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& directory, const FileStrings& id, std::list<FileNumbers>& nums, const EMaskOptions& desc )
 {
 	nums.sort();
 	BOOST_ASSERT( nums.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( nums.front().size() == nums.back().size() );
-	const std::size_t len = nums.front().size();
+	std::size_t len = nums.front().size();
 
-	// Detect which part is the possible sequence numbers.
-	// In details:
-	// FileNumbers contains a list of numbers contained in the filename. Here
-	// we create a list of index of varying number values
-	// idx: 0  1  2  3  4
-	//    [
-	//     (2, 4, 3, 6, 9),
-	//     (2, 4, 3, 7, 9),
-	//     (2, 4, 3, 8, 9),
-	//     (2, 4, 3, 9, 9),
-	//     (2, 4, 4, 3, 9),
-	//     (2, 4, 4, 5, 9),
-	//     (2, 4, 4, 7, 9),
-	//    ]
-	// The numbers are varying only at index 2 and 3.
-	// We put this information into @p allIds = [2, 3].
-	std::vector<std::size_t> allIds; // list of index with 0 < id < len
+	// detect which part is the sequence number
+	// for the moment, accept only one sequence
+	// but we can easily support multi-sequences
+	std::vector<std::size_t> allIds; // list of ids (with 0<id<len) with value changes
 	for( std::size_t i = 0; i < len; ++i )
 	{
 		const Time t = nums.front().getTime( i );
@@ -526,7 +641,7 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 		{
 			if( sn.getTime( i ) != t )
 			{
-				allIds.push_back( i ); // the number is not always the same, we put the index in the list
+				allIds.push_back( i );
 				break;
 			}
 		}
@@ -535,8 +650,6 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	std::size_t idChangeEnd = 0;
 	if( allIds.size() == 0 )
 	{
-		// if no sequence really detected,
-		// by default we declare the last number of the filename
 		idChangeBegin = idChangeEnd = len - 1;
 	}
 	else
@@ -545,7 +658,7 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 		idChangeEnd = allIds.back();
 	}
 	Sequence seqCommon( directory, desc );
-	// fill information into the sequence...
+	// fill information in the sequence...
 	for( std::size_t i = 0; i < idChangeBegin; ++i )
 	{
 		seqCommon._prefix += id[i];
@@ -559,7 +672,6 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	}
 	seqCommon._suffix += id[len];
 	std::list<Sequence> result;
-	// we detect a standard sequence
 	if( allIds.size() <= 1 )
 	{
 		// standard case, one sequence detected
@@ -631,13 +743,6 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	return result;
 }
 
-/**
- * @brief Construct id and nums from a filename.
- * @param[in] str: the string to process (filename)
- * @param[out] id: list of strings
- * @param[out] nums: list of integers
- * @return number of decteted numbers
- */
 std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums )
 {
 	static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
@@ -645,13 +750,13 @@ std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, Fil
 	static const int subs[] = { -1, 0, }; // get before match and current match
 	boost::sregex_token_iterator m( str.begin(), str.end(), re, subs );
 	boost::sregex_token_iterator end;
-
+	//std::cout << str << std::endl;
 	while( m != end )
 	{
 		// begin with string id, can be an empty string if str begins with a number
 		id.getId().push_back( *m++ );
-		if( m != end )
-		{ // if end with a string and not a number
+		if( m != end ) // if end with a string and not a number
+		{
 			nums.push_back( *m++ );
 		}
 	}
@@ -659,6 +764,7 @@ std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, Fil
 	{
 		id.getId().push_back( "" ); // we end with an empty string
 	}
+	//std::cout << nums.size() << std::endl;
 	return nums.size();
 }
 

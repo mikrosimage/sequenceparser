@@ -18,6 +18,10 @@ else
     ADDRESS_MODEL=32
 fi
 
+python --version 1&> pythonVersion.txt 
+pyV=`cat pythonVersion.txt | cut -f2 -d' ' | cut -c 1-3`
+rm pythonVersion.txt
+
 # boost build configuration
 export BOOST_BUILD_PATH=$BOOST_ROOT/tools/build/v2
-$BOOST_ROOT/bjam --toolset=gcc cflags=-fPIC cxxflags=-fPIC python=2.6 address-model=$ADDRESS_MODEL $*
+$BOOST_ROOT/bjam --toolset=gcc cflags=-fPIC cxxflags=-fPIC python=$pyV address-model=$ADDRESS_MODEL $*

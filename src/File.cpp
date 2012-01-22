@@ -20,7 +20,7 @@ std::ostream& File::getCout(std::ostream& os) const
     {
 	os << std::setw( PROPERTIES_WIDTH ) << "f ";
     }
-    if (showRelativePath()) {
+    if ( showRelativePath() ) {
         dir = _directory;
 	dir = boost::regex_replace( dir.string(), boost::regex( "/\\./$" ), "/" );
 	std::string path = ( dir / _filename ).string();

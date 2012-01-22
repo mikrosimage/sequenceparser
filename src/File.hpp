@@ -11,8 +11,8 @@ class File : public FileObject
 public:
 
     File(const boost::filesystem::path& directory, const std::string& filename, const EMaskOptions& options) :
-	FileObject(directory, eMaskTypeFile, options),
-	_filename ( filename )
+        FileObject( directory, eMaskTypeFile, options ),
+        _filename ( filename )
     { }
 
     ~File()
@@ -25,7 +25,12 @@ public:
 
     inline std::string                   getAbsoluteFilename() const
     {
-        return (getAbsoluteDirectory() / _filename).string();
+        return ( getAbsoluteDirectory() / _filename ).string();
+    }
+
+    inline std::string                   getFilename() const
+    {
+        return _filename;
     }
 
     inline void                          clear()
