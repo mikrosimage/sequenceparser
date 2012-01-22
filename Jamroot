@@ -19,8 +19,8 @@ actions swigCpptoPythonWrap
 }
 IMPORT $(__name__) : swigCpptoPythonWrap : : swigCpptoPythonWrap ;
 
-make sequenceParser.py : python/sequenceParser.i : @swigCpptoPythonRelease : <variant>release ;
-make sequenceParser.py : python/sequenceParser.i : @swigCpptoPythonDebug   : <variant>debug ;
+make sequenceParser.py : src/sequenceParser.i : @swigCpptoPythonRelease : <variant>release ;
+make sequenceParser.py : src/sequenceParser.i : @swigCpptoPythonDebug   : <variant>debug ;
 actions swigCpptoPythonRelease
 {
 	swig -c++ -python -I. -outdir $(DIST_RELEASE) $(>)
@@ -50,7 +50,7 @@ project
 
 lib sequence
 	:
-		[ glob src/*.cpp ]
+                [ glob src/*.cpp src/detail/*.cpp ]
 	;
 
 install sequenceLibrary
