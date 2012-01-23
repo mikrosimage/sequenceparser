@@ -167,6 +167,36 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
     BOOST_CHECK( listSequence.size()   == numberOfSequences   );
 }
 
+void testFirstSequenceLimits  ( const char* path, const int minValue, const int maxValue )
+{
+    sequenceParser::Detector detector;
+    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+
+    listSequence   = detector.sequenceInDirectory    ( path );
+
+    boost::shared_ptr<sequenceParser::Sequence   > seq =listSequence.front();
+
+    std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue << " found " << seq->getFirstTime() << " -> " << seq->getLastTime() << std::endl;
+
+    BOOST_CHECK( seq->getFirstTime()  == minValue );
+    BOOST_CHECK( seq->getLastTime()   == maxValue );
+}
+
+void testFirstSequenceLimits  ( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
+{
+    sequenceParser::Detector detector;
+    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+
+    listSequence   = detector.sequenceInDirectory    ( path, options );
+
+    boost::shared_ptr<sequenceParser::Sequence   > seq = listSequence.front();
+
+    std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found " << seq->getFirstTime() << " -> " << seq->getLastTime() << std::endl;
+
+    BOOST_CHECK( seq->getFirstTime()  == minValue );
+    BOOST_CHECK( seq->getLastTime()   == maxValue );
+}
+
 BOOST_AUTO_TEST_CASE(TestSequence)
 {
     createTmpDiretoriesFilesAndSequences();
@@ -180,13 +210,19 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/"                                                                           , 0, 0, 2, 2 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"                                                              , 0, 0, 0, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 99 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"                                                              , 0, 0, 0, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 99 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/"                      , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 2, 2 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
 
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                                                                           , 0, 0, 3, 3 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 );

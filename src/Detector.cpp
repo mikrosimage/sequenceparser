@@ -80,7 +80,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
                                 if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
                                 {
                                         // if at least one number detected
-                                        if( seqConstruct( iter->path().filename().string(), id, nums ) )
+                                        if( seqConstruct( iter->path().filename().string(), id, nums, desc ) )
                                         {
                                                 // need to construct sequence to detect file with a pattern but with only one image
                                                 const SeqIdMap::iterator it( sequences.find( id ) );
@@ -187,7 +187,7 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std
                                 if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
                                 {
                                         // if at least one number detected
-                                        if( seqConstruct( iter->path().filename().string(), id, nums ) )
+                                        if( seqConstruct( iter->path().filename().string(), id, nums, desc ) )
                                         {
                                                 const SeqIdMap::iterator it( sequences.find( id ) );
                                                 if( it != sequences.end() ) // is already in map
@@ -290,7 +290,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
                                 if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
                                 {
                                         // if at least one number detected
-                                        if( seqConstruct( iter->path().filename().string(), id, nums ) )
+                                        if( seqConstruct( iter->path().filename().string(), id, nums, desc ) )
                                         {
                                                 const SeqIdMap::iterator it( sequences.find( id ) );
                                                 if( it != sequences.end() ) // is already in map
@@ -472,7 +472,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
                                 if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
                                 {
                                         // if at least one number detected
-                                        if( seqConstruct( iter->path().filename().string(), id, nums ) )
+                                        if( seqConstruct( iter->path().filename().string(), id, nums, desc ) )
                                         {
                                                 const SeqIdMap::iterator it( sequences.find( id ) );
                                                 if( it != sequences.end() ) // is already in map
@@ -753,10 +753,13 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
         return result;
 }
 
-std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums )
+std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums, const EMaskOptions& options )
 {
         static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
-        static const boost::regex re( "[\\-\\+]?\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}" );
+        std::string signedRegex = "";
+        //if( options & eMaskOptionsNegativeIndexes )
+            signedRegex = "[\\-\\+]?";
+        static const boost::regex re( signedRegex + "\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}" );
         static const int subs[] = { -1, 0, }; // get before match and current match
         boost::sregex_token_iterator m( str.begin(), str.end(), re, subs );
         boost::sregex_token_iterator end;

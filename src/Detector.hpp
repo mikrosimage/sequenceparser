@@ -142,7 +142,7 @@ private:
      * @param[out] nums: list of integers
      * @return number of decteted numbers
      */
-    std::size_t seqConstruct( const std::string& str, detail::FileStrings& id, detail::FileNumbers& nums );
+    std::size_t seqConstruct( const std::string& str, detail::FileStrings& id, detail::FileNumbers& nums, const EMaskOptions& options );
 };
 
 }

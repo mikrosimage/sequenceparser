@@ -285,7 +285,7 @@ void Sequence::extractStep( const std::list<detail::FileNumbers>& times, const s
 
 std::size_t Sequence::getPaddingFromStringNumber( const std::string& timeStr )
 {
-    if (timeStr.size() > 1)
+    if ( timeStr.size() > 1 )
     {
         // if the number is signed, this charater does not count as padding.
         if (timeStr[0] == '-' || timeStr[0] == '+')
