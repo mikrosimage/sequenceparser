@@ -11,12 +11,14 @@
 #include "File.hpp"
 #include "Folder.hpp"
 #include "Sequence.hpp"
+#include "commonDefinitions.hpp"
 %}
 
 
 namespace std {
 %template(StringVector) vector<string>;
 %template(StringList) list<string>;
+
 }
 
 %include "Detector.hpp"

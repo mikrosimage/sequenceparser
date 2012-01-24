@@ -96,13 +96,13 @@ Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
     {
         return ePatternCStyle;
     }
-    else if ( regex_match( pattern.c_str(), regexPatternFrame ) )
-    {
-        return ePatternFrame;
-    }
     else if ( regex_match( pattern.c_str(), regexPatternFrameNeg ) )
     {
         return ePatternFrameNeg;
+    }
+    else if ( regex_match( pattern.c_str(), regexPatternFrame ) )
+    {
+        return ePatternFrame;
     }
     return ePatternNone;
 }
@@ -177,6 +177,7 @@ bool Sequence::init( const std::string& pattern, const Time firstTime, const Tim
     _lastTime  = lastTime;
     _step      = step;
     _nbFiles   = 0;
+    std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
     return true;
 }
 
@@ -217,6 +218,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
         {
             _firstTime = _lastTime = allTimes.front();
         }
+        std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
         return true; // an empty sequence
     }
     allTimes.sort();
@@ -226,6 +228,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
     _firstTime     = allTimes.front         ( );
     _lastTime      = allTimes.back          ( );
     _nbFiles       = allTimes.size          ( );
+    std::cout << _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
     return true; // a real file sequence
 }
 

@@ -576,6 +576,12 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
         else
         {
                 bfs::path tmpPath( researchPath );
+                if( ! tmpPath.has_parent_path() )
+                {
+                    filters.push_back( researchPath );
+                    researchPath = ".";
+                    return true;
+                }
                 if( !bfs::exists( tmpPath.parent_path() ) )
                 {
                         // researchPath and it parent don't exists, could not find file/sequence/folder
@@ -756,14 +762,23 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, FileNumbers& nums, const EMaskOptions& options )
 {
         static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
-        std::string signedRegex = "";
-        if( options & eMaskOptionsNegativeIndexes )
-            signedRegex = "[\\-\\+]?";
-        static const boost::regex re( signedRegex + "\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}" );
+        std::string regex;
+        //std::cout << options << "   " << eMaskOptionsNegativeIndexes << " ==> " << ( options & eMaskOptionsNegativeIndexes ) << std::endl;
+        if( ( options & eMaskOptionsNegativeIndexes ) == eMaskOptionsNegativeIndexes )
+        {
+            regex += "[\\-\\+]?\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}";
+        }
+        else
+        {
+            regex += "\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}";
+        }
+        static const boost::regex re( regex );
         static const int subs[] = { -1, 0, }; // get before match and current match
         boost::sregex_token_iterator m( str.begin(), str.end(), re, subs );
         boost::sregex_token_iterator end;
-        //std::cout << str << std::endl;
+        /*if( options & eMaskOptionsNegativeIndexes )
+            std::cout << "*";*/
+        //std::cout << regex << std::endl;
         while( m != end )
         {
                 // begin with string id, can be an empty string if str begins with a number

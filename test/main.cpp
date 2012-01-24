@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
     //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-    //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+   // testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
     //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
 
