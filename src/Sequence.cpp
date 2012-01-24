@@ -96,11 +96,11 @@ Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
     {
         return ePatternCStyle;
     }
-    else if ( !( _options & eMaskOptionsNegativeIndexes ) && ( regex_match( pattern.c_str(), regexPatternFrame ) ) )
+    else if ( regex_match( pattern.c_str(), regexPatternFrame ) )
     {
         return ePatternFrame;
     }
-    else if ( ( _options & eMaskOptionsNegativeIndexes ) && ( regex_match( pattern.c_str(), regexPatternFrameNeg ) ) )
+    else if ( regex_match( pattern.c_str(), regexPatternFrameNeg ) )
     {
         return ePatternFrameNeg;
     }

@@ -616,8 +616,8 @@ bool Detector::isNotFilter( std::string filename, std::vector<std::string>& filt
                 filter = boost::regex_replace( filter, boost::regex( "\\?" ), "(.)" );
                 if( ( desc & eMaskOptionsNegativeIndexes ) )
                 {
-                        filter = boost::regex_replace( filter, boost::regex( "\\@" ), "([\\-]|[\\+])?[0-9]+" );
-                        filter = boost::regex_replace( filter, boost::regex( "\\#" ), "([0-9]|[\\-]|[\\+])" );
+                        filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[\\-\\+]?[0-9]+" );
+                        filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[\\-\\+0123456789]" );
                 }
                 else
                 {
@@ -757,7 +757,7 @@ std::size_t Detector::seqConstruct( const std::string& str, FileStrings& id, Fil
 {
         static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
         std::string signedRegex = "";
-        //if( options & eMaskOptionsNegativeIndexes )
+        if( options & eMaskOptionsNegativeIndexes )
             signedRegex = "[\\-\\+]?";
         static const boost::regex re( signedRegex + "\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}" );
         static const int subs[] = { -1, 0, }; // get before match and current match
