@@ -236,6 +236,12 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*.@.dpx"                                                                    , 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/???.####.dpx"                                                               , 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/???.@.dpx"                                                                  , 0, 0, 1, 1 );
+
+    boost::filesystem::current_path("tmpTestSequence/root/film/strictPadding/");
+    testFindObjectInDiretory ( "./img.0050.dpx"                                                                                                     , 0, 1, 0, 1 );
+    testFindObjectInDiretory ( "img.0050.dpx"                                                                                                       , 0, 1, 0, 1 );
+    boost::filesystem::current_path("../../../../");
+
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*0050.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );

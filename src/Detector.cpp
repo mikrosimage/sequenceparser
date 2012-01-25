@@ -439,7 +439,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
         std::list<boost::shared_ptr<FileObject> > outputSequences;
         std::string tmpDir( dir );
 
-        if( !detectDirectoryInResearch( tmpDir, filters ) )
+        if( !detectDirectoryInResearch  ( tmpDir, filters ) )
         {
                 return outputFiles;
         }
@@ -567,8 +567,10 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
                         // warning: can find a sequence based on a filename
                         bfs::path tmpPath( researchPath );
                         filters.push_back( tmpPath.filename().string() );
-                        researchPath = tmpPath.parent_path().string();
-
+                        if( tmpPath.has_parent_path() )
+                            researchPath = tmpPath.parent_path().string();
+                        else
+                            researchPath = "./";
                 }
                 // else
                 // the researchPath is a directory, we search into the directory without filtering
