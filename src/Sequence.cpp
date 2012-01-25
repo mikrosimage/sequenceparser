@@ -177,7 +177,7 @@ bool Sequence::init( const std::string& pattern, const Time firstTime, const Tim
     _lastTime  = lastTime;
     _step      = step;
     _nbFiles   = 0;
-    std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+    //std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
     return true;
 }
 
