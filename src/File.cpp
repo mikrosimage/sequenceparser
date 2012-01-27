@@ -2,10 +2,10 @@
 #include <iomanip>
 #include <boost/regex.hpp>
 
-namespace bfs = boost::filesystem;
 
-namespace sequenceParser
-{
+namespace sequenceParser {
+
+namespace bfs = boost::filesystem;
 
 std::ostream& File::getCout(std::ostream& os) const
 {

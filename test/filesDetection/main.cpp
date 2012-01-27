@@ -1,6 +1,6 @@
 #include <Detector.hpp>
 
-#define BOOST_TEST_MODULE SequenceDetector
+#define BOOST_TEST_MODULE FileSequenceDetector
 
 #include <iostream>
 #include <iomanip>

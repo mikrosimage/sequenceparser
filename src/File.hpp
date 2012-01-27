@@ -3,8 +3,7 @@
 
 #include <FileObject.hpp>
 
-namespace sequenceParser
-{
+namespace sequenceParser {
 
 class File : public FileObject
 {
@@ -46,3 +45,4 @@ private:
 }
 
 #endif
+

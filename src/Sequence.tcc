@@ -149,5 +149,3 @@ inline std::string           Sequence::getSuffix() const
     return _suffix;
 }
 
-inline void                    setFirstAndLastTime          ( );
-

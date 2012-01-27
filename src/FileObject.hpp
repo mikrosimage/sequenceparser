@@ -5,8 +5,7 @@
 #include <commonDefinitions.hpp>
 
 
-namespace sequenceParser
-{
+namespace sequenceParser {
 
 /**
  * @brief A container for files, directories and sequences.
@@ -41,8 +40,10 @@ public:
 
     virtual ~FileObject();
 
+#ifndef SWIG
     friend std::ostream& operator<<(std::ostream& os, const FileObject& fo);
-
+#endif
+	
     virtual std::ostream& getCout(std::ostream& os) const = 0;
 
     /**
@@ -148,4 +149,7 @@ protected:
 };
 
 }
+
 #endif
+
+

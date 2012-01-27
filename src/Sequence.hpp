@@ -212,8 +212,6 @@ public:
 
     inline std::string             getSuffix                    () const;
 
-    inline void                    setFirstAndLastTime          ();
-
     /**
      * @brief Check if the filename is inside the sequence and return it's time value.
      * @param[out] time: the time extract from the filename (only if contained in the sequence)
@@ -226,6 +224,24 @@ public:
     bool operator<(const Sequence& other) const
     {
         return getAbsoluteStandardPattern() < other.getAbsoluteStandardPattern();
+    }
+
+    bool operator==(const Sequence& other) const
+    {
+        return 
+			( _prefix == other._prefix ) &&
+			( _suffix == other._suffix ) &&
+			( _strictPadding == other._strictPadding ) &&
+			( _padding == other._padding ) &&
+			( _step == other._step ) &&
+			( _firstTime == other._firstTime ) &&
+			( _lastTime == other._lastTime ) &&
+			( _nbFiles == other._nbFiles );
+    }
+
+    bool operator!=(const Sequence& other) const
+    {
+        return ! operator==( other );
     }
 
 protected:

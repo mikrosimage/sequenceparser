@@ -1,6 +1,7 @@
 #ifndef _SEQUENCE_PARSER_DETECTOR_HPP_
 #define _SEQUENCE_PARSER_DETECTOR_HPP_
 
+#include "commonDefinitions.hpp"
 #include "FileObject.hpp"
 #include "Sequence.hpp"
 #include "File.hpp"
@@ -28,80 +29,84 @@ public :
      ** fileInDirectory methods
      **
      **/
-    std::list<boost::shared_ptr<sequenceParser::File> >       fileInDirectory                 ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+    std::list<boost::shared_ptr<File> >       fileInDirectory                 ( const std::string& directory,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::File> >       fileInDirectory                 ( const std::string& directory,
+    std::list<boost::shared_ptr<File> >       fileInDirectory                 ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileInDirectory            ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileInDirectory            ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
 
-    std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDirectory             ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+    std::list<boost::shared_ptr<Sequence> >   sequenceInDirectory             ( const std::string& directory,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::Sequence> >   sequenceInDirectory             ( const std::string& directory,
+    std::list<boost::shared_ptr<Sequence> >   sequenceInDirectory             ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
+
+	
+	std::list<boost::shared_ptr<Sequence> >                   sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
+
+	
+    void                                                      printSequenceInDirectory        ( const std::string& directory,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printSequenceInDirectory        ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
-
-    void                                                      printSequenceInDirectory        ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDirectory      ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+    std::list<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory      ( const std::string& directory,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::FileObject> > fileAndSequenceInDirectory      ( const std::string& directory,
+    std::list<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory      ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileAndSequenceInDirectory ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileAndSequenceInDirectory ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDirectory               ( const std::string& directory,
-                                                                                               const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+    std::list<boost::shared_ptr<Folder> >     folderInDirectory               ( const std::string& directory,
+                                                                                               const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::Folder> >     folderInDirectory               ( const std::string& directory,
+    std::list<boost::shared_ptr<Folder> >     folderInDirectory               ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFolderInDirectory          ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFolderInDirectory          ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectInDirectory           ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskType mask = eMaskTypeDefault,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+    std::list<boost::shared_ptr<FileObject> > fileObjectInDirectory           ( const std::string& directory,
+                                                                                                const EMaskType mask = eMaskTypeDefault,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
-    std::list<boost::shared_ptr<sequenceParser::FileObject> > fileObjectInDirectory           ( const std::string& directory,
+    std::list<boost::shared_ptr<FileObject> > fileObjectInDirectory           ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskType mask = eMaskTypeDefault,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskType mask = eMaskTypeDefault,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileObjectInDirectory      ( const std::string& directory,
-                                                                                                const sequenceParser::EMaskType mask = eMaskTypeDefault,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskType mask = eMaskTypeDefault,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
     void                                                      printFileObjectInDirectory      ( const std::string& directory,
                                                                                                 std::vector<std::string>& filters,
-                                                                                                const sequenceParser::EMaskType mask = eMaskTypeDefault,
-                                                                                                const sequenceParser::EMaskOptions desc = eMaskOptionsDefault );
+                                                                                                const EMaskType mask = eMaskTypeDefault,
+                                                                                                const EMaskOptions desc = eMaskOptionsDefault );
 
 private:
     /**
@@ -123,7 +128,7 @@ private:
      *
      * @return return true if the filename is filtered by filter(s)
      */
-    bool isNotFilter( std::string filename, std::vector<std::string>& filters, const EMaskOptions desc );
+    bool isNotFilter( const std::string& filename, const std::vector<std::string>& filters, const EMaskOptions desc );
 
     /**
      * @brief Create a sequence
@@ -133,7 +138,7 @@ private:
      *          so there is no reason to create a copy.
      * @return a sequence object with all informations
      */
-    std::list<sequenceParser::Sequence> buildSequence( const boost::filesystem::path& directory, const detail::FileStrings& id, std::list<detail::FileNumbers>& nums, const EMaskOptions& desc );
+    std::list<Sequence> buildSequence( const boost::filesystem::path& directory, const detail::FileStrings& id, std::list<detail::FileNumbers>& nums, const EMaskOptions& desc );
 
     /**
      * @brief Construct id and nums from a filename.
@@ -146,4 +151,5 @@ private:
 };
 
 }
+
 #endif

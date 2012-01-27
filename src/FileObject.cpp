@@ -1,7 +1,6 @@
 #include <FileObject.hpp>
 
-namespace sequenceParser
-{
+namespace sequenceParser {
 
 FileObject::~FileObject()
 {

@@ -3,8 +3,7 @@
 
 #include <FileObject.hpp>
 
-namespace sequenceParser
-{
+namespace sequenceParser {
 
 class Folder : public FileObject
 {
