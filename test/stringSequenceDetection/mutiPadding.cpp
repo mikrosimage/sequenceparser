@@ -25,6 +25,10 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding )
 	listSequence = detector.sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 1 );
+	
+	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
+	BOOST_CHECK( seq->getPadding() == 3 );
+	BOOST_CHECK( seq->isStrictPadding() == true );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
@@ -48,6 +52,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 	BOOST_CHECK( listSequence.size() == 1 );
 
 	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
+	BOOST_CHECK( seq->getPadding() == 0 );
 	BOOST_CHECK( seq->getFirstTime() == 99 );
 	BOOST_CHECK( seq->getLastTime() == 123456 );
 	BOOST_CHECK( seq->getNbFiles() == 5 );

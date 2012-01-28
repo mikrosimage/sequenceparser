@@ -7,10 +7,10 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE( MutiSequenceDetection )
 
-BOOST_AUTO_TEST_CASE(SimpleMultiSequence)
+BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -32,11 +32,10 @@ BOOST_AUTO_TEST_CASE(SimpleMultiSequence)
 	BOOST_CHECK( listSequence.size() == 3 );
 }
 
-
-BOOST_AUTO_TEST_CASE(SimpleMultiSequenceMultiLevel)
+BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 

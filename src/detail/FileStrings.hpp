@@ -37,7 +37,7 @@ public:
 		_id.clear();
 	}
 
-	bool operator==(const This& v ) const
+	bool operator==( const This& v ) const
 	{
 		if( _id.size() != v._id.size() )
 		{
@@ -53,7 +53,7 @@ public:
 		return true;
 	}
 
-	const std::string& operator[](const std::size_t i ) const
+	const std::string& operator[]( const std::size_t i ) const
 	{
 		return _id[i];
 	}
