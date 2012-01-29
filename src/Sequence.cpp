@@ -88,23 +88,23 @@ bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeS
 
 Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
 {
-    if ( regex_match( pattern.c_str(), regexPatternStandard ) )
-    {
-        return ePatternStandard;
-    }
-    else if ( regex_match( pattern.c_str(), regexPatternCStyle ) )
-    {
-        return ePatternCStyle;
-    }
-    else if ( ( _options & eMaskOptionsNegativeIndexes ) && regex_match( pattern.c_str(), regexPatternFrameNeg ) )
-    {
-        return ePatternFrameNeg;
-    }
-    else if ( regex_match( pattern.c_str(), regexPatternFrame ) )
-    {
-        return ePatternFrame;
-    }
-    return ePatternNone;
+	if( regex_match( pattern.c_str(), regexPatternStandard ) )
+	{
+		return ePatternStandard;
+	}
+	else if( regex_match( pattern.c_str(), regexPatternCStyle ) )
+	{
+		return ePatternCStyle;
+	}
+	else if( ( _options & eMaskOptionsNegativeIndexes ) && regex_match( pattern.c_str(), regexPatternFrameNeg ) )
+	{
+		return ePatternFrameNeg;
+	}
+	else if( regex_match( pattern.c_str(), regexPatternFrame ) )
+	{
+		return ePatternFrame;
+	}
+	return ePatternNone;
 }
 
 /**
@@ -171,65 +171,65 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 
 bool Sequence::init( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
 {
-    if ( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
-        return false; // not regognize as a pattern, maybe a still file
-    _firstTime = firstTime;
-    _lastTime  = lastTime;
-    _step      = step;
-    _nbFiles   = 0;
-    //std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
-    return true;
+	if( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
+		return false; // not regognize as a pattern, maybe a still file
+	_firstTime = firstTime;
+	_lastTime = lastTime;
+	_step = step;
+	_nbFiles = 0;
+	//std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+	return true;
 }
 
 bool Sequence::initFromDetection( const std::string& pattern, const EPattern accept )
 {
-    clear();
-    setDirectoryFromPath(pattern);
+	clear();
+	setDirectoryFromPath( pattern );
 
-    if ( !retrieveInfosFromPattern( boost::filesystem::path(pattern).filename().string(), accept, _prefix, _suffix, _padding, _strictPadding ) )
-        return false; // not recognized as a pattern, maybe a still file
-    if ( !boost::filesystem::exists( _directory ) )
-        return true; // an empty sequence
+	if( !retrieveInfosFromPattern( boost::filesystem::path( pattern ).filename().string(), accept, _prefix, _suffix, _padding, _strictPadding ) )
+		return false; // not recognized as a pattern, maybe a still file
+	if( !boost::filesystem::exists( _directory ) )
+		return true; // an empty sequence
 
-    std::list<std::string>  allTimesStr;
-    std::list<Time>         allTimes;
-    bfs::directory_iterator itEnd;
+	std::list<std::string> allTimesStr;
+	std::list<Time> allTimes;
+	bfs::directory_iterator itEnd;
 
-    for ( bfs::directory_iterator iter(_directory); iter != itEnd; ++iter )
-    {
-        // we don't make this check, which can take long time on big sequences (>1000 files)
-        // depending on your filesystem, we may need to do a stat() for each file
-        //      if( bfs::is_directory( iter->status() ) )
-        //          continue; // skip directories
-        Time        time;
-        std::string timeStr;
+	for( bfs::directory_iterator iter( _directory ); iter != itEnd; ++iter )
+	{
+		// we don't make this check, which can take long time on big sequences (>1000 files)
+		// depending on your filesystem, we may need to do a stat() for each file
+		//      if( bfs::is_directory( iter->status() ) )
+		//          continue; // skip directories
+		Time time;
+		std::string timeStr;
 
-        // if the file is inside the sequence
-        if ( isIn(iter->path().filename().string(), time, timeStr ) )
-        {
-            // create a big list of all times in our sequence
-            allTimesStr.push_back(timeStr);
-            allTimes.push_back(time);
-        }
-    }
-    if (allTimes.size() < 2)
-    {
-        if (allTimes.size() == 1)
-        {
-            _firstTime = _lastTime = allTimes.front();
-        }
-        //std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
-        return true; // an empty sequence
-    }
-    allTimes.sort();
-    extractStep            ( allTimes );
-    extractPadding         ( allTimesStr );
-    extractIsStrictPadding ( allTimesStr, _padding );
-    _firstTime     = allTimes.front         ( );
-    _lastTime      = allTimes.back          ( );
-    _nbFiles       = allTimes.size          ( );
-    //std::cout << _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
-    return true; // a real file sequence
+		// if the file is inside the sequence
+		if( isIn( iter->path().filename().string(), time, timeStr ) )
+		{
+			// create a big list of all times in our sequence
+			allTimesStr.push_back( timeStr );
+			allTimes.push_back( time );
+		}
+	}
+	if( allTimes.size() < 2 )
+	{
+		if( allTimes.size() == 1 )
+		{
+			_firstTime = _lastTime = allTimes.front();
+		}
+		//std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+		return true; // an empty sequence
+	}
+	allTimes.sort();
+	extractStep( allTimes );
+	extractPadding( allTimesStr );
+	extractIsStrictPadding( allTimesStr, _padding );
+	_firstTime = allTimes.front();
+	_lastTime = allTimes.back();
+	_nbFiles = allTimes.size();
+	//std::cout << _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+	return true; // a real file sequence
 }
 
 /**
@@ -322,17 +322,33 @@ void Sequence::extractPadding( const std::list<std::string>& timesStr )
 void Sequence::extractPadding( const std::list<detail::FileNumbers>& times, const std::size_t i )
 {
 	BOOST_ASSERT( times.size() > 0 );
-	const std::size_t padding = times.front().getPadding( i );
 
+	std::set<std::size_t> padding;
+	std::set<std::size_t> nbDigits;
+	
 	BOOST_FOREACH( const detail::FileNumbers& s, times )
 	{
-		if( padding != s.getPadding( i ) )
-		{
-			_padding = 0;
-			return;
-		}
+		padding.insert( s.getPadding(i) );
+		nbDigits.insert( s.getNbDigits(i) );
 	}
-	_padding = padding;
+	
+	std::set<std::size_t> pad = padding;
+	pad.erase(0);
+	
+	if( pad.size() == 0 )
+	{
+		_padding = 0;
+	}
+	else if( pad.size() == 1 )
+	{
+		_padding = *pad.begin();
+	}
+	else
+	{
+		// @todo multi-padding !
+		// need to split into multiple sequences !
+		_padding = 0;
+	}
 }
 
 /**

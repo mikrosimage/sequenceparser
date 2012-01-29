@@ -7,7 +7,30 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE( MultiPaddingSequenceDetection )
 
-BOOST_AUTO_TEST_CASE( SequenceWithPadding )
+BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
+{
+	sequenceParser::Detector detector;
+	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+
+	std::vector<boost::filesystem::path> paths;
+
+	boost::assign::push_back( paths )
+		( "aaa/bbb/a1b2c001.j2c" )
+		( "aaa/bbb/a1b2c002.j2c" )
+		( "aaa/bbb/a1b2c003.j2c" )
+		( "aaa/bbb/a1b2c023.j2c" )
+		;
+
+	listSequence = detector.sequenceFromFilenameList( paths );
+
+	BOOST_CHECK( listSequence.size() == 1 );
+	
+	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
+	BOOST_CHECK( seq->getPadding() == 3 );
+	BOOST_CHECK( seq->isStrictPadding() == true );
+}
+
+BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 {
 	sequenceParser::Detector detector;
 	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
