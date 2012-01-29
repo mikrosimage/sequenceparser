@@ -65,13 +65,20 @@ public:
 		return _numbers[i].second;
 	}
 
-	std::size_t getPadding( const std::size_t& i ) const
+	
+	static std::size_t extractPadding( const std::string& s )
 	{
-		const std::string& s = _numbers[i].second;
-
+		int hasNeg = 0;
 		if( s.size() == 1 )
 			return 0;
-		return s[0] == '0' ? s.size() : 0;
+		if( s[0] == '-' )
+			++hasNeg;
+		return s[hasNeg] == '0' ? s.size()-hasNeg : 0;
+	}
+	
+	std::size_t getPadding( const std::size_t& i ) const
+	{
+		return extractPadding( _numbers[i].second );
 	}
 
 	Time getTime( const std::size_t& i ) const
@@ -91,9 +98,11 @@ public:
 		BOOST_ASSERT( _numbers.size() == v._numbers.size() );
 		for( Vec::const_iterator i = _numbers.begin(), iEnd = _numbers.end(), vi = v._numbers.begin(); i != iEnd; ++i, ++vi )
 		{
-			if( i->second.size() < vi->second.size() )
+			const std::size_t iPadding = extractPadding( i->second );
+			const std::size_t viPadding = extractPadding( vi->second );
+			if( iPadding < viPadding )
 				return true;
-			else if( i->second.size() > vi->second.size() )
+			else if( iPadding > viPadding )
 				return false;
 
 			if( i->first < vi->first )

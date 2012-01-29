@@ -25,7 +25,6 @@ namespace bfs = boost::filesystem;
 
 struct SeqIdHash : std::unary_function<FileStrings, std::size_t>
 {
-
 	std::size_t operator()(const FileStrings & p ) const
 	{
 		return p.getHash();
@@ -60,7 +59,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
 	bfs::path directory( tmpDir );
 	SeqIdMap sequences;
-	
+
 	// temporary variables, should be inside the loop but here for optimization.
 	FileStrings tmpStringParts; // an object uniquely identify a sequence
 	FileNumbers tmpNumberParts; // the list of numbers inside one filename
@@ -79,7 +78,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 			if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
-				if( seqConstruct( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
 				{
 					// need to construct sequence to detect file with a pattern but with only one image
 					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
@@ -105,7 +104,6 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 		}
 	}
 	// add sequences in the output list
-
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
 		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
@@ -179,27 +177,24 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std
 
 		if( !( iter->path().filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 		{
-			// detect if isn't a folder
-			if( !bfs::is_directory( iter->status() ) )
-			{ // it's a file or a file of a sequence
-				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
+			// it's a file or a file of a sequence
+			if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
+			{
+				// if at least one number detected
+				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
 				{
-					// if at least one number detected
-					if( seqConstruct( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+					if( it != sequences.end() ) // is already in map
 					{
-						const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-						if( it != sequences.end() ) // is already in map
-						{
-							// append the list of numbers
-							sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-						}
-						else
-						{
-							// create an entry in the map
-							std::list<FileNumbers> li;
-							li.push_back( tmpNumberParts );
-							sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-						}
+						// append the list of numbers
+						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
+					}
+					else
+					{
+						// create an entry in the map
+						std::list<FileNumbers> li;
+						li.push_back( tmpNumberParts );
+						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 					}
 				}
 			}
@@ -249,28 +244,24 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( cons
 
 		if( !( iter.filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 		{
-			// detect if isn't a folder
-			if( !bfs::is_directory( iter ) )
+			// it's a file or a file of a sequence
+			if( isNotFilter( iter.filename().string(), filters, desc ) ) // filtering of entries with filters strings
 			{
-				// it's a file or a file of a sequence
-				if( isNotFilter( iter.filename().string(), filters, desc ) ) // filtering of entries with filters strings
+				// if at least one number detected
+				if( decomposeFilename( iter.filename().string(), tmpStringParts, tmpNumberParts, desc ) )
 				{
-					// if at least one number detected
-					if( seqConstruct( iter.filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+					if( it != sequences.end() ) // is already in map
 					{
-						const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-						if( it != sequences.end() ) // is already in map
-						{
-							// append the list of numbers
-							sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-						}
-						else
-						{
-							// create an entry in the map
-							std::list<FileNumbers> li;
-							li.push_back( tmpNumberParts );
-							sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-						}
+						// append the list of numbers
+						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
+					}
+					else
+					{
+						// create an entry in the map
+						std::list<FileNumbers> li;
+						li.push_back( tmpNumberParts );
+						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 					}
 				}
 			}
@@ -278,8 +269,8 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( cons
 	}
 
 	boost::filesystem::path directory; ///< @todo filter by directories, etc.
-	// add sequences in the output list
 
+	// add sequences in the output list
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
 		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
@@ -354,34 +345,30 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 
 		if( !( iter->path().filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 		{
-			// detect if isn't a folder
-			if( !bfs::is_directory( iter->status() ) )
-			{ // it's a file or a file of a sequence
-
-				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
+			// it's a file or a file of a sequence
+			if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
+			{
+				// if at least one number detected
+				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
 				{
-					// if at least one number detected
-					if( seqConstruct( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+					if( it != sequences.end() ) // is already in map
 					{
-						const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-						if( it != sequences.end() ) // is already in map
-						{
-							// append the list of numbers
-							sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-						}
-						else
-						{
-							// create an entry in the map
-							std::list<FileNumbers> li;
-							li.push_back( tmpNumberParts );
-							sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-						}
+						// append the list of numbers
+						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
 					}
 					else
 					{
-						boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-						outputFiles.push_back( f );
+						// create an entry in the map
+						std::list<FileNumbers> li;
+						li.push_back( tmpNumberParts );
+						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 					}
+				}
+				else
+				{
+					boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
+					outputFiles.push_back( f );
 				}
 			}
 		}
@@ -532,6 +519,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 
 		if( !( iter->path().filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 		{
+			// @todo: no check that needs to ask the status of the file here (like asking if it's a folder).
 			// detect if is a folder
 			if( bfs::is_directory( iter->status() ) )
 			{
@@ -543,7 +531,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 				if( isNotFilter( iter->path().filename().string(), filters, desc ) ) // filtering of entries with filters strings
 				{
 					// if at least one number detected
-					if( seqConstruct( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+					if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
 					{
 						const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
 						if( it != sequences.end() ) // is already in map
@@ -590,6 +578,10 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 					outputSequences.push_back( seq );
 				}
 			}
+			// else
+			// {
+			// @todo loop to declare direcotries !
+			// }
 		}
 	}
 
@@ -638,11 +630,11 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 			// warning: can find a sequence based on a filename
 			bfs::path tmpPath( researchPath );
 			filters.push_back( tmpPath.filename().string() );
-                        if( tmpPath.has_parent_path() )
-			researchPath = tmpPath.parent_path().string();
+			if( tmpPath.has_parent_path() )
+				researchPath = tmpPath.parent_path().string();
 
-                        else
-                            researchPath = "./";
+			else
+				researchPath = "./";
 		}
 		// else
 		// the researchPath is a directory, we search into the directory without filtering
@@ -650,12 +642,12 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 	else
 	{
 		bfs::path tmpPath( researchPath );
-                if( ! tmpPath.has_parent_path() )
-                {
-                    filters.push_back( researchPath );
-                    researchPath = ".";
-                    return true;
-                }
+		if( !tmpPath.has_parent_path() )
+		{
+			filters.push_back( researchPath );
+			researchPath = ".";
+			return true;
+		}
 		if( !bfs::exists( tmpPath.parent_path() ) )
 		{
 			// researchPath and it parent don't exists, could not find file/sequence/folder
@@ -716,12 +708,12 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	BOOST_ASSERT( tmpNumberParts.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( tmpNumberParts.front().size() == tmpNumberParts.back().size() );
-	std::size_t len = tmpNumberParts.front().size();
+	const std::size_t len = tmpNumberParts.front().size();
 
 	// detect which part is the sequence number
 	// for the moment, accept only one sequence
 	// but we can easily support multi-sequences
-	std::vector<std::size_t> allIds; // list of ids (with 0<tmpStringParts<len) with value changes
+	std::vector<std::size_t> allIndex; // list of indices (with 0 < index < len) with value changes
 	for( std::size_t i = 0; i < len; ++i )
 	{
 		const Time t = tmpNumberParts.front().getTime( i );
@@ -730,21 +722,21 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 		{
 			if( sn.getTime( i ) != t )
 			{
-				allIds.push_back( i );
+				allIndex.push_back( i );
 				break;
 			}
 		}
 	}
 	std::size_t idChangeBegin = 0;
 	std::size_t idChangeEnd = 0;
-	if( allIds.size() == 0 )
+	if( allIndex.size() == 0 )
 	{
 		idChangeBegin = idChangeEnd = len - 1;
 	}
 	else
 	{
-		idChangeBegin = allIds.front();
-		idChangeEnd = allIds.back();
+		idChangeBegin = allIndex.front();
+		idChangeEnd = allIndex.back();
 	}
 	Sequence seqCommon( directory, desc );
 	// fill information in the sequence...
@@ -761,7 +753,7 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	}
 	seqCommon._suffix += tmpStringParts[len];
 	std::list<Sequence> result;
-	if( allIds.size() <= 1 )
+	if( allIndex.size() <= 1 )
 	{
 		// standard case, one sequence detected
 		seqCommon._firstTime = tmpNumberParts.front().getTime( idChangeEnd );
@@ -832,41 +824,43 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 	return result;
 }
 
-std::size_t Detector::seqConstruct( const std::string& str, FileStrings& stringParts, FileNumbers& numberParts, const EMaskOptions& options )
+std::size_t Detector::decomposeFilename( const std::string& filename, FileStrings& stringParts, FileNumbers& numberParts, const EMaskOptions& options )
 {
 	static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
-        std::string regex;
-        //std::cout << options << "   " << eMaskOptionsNegativeIndexes << " ==> " << ( options & eMaskOptionsNegativeIndexes ) << std::endl;
-        if( options & eMaskOptionsNegativeIndexes )
-        {
-            regex += "[\\-\\+]?\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}";
-        }
-        else
-        {
-            regex += "\\d*?\\d{1," + boost::lexical_cast<std::string > ( max ) + "}";
-        }
-        static const boost::regex re( regex );
-	static const int subs[] = { -1, 0, }; // get before match and current match
-	boost::sregex_token_iterator m( str.begin(), str.end(), re, subs );
+	std::string regex;
+	if( options & eMaskOptionsNegativeIndexes )
+	{
+		regex = "[\\+\\-]?+\\d{1," + boost::lexical_cast<std::string>( max ) + "}";
+	}
+	else
+	{
+		regex = "\\d{1," + boost::lexical_cast<std::string>( max ) + "}";
+	}
+	const boost::regex re( regex );
+	static const int subs[] = { -1, 0 }; // get before match and current match
+	boost::sregex_token_iterator m( filename.begin(), filename.end(), re, subs );
 	boost::sregex_token_iterator end;
-        /*if( options & eMaskOptionsNegativeIndexes )
-            std::cout << "*";*/
-        //std::cout << regex << std::endl;
+	
+//	std::cout << "________________________________________" << std::endl;
+//	std::cout << "filename: " << filename << std::endl;
+//	std::cout << "regex: " << regex << std::endl;
 	while( m != end )
 	{
-                // begin with string id, can be an empty string if str begins with a number
-                stringParts.getId().push_back( *m++ );
+		// begin with string id, can be an empty string if str begins with a number
+//		std::cout << "stringPart: " << *m << std::endl;
+		stringParts.getId().push_back( *m++ );
 		if( m != end ) // if end with a string and not a number
 		{
-                        numberParts.push_back( *m++ );
+//			std::cout << "numberPart: " << *m << std::endl;
+			numberParts.push_back( *m++ );
 		}
 	}
-        if( stringParts.getId().size() == numberParts.size() )
+	if( stringParts.getId().size() == numberParts.size() )
 	{
-                stringParts.getId().push_back( "" ); // we end with an empty string
+		stringParts.getId().push_back( "" ); // we end with an empty string
 	}
-        //std::cout << numberParts.size() << std::endl;
-        return numberParts.size();
+	//std::cout << numberParts.size() << std::endl;
+	return numberParts.size();
 }
 
 }

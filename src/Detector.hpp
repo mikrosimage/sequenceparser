@@ -132,23 +132,34 @@ private:
 	bool isNotFilter( const std::string& filename, const std::vector<std::string>& filters, const EMaskOptions desc );
 
 	/**
-	 * @brief Create a sequence
-	 * @param[in] id: the sequence identifier
-	 * @param[inout] nums: the list of sequence of number inside each filename
-	 * @warning We modify nums in place, because we don't use it after
+	 * @brief Create a list of sequences from a list of FileNumbers associated to a common FileStrings.
+	 * 
+	 * @param[in] stringParts the sequence identifier
+	 * @param[inout] numberParts the list of sequence of number inside each filename
+	 * @param[in] desc detection flags
+	 * 
+	 * @warning We modify @p numberParts in place, because we don't use it after
 	 *          so there is no reason to create a copy.
 	 * @return a sequence object with all informations
 	 */
-	std::list<Sequence> buildSequence( const boost::filesystem::path& directory, const detail::FileStrings& id, std::list<detail::FileNumbers>& nums, const EMaskOptions& desc );
+	std::list<Sequence> buildSequence( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::list<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
 
 	/**
-	 * @brief Construct id and nums from a filename.
-	 * @param[in] str: the string to process (filename)
-	 * @param[out] id: list of strings
-	 * @param[out] nums: list of integers
+	 * @brief Extract number and string parts from a filename.
+	 * 
+	 * Example:
+	 * filename = "aa1b22cccc3"
+	 * Will return:
+	 * stringParts = ["aa", "b", "cccc"]
+	 * numberParts = [1, 22, 3]
+	 * 
+	 * @param[in] str the string to process (filename)
+	 * @param[out] stringParts list of strings
+	 * @param[out] numberParts list of integers
+	 * 
 	 * @return number of decteted numbers
 	 */
-	std::size_t seqConstruct( const std::string& str, detail::FileStrings& id, detail::FileNumbers& nums, const EMaskOptions& options );
+	std::size_t decomposeFilename( const std::string& filename, detail::FileStrings& stringParts, detail::FileNumbers& numberParts, const EMaskOptions& options );
 };
 
 }
