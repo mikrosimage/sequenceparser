@@ -59,10 +59,6 @@ public:
 	void printSequenceInDirectory( const std::string& directory,
 								   const EMaskOptions desc = eMaskOptionsDefault );
 
-	void printSequenceInDirectory( const std::string& directory,
-								   std::vector<std::string>& filters,
-								   const EMaskOptions desc = eMaskOptionsDefault );
-
 	std::list<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
 																		  const EMaskOptions desc = eMaskOptionsDefault );
 
@@ -120,17 +116,7 @@ private:
 	 */
 	bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters );
 
-	/**
-	 * Detect if the filename is filtered by one of the filter
-	 *
-	 * @param[in] filename filename need to be check if it filtered
-	 * @param[in] filters vector of filters
-	 * @param[in] desc enable research options (Cf. EMaskOptions in commonDefinitions.hpp )
-	 *
-	 * @return return true if the filename is filtered by filter(s)
-	 */
-	bool isNotFilter( const std::string& filename, const std::vector<std::string>& filters, const EMaskOptions desc );
-
+	
 	/**
 	 * @brief Create a list of sequences from a list of FileNumbers associated to a common FileStrings.
 	 * 
