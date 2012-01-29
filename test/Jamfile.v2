@@ -1,0 +1,5 @@
+for local l in [ glob * ]
+{
+        build-project $(l) ;
+}
+
