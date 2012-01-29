@@ -61,5 +61,27 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 	BOOST_CHECK( seq->getStep() == 1 );
 }
 
+BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
+{
+	sequenceParser::Detector detector;
+	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+
+	std::vector<boost::filesystem::path> paths;
+
+	boost::assign::push_back( paths )
+		( "aaa/bbb/a1b2c00099.j2c" )
+		( "aaa/bbb/a1b2c00102.j2c" )
+	
+		( "aaa/bbb/a1b2c1234.j2c" )
+		( "aaa/bbb/a1b2c12345.j2c" )
+		( "aaa/bbb/a1b2c123456.j2c" )
+		;
+
+	listSequence = detector.sequenceFromFilenameList( paths );
+
+	std::cout << "AA: " << listSequence.size() << std::endl;
+//	BOOST_CHECK( listSequence.size() == 2 ); // @todo bug to fix !
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

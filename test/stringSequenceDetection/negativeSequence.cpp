@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 
 	listSequence = detector.sequenceFromFilenameList( paths, eMaskOptionsNegativeIndexes );
 
-	std::cout << "AA: " << listSequence.size() << std::endl;
+	//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 1 );
 
 	const boost::shared_ptr<Sequence> seq = listSequence.front();
