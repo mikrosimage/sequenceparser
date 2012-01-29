@@ -66,14 +66,24 @@ public:
 	}
 
 	
-	static std::size_t extractPadding( const std::string& s )
+	static bool hasSign( const std::string& s ) { return ( ( s[0] == '-' ) || ( s[0] == '+' ) ); }
+	
+	static std::size_t extractPadding( const std::string& str )
 	{
-		int hasNeg = 0;
-		if( s.size() == 1 )
+		if( str.size() == 1 )
 			return 0;
-		if( s[0] == '-' )
-			++hasNeg;
-		return s[hasNeg] == '0' ? s.size()-hasNeg : 0;
+		const bool withSign = hasSign(str);
+		return str[withSign] == '0' ? str.size()-withSign : 0;
+	}
+	
+	static std::size_t extractNbDigits( const std::string& s )
+	{
+		return s.size() - hasSign( s );
+	}
+	
+	std::size_t getNbDigits( const std::size_t& i ) const
+	{
+		return extractNbDigits( _numbers[i].second );
 	}
 	
 	std::size_t getPadding( const std::size_t& i ) const

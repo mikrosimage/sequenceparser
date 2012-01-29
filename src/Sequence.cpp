@@ -322,11 +322,11 @@ void Sequence::extractPadding( const std::list<std::string>& timesStr )
 void Sequence::extractPadding( const std::list<detail::FileNumbers>& times, const std::size_t i )
 {
 	BOOST_ASSERT( times.size() > 0 );
-	const std::size_t padding = times.front().getString( i ).size();
+	const std::size_t padding = times.front().getPadding( i );
 
 	BOOST_FOREACH( const detail::FileNumbers& s, times )
 	{
-		if( padding != s.getString( i ).size() )
+		if( padding != s.getPadding( i ) )
 		{
 			_padding = 0;
 			return;
