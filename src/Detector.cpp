@@ -35,10 +35,12 @@ struct SeqIdHash : std::unary_function<FileStrings, std::size_t>
 boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
 {
 	boost::cmatch match;
-	boost::regex expression( ".*\\%(\\d{1,2})d.*" ); // match to pattern like : %04d
+	boost::regex expression( "(.*[%])([0-9]{2})([d].*)" ); // match to pattern like : %04d
 	if( boost::regex_match( filter.c_str(), match, expression ) )
 	{
-		const int patternWidth = boost::lexical_cast<int>( match[1].first );
+		std::string matched = match[1].second;
+		matched.erase( 2 , matched.size()-2); // keep only numbers
+		const int patternWidth = boost::lexical_cast<int>( matched );
 		std::string replacing( patternWidth, '#' );
 		filter = boost::regex_replace( filter, boost::regex( "\\%\\d{1,2}d" ), replacing );
 	}
@@ -49,9 +51,17 @@ boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
 
 	filter = boost::regex_replace( filter, boost::regex( "\\*" ), "(.*)" );
 	filter = boost::regex_replace( filter, boost::regex( "\\?" ), "(.)" );
-	filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[0-9]+" ); // one @ correspond to one or more digits
-	filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[0-9]" ); // each # in pattern correspond to a digit
-	
+	if( desc & eMaskOptionsNegativeIndexes )
+	{
+		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[\\-\\+]?[0-9]+" ); // one @ correspond to one or more digits
+		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[\\-\\+]?[0-9]" ); // each # in pattern correspond to a digit
+	}
+	else
+	{
+		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[0-9]+" ); // one @ correspond to one or more digits
+		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[0-9]" ); // each # in pattern correspond to a digit
+	}
+
 	return boost::regex( filter );
 }
 
@@ -105,8 +115,6 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 
 std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
-	
 	std::list<boost::shared_ptr<File> > outputFiles;
 	std::string tmpDir( dir );
 
@@ -114,6 +122,8 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 	{
 		return outputFiles;
 	}
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -157,8 +167,11 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 				}
 				else
 				{
-					boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-					outputFiles.push_back( f );
+					if( ! bfs::is_directory( directory / iter->path().filename().string() ) )
+					{
+						boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
+						outputFiles.push_back( f );
+					}
 				}
 			}
 		}
@@ -171,7 +184,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
 			// don't detect sequence of directories
-			if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+			if( ! bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
 				if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
@@ -212,8 +225,6 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std
 
 std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
-	
 	std::list<boost::shared_ptr<Sequence> > outputSequences;
 	std::string tmpDir( dir );
 
@@ -221,6 +232,8 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std
 	{
 		return outputSequences;
 	}
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -289,7 +302,7 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( cons
 {
 	std::vector<std::string> filters; // @todo as argument !
 	std::list<boost::shared_ptr<Sequence> > outputSequences;
-	
+
 	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// variables for sequence detection
@@ -376,8 +389,6 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 
 std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
-	
 	std::list<boost::shared_ptr<FileObject> > output;
 	std::list<boost::shared_ptr<FileObject> > outputFiles;
 	std::list<boost::shared_ptr<FileObject> > outputSequences;
@@ -387,6 +398,8 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 	{
 		return output;
 	}
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -489,8 +502,6 @@ std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::st
 
 std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
-	
 	std::list<boost::shared_ptr<Folder> > outputFolders;
 	bfs::path directory;
 
@@ -509,6 +520,8 @@ std::list<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::st
 	{
 		return outputFolders;
 	}
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// for all files in the directory
 	bfs::directory_iterator itEnd;
@@ -553,8 +566,6 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 
 std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
 {
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
-	
 	std::list<boost::shared_ptr<FileObject> > output;
 	std::list<boost::shared_ptr<FileObject> > outputFolders;
 	std::list<boost::shared_ptr<FileObject> > outputFiles;
@@ -565,6 +576,8 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 	{
 		return outputFiles;
 	}
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::list<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -863,7 +876,7 @@ std::size_t Detector::decomposeFilename( const std::string& filename, FileString
 	static const int subs[] = { -1, 0 }; // get before match and current match
 	boost::sregex_token_iterator m( filename.begin(), filename.end(), re, subs );
 	boost::sregex_token_iterator end;
-	
+
 //	std::cout << "________________________________________" << std::endl;
 //	std::cout << "filename: " << filename << std::endl;
 //	std::cout << "regex: " << regex << std::endl;

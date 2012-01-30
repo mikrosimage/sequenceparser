@@ -14,7 +14,7 @@ using boost::unit_test::test_suite;
 void copyFile( std::string src, std::string dst )
 {
     if ( ! boost::filesystem::exists( dst ) )
-        boost::filesystem::copy_file(src, dst);
+	boost::filesystem::copy_file(src, dst);
 }
 
 void createTmpDiretoriesFilesAndSequences()
@@ -38,85 +38,85 @@ void createTmpDiretoriesFilesAndSequences()
     // no strict padding: 0000, 0001, 0010, 0020, 0100
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%04d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/strictPadding/img."+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%04d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/strictPadding/img."+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
 
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%04d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/strictPadding/.img."+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%04d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/strictPadding/.img."+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
 
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%04d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/strictPadding/img."+std::string(numberName)+".jpg";
-        copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%04d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/strictPadding/img."+std::string(numberName)+".jpg";
+	copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
     }
 
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%04d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/strictPadding/imgBroken."+std::string(numberName)+".jpg";
-        copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
-        if( i == 2 ) i = 9;
-        if( i == 55 ) i = 99;
+	char numberName[20];
+	sprintf( numberName,"%04d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/strictPadding/imgBroken."+std::string(numberName)+".jpg";
+	copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
+	if( i == 2 ) i = 9;
+	if( i == 55 ) i = 99;
     }
 
     // no strict padding: 0, 1, 10, 20, 100
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/img."+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/img."+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
 
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/.img."+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/.img."+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
 
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/img."+std::string(numberName)+".jpg";
-        copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/img."+std::string(numberName)+".jpg";
+	copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
     }
 
     for( int i =0; i< 101; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%d", i );
-        std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/imgBroken."+std::string(numberName)+".jpg";
-        copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
-        if( i == 2 ) i = 9;
-        if( i == 55 ) i = 99;
+	char numberName[20];
+	sprintf( numberName,"%d", i );
+	std::string outputFilename = "tmpTestSequence/root/film/noStrictPadding/imgBroken."+std::string(numberName)+".jpg";
+	copyFile( "tmpTestSequence/root/trash/img.jpg", outputFilename );
+	if( i == 2 ) i = 9;
+	if( i == 55 ) i = 99;
     }
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%04d", i );
-        std::string outputFilename = "tmpTestSequence/root/trash/dpx/negative/img.-"+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%04d", i );
+	std::string outputFilename = "tmpTestSequence/root/trash/dpx/negative/img.-"+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
     for( int i =0; i< 100; i++ )
     {
-        char numberName[20];
-        sprintf( numberName,"%d", i );
-        std::string outputFilename = "tmpTestSequence/root/trash/dpx/negative/seqTest.-"+std::string(numberName)+".dpx";
-        copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
+	char numberName[20];
+	sprintf( numberName,"%d", i );
+	std::string outputFilename = "tmpTestSequence/root/trash/dpx/negative/seqTest.-"+std::string(numberName)+".dpx";
+	copyFile( "tmpTestSequence/root/trash/dpx/img.dpx", outputFilename );
     }
 }
 
@@ -139,6 +139,9 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
     listSequence   = detector.sequenceInDirectory    ( path );
 
     std::cout << "test path: " << std::left << std::setw(60) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
+	std::list<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+	for(it=listSequence.begin() ; it != listSequence.end(); it++)
+		std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 
     BOOST_CHECK( listFileObject.size() == numberOfFileObjects );
     BOOST_CHECK( listFolder.size()     == numberOfFolders     );
@@ -160,7 +163,9 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
     listSequence   = detector.sequenceInDirectory    ( path, options );
 
     std::cout << "test path: " << std::left << std::setw(60) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
-
+	std::list<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+	for(it=listSequence.begin() ; it != listSequence.end(); it++)
+		std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
     BOOST_CHECK( listFileObject.size() == numberOfFileObjects );
     BOOST_CHECK( listFolder.size()     == numberOfFolders     );
     BOOST_CHECK( listFile.size()       == numberOfFiles       );
@@ -216,13 +221,12 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 99 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/"                      , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 2, 2 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-    //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-    //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
-    testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-   // testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+    testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 0, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-    //testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+    testFirstSequenceLimits  ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
 
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                                                                           , 0, 0, 3, 3 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 );
