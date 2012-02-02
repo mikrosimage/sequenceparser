@@ -101,26 +101,19 @@ public:
 		return _numbers.size();
 	}
 
+	struct SortByPadding
+	{
+		bool operator()( const FileNumbers& a, const FileNumbers& b ) const;
+	};
+	struct SortByDigit
+	{
+		bool operator()( const FileNumbers& a, const FileNumbers& b ) const;
+	};
+	
 	bool operator<(const This& v )
 	{
-		// can't have multiple size, if multiple size they must have a
-		// different SeqId
-		BOOST_ASSERT( _numbers.size() == v._numbers.size() );
-		for( Vec::const_iterator i = _numbers.begin(), iEnd = _numbers.end(), vi = v._numbers.begin(); i != iEnd; ++i, ++vi )
-		{
-			const std::size_t iPadding = extractPadding( i->second );
-			const std::size_t viPadding = extractPadding( vi->second );
-			if( iPadding < viPadding )
-				return true;
-			else if( iPadding > viPadding )
-				return false;
-
-			if( i->first < vi->first )
-				return true;
-			else if( i->first > vi->first )
-				return false;
-		}
-		return false; // equals
+		// by default sort by padding
+		return SortByPadding()( *this, v );
 	}
 
 	bool rangeEquals( const This& v, const size_t begin, const size_t end ) const

@@ -271,15 +271,15 @@ void Sequence::extractStep( const std::list<Time>& times )
 /**
  * @brief Extract step from a sorted list of time values.
  */
-void Sequence::extractStep( const std::list<detail::FileNumbers>& times, const std::size_t i )
+void Sequence::extractStep( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
 {
-	if( times.size() <= 1 )
+	if( std::distance( timesBegin, timesEnd ) <= 1 )
 	{
 		_step = 1;
 		return;
 	}
 	std::set<std::size_t> allSteps;
-	for( std::list<detail::FileNumbers>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
+	for( std::list<detail::FileNumbers>::const_iterator itA = timesBegin, itB = boost::next(timesBegin), itEnd = timesEnd; itB != itEnd; ++itA, ++itB )
 	{
 		allSteps.insert( itB->getTime( i ) - itA->getTime( i ) );
 	}
@@ -319,17 +319,19 @@ void Sequence::extractPadding( const std::list<std::string>& timesStr )
 	_padding = padding;
 }
 
-void Sequence::extractPadding( const std::list<detail::FileNumbers>& times, const std::size_t i )
+void Sequence::extractPadding( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
 {
-	BOOST_ASSERT( times.size() > 0 );
+	BOOST_ASSERT( timesBegin != timesEnd );
 
 	std::set<std::size_t> padding;
 	std::set<std::size_t> nbDigits;
 	
-	BOOST_FOREACH( const detail::FileNumbers& s, times )
+	for( std::list<detail::FileNumbers>::const_iterator s = timesBegin;
+		 s != timesEnd;
+		 ++s )
 	{
-		padding.insert( s.getPadding(i) );
-		nbDigits.insert( s.getNbDigits(i) );
+		padding.insert( s->getPadding(i) );
+		nbDigits.insert( s->getNbDigits(i) );
 	}
 	
 	std::set<std::size_t> pad = padding;

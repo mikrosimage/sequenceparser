@@ -50,6 +50,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 	BOOST_CHECK( listSequence.size() == 1 );
 	
 	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
+	std::cout << "seq padding: " << seq->getPadding() << std::endl;
 	BOOST_CHECK( seq->getPadding() == 3 );
 	BOOST_CHECK( seq->isStrictPadding() == true );
 }

@@ -117,6 +117,25 @@ private:
 	bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters );
 
 	
+	Sequence privateBuildSequence(
+			const Sequence& defaultSeq,
+			const detail::FileStrings& stringParts,
+			const std::list<detail::FileNumbers>::const_iterator& numberPartsBegin,
+			const std::list<detail::FileNumbers>::const_iterator& numberPartsEnd,
+			const std::size_t index,
+			const std::size_t padding,
+			const bool strictPadding
+		) const;
+	
+	void privateBuildSequencesAccordingToPadding(
+		std::list<Sequence>& result,
+		const Sequence& defaultSeq,
+		const detail::FileStrings& stringParts,
+		const std::list<detail::FileNumbers>::iterator& numberPartsBegin,
+		const std::list<detail::FileNumbers>::iterator numberPartsEnd,
+		const int index ) const;
+
+	
 	/**
 	 * @brief Create a list of sequences from a list of FileNumbers associated to a common FileStrings.
 	 * 
@@ -128,7 +147,7 @@ private:
 	 *          so there is no reason to create a copy.
 	 * @return a sequence object with all informations
 	 */
-	std::list<Sequence> buildSequence( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::list<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
+	std::list<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::list<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
 
 	/**
 	 * @brief Extract number and string parts from a filename.

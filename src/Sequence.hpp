@@ -40,14 +40,14 @@ public:
 		ePatternAll = ePatternCStyle + ePatternStandard + ePatternFrameNeg
 	};
 
-	Sequence() :
-	FileObject()
+	Sequence()
+	: FileObject()
 	{
 		clear();
 	}
 
-	Sequence( const boost::filesystem::path& directory, const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const EMaskOptions options = eMaskOptionsDefault, const bool strictPadding = false ) :
-	FileObject( directory, eMaskTypeSequence, options )
+	Sequence( const boost::filesystem::path& directory, const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const EMaskOptions options = eMaskOptionsDefault, const bool strictPadding = false )
+		: FileObject( directory, eMaskTypeSequence, options )
 	{
 		init( prefix, padding, suffix, firstTime, lastTime, step, strictPadding );
 	}
@@ -142,7 +142,7 @@ private:
 	/**
 	 * @brief Extract step from a sorted list of time values.
 	 */
-	void extractStep( const std::list<detail::FileNumbers>& times, const std::size_t i );
+	void extractStep( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
 
 	std::size_t getPaddingFromStringNumber( const std::string& timeStr );
 
@@ -152,7 +152,7 @@ private:
 	 */
 	void extractPadding( const std::list<std::string>& timesStr );
 
-	void extractPadding( const std::list<detail::FileNumbers>& times, const std::size_t i );
+	void extractPadding( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
 
 	/**
 	 * @brief return if the padding is strict (at least one frame begins with a '0' padding character).

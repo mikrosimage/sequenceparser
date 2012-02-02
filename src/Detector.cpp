@@ -98,7 +98,6 @@ bool isNotFilter( const std::string& filename, const std::vector<boost::regex>& 
 }
 
 
-
 Detector::Detector()
 {
 }
@@ -179,7 +178,7 @@ std::list<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string
 	// add sequences in the output list
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+		const std::list<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
@@ -279,7 +278,7 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std
 
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+		const std::list<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
@@ -350,7 +349,7 @@ std::list<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( cons
 	// add sequences in the output list
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+		const std::list<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
@@ -450,7 +449,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( 
 
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+		const std::list<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
@@ -637,7 +636,7 @@ std::list<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const
 
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::list<Sequence> ss = buildSequence( directory, p.first, p.second, desc );
+		const std::list<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::list<Sequence>::value_type & s, ss )
 		{
@@ -738,9 +737,191 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 	return true;
 }
 
-std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& directory, const FileStrings& stringParts, std::list<FileNumbers>& numberParts, const EMaskOptions& desc )
+Sequence Detector::privateBuildSequence(
+		const Sequence& defaultSeq,
+		const FileStrings& stringParts,
+		const std::list<FileNumbers>::const_iterator& numberPartsBegin,
+		const std::list<FileNumbers>::const_iterator& numberPartsEnd,
+		const std::size_t index,
+		const std::size_t padding,
+		const bool strictPadding
+	) const
 {
-	numberParts.sort();
+	const std::size_t len = numberPartsBegin->size();
+	Sequence sequence( defaultSeq );
+	
+	// fill information in the sequence...
+	for( std::size_t i = 0; i < index; ++i )
+	{
+		sequence._prefix += stringParts[i];
+		sequence._prefix += numberPartsBegin->getString( i );
+	}
+	sequence._prefix += stringParts[index];
+	for( std::size_t i = index + 1; i < len; ++i )
+	{
+		sequence._suffix += stringParts[i];
+		sequence._suffix += numberPartsBegin->getString( i );
+	}
+	sequence._suffix += stringParts[len];
+
+	std::list<FileNumbers>::const_iterator numberPartsLast = numberPartsEnd;
+	--numberPartsLast;
+	
+	// standard case, one sequence detected
+	sequence._firstTime = numberPartsBegin->getTime( index );
+	sequence._lastTime = numberPartsLast->getTime( index );
+	sequence._nbFiles = std::distance( numberPartsBegin, numberPartsEnd );
+
+	sequence.extractStep( numberPartsBegin, numberPartsEnd, index );
+	//sequence.extractPadding( numberPartsBegin, numberPartsEnd, index );
+	sequence._padding = padding;
+	sequence._strictPadding = strictPadding;
+	//sequence.extractIsStrictPadding( numberPartsBegin, numberPartsEnd, index, sequence._padding );
+	
+	return sequence;
+}
+
+/**
+ * 
+ * @param result 
+ * @param numberPartsBegin
+ * @param numberPartsEnd
+ * @param index
+ */
+void Detector::privateBuildSequencesAccordingToPadding(
+	std::list<Sequence>& result,
+	const Sequence& defaultSeq,
+	const FileStrings& stringParts,
+	const std::list<FileNumbers>::iterator& numberPartsBegin,
+	const std::list<FileNumbers>::iterator numberPartsEnd,
+	const int index ) const
+{
+	std::set<std::size_t> paddings;
+	std::set<std::size_t> ambiguousPaddindDigits;
+	for( std::list<FileNumbers>::const_iterator it = numberPartsBegin;
+	     it != numberPartsEnd;
+		 ++it )
+	{
+		const std::size_t padding  = it->getPadding(index);
+		const std::size_t nbDigits = it->getNbDigits(index);
+		
+		paddings.insert( padding );
+		
+		if( padding == 0 )
+		{
+			ambiguousPaddindDigits.insert( nbDigits );
+		}
+	}
+	
+	if( paddings.size() == 1 )
+	{
+		// standard case: only one padding used in the sequence!
+		const std::size_t p = *paddings.begin();
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, numberPartsBegin, numberPartsEnd, index, p, (p!=0) ) );
+		return;
+	}
+	
+	bool onlyConsiderPadding = false;
+	if( paddings.find( 0 ) == paddings.end() )
+	{
+		// No element without padding.
+		// All parts are prefixed by 0, only strict padding,
+		// so we can sort by padding without ambiguity
+		onlyConsiderPadding = true;
+	}
+	else
+	{
+		// We have a mix of padding and no padding.
+		// It may be the same number of digits (strict or ambiguous padding: [09, 10]).
+		// Some ambiguous cases:
+		//	--------------------------------------------------------------------------------
+		//	|     sort by padding      |     sort by padding     |     sort by digits      |
+		//	--------------------------------------------------------------------------------
+		//	|  number  padding digits  |  number padding digits  |  number padding digits  |
+		//	|  1       0       1       |  100    0       3       |  1      0       1       |
+		//	|  5       0       1       |  102    0       3       |  5      0       1       |
+		//	|  10      0       2       |                         |  10     0       2       |
+		//	|  100     0       3       |  001    3       3       |                         |
+		//	|  102     0       3       |  002    3       3       |  001    3       3       |
+		//	|  1000    0       4       |  099    3       3       |  002    3       3       |
+		//	|                          |                         |  099    3       3       |
+		//	|  001     3       3       |  0001   4       4       |  100    0       3       |
+		//	|  002     3       3       |  0123   4       4       |  102    0       3       |
+		//	|  099     3       3       |  1234   4       4       |                         |
+		//	|                          |                         |  0001   4       4       |
+		//	|  0001    4       4       |                         |  0123   4       4       |
+		//	|  0123    4       4       |                         |  1234   4       4       |
+		//	|  1234    4       4       |                         |                         |
+		//	|                          |                         |  10000  0       5       |
+		//	--------------------------------------------------------------------------------
+		//	|                          |  The sequence without   |   One sequence without  |
+		//	|   One sequence without   |  padding can be merge   | padding, should use a   |
+		//	|        padding           |   in sequence with      |     sort by padding     |
+		//	|                          |        padding 3        |                         |
+		//	--------------------------------------------------------------------------------
+		//	|          YES             |   NO : sort by digits   |  NO : sort by padding   |
+		//	--------------------------------------------------------------------------------
+		onlyConsiderPadding = false;
+		BOOST_FOREACH( const std::size_t dig, ambiguousPaddindDigits )
+		{
+			if( paddings.find( dig ) == paddings.end() )
+			{
+				// if one digits from ambiguous digits doesn't correspond to
+				// a padding... we keep the whole sequence without padding.
+				onlyConsiderPadding = true;
+				break;
+			}
+		}
+	}
+	
+	if( onlyConsiderPadding )
+	{
+		std::cout << "Detector onlyConsiderPadding: " << __LINE__ << std::endl;
+		// sort by padding
+//		std::sort( numberPartsBegin, numberPartsEnd, FileNumbers::SortByPadding() );
+		// split when the padding changed
+		std::list<FileNumbers>::const_iterator start = numberPartsBegin;
+		for( std::list<FileNumbers>::const_iterator it = boost::next(start); it != numberPartsEnd; ++it )
+		{
+			if( start->getPadding(index) != it->getPadding(index) )
+			{
+				const std::size_t p = start->getPadding(index);
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, start, it, index, p, (p!=0) ) );
+				start = it;
+			}
+		}
+		const std::size_t p = start->getPadding(index);
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, start, numberPartsEnd, index, p, (p!=0) ) );
+		return;
+	}
+	else
+	{
+		std::cout << "Detector onlyConsiderDigits: " << __LINE__ << std::endl;
+		// sort by digits
+//		std::sort( numberPartsBegin, numberPartsEnd, FileNumbers::SortByDigit() );
+		// split when the number of digits changed
+		std::list<FileNumbers>::const_iterator start = numberPartsBegin;
+		for( std::list<FileNumbers>::const_iterator it = boost::next(numberPartsBegin); it != numberPartsEnd; ++it )
+		{
+			if( start->getNbDigits(index) != it->getNbDigits(index) )
+			{
+				const std::size_t p = boost::prior(it)->getPadding(index);
+				const std::size_t pStart = start->getPadding(index);
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, start, it, index, p, (p!=pStart) ) );
+				start = it;
+			}
+		}
+		const std::size_t p = boost::prior(numberPartsEnd)->getPadding(index);
+		const std::size_t pStart = start->getPadding(index);
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, start, numberPartsEnd, index, p, (p!=pStart) ) );
+		return;
+	}
+}
+
+std::list<Sequence> Detector::buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::list<FileNumbers>& numberParts, const EMaskOptions& desc )
+{
+	Sequence defaultSeq( directory, desc );
+//	numberParts.sort();
 	BOOST_ASSERT( numberParts.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( numberParts.front().size() == numberParts.back().size() );
@@ -763,100 +944,23 @@ std::list<Sequence> Detector::buildSequence( const boost::filesystem::path& dire
 			}
 		}
 	}
-	std::size_t idChangeBegin = 0;
-	std::size_t idChangeEnd = 0;
-	if( allIndex.size() == 0 )
+	std::list<Sequence> result;
+	if( allIndex.size() == 1 )
 	{
-		idChangeBegin = idChangeEnd = len - 1;
+		// if it's a simple sequence, but may be mix multiple paddings
+		privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, numberParts.begin(), numberParts.end(), allIndex.front() );
 	}
 	else
 	{
-		idChangeBegin = allIndex.front();
-		idChangeEnd = allIndex.back();
+		// it's a multi-sequence
 	}
-	Sequence seqCommon( directory, desc );
-	// fill information in the sequence...
-	for( std::size_t i = 0; i < idChangeBegin; ++i )
-	{
-		seqCommon._prefix += stringParts[i];
-		seqCommon._prefix += numberParts.front().getString( i );
-	}
-	seqCommon._prefix += stringParts[idChangeBegin];
-	for( std::size_t i = idChangeEnd + 1; i < len; ++i )
-	{
-		seqCommon._suffix += stringParts[i];
-		seqCommon._suffix += numberParts.front().getString( i );
-	}
-	seqCommon._suffix += stringParts[len];
-	std::list<Sequence> result;
-	if( allIndex.size() <= 1 )
-	{
-		// standard case, one sequence detected
-		seqCommon._firstTime = numberParts.front().getTime( idChangeEnd );
-		seqCommon._lastTime = numberParts.back().getTime( idChangeEnd );
-		seqCommon._nbFiles = numberParts.size();
-
-		seqCommon.extractStep( numberParts, idChangeEnd );
-		seqCommon.extractPadding( numberParts, idChangeEnd );
-		seqCommon.extractIsStrictPadding( numberParts, idChangeEnd, seqCommon._padding );
-		result.push_back( seqCommon );
-		return result;
-	}
-	// it's a multi-sequence...
-	const FileNumbers* previous = &numberParts.front();
-	Sequence s = seqCommon;
-	s._prefix += previous->getString( idChangeBegin );
-	for( std::size_t i = idChangeBegin + 1; i < idChangeEnd; ++i )
-	{
-		s._prefix += stringParts[i];
-		s._prefix += previous->getString( i );
-	}
-	s._prefix += stringParts[idChangeEnd];
-	result.push_back( s );
-	std::list<Time> times;
-	std::list<std::string> timesStr;
-	std::size_t iCurrent = 0;
-
-	BOOST_FOREACH( const FileNumbers& sn, numberParts )
-	{
-		if( !sn.rangeEquals( *previous, idChangeBegin, idChangeEnd ) )
-		{
-			// update the last added sequence
-			result.back()._nbFiles = times.size();
-			result.back()._firstTime = times.front();
-			result.back()._lastTime = times.back();
-			result.back().extractStep( times );
-			result.back().extractPadding( timesStr );
-			result.back().extractIsStrictPadding( timesStr, result.back()._padding );
-			times.clear();
-
-			// create a new sequence initilized with "sn" values
-			s = seqCommon;
-			s._prefix += sn.getString( idChangeBegin );
-			for( std::size_t i = idChangeBegin + 1; i < idChangeEnd; ++i )
-			{
-				s._prefix += stringParts[i];
-				s._prefix += sn.getString( i );
-			}
-			s._prefix += stringParts[idChangeEnd];
-			s._padding = sn.getPadding( idChangeEnd );
-			result.push_back( s );
-			previous = &sn;
-		}
-		times.push_back( sn.getTime( idChangeEnd ) );
-		timesStr.push_back( sn.getString( idChangeEnd ) );
-		++iCurrent;
-	}
-
-	// update the last added sequence
-	result.back()._nbFiles = times.size();
-	result.back()._firstTime = times.front();
-	result.back()._lastTime = times.back();
-
-	result.back().extractStep( times );
-	result.back().extractPadding( timesStr );
-	result.back().extractIsStrictPadding( timesStr, result.back()._padding );
-
+//	BOOST_FOREACH( const FileNumbers& sn, numberParts )
+//	{
+//		if( !sn.rangeEquals( *previous, idChangeBegin, idChangeEnd ) )
+//		{
+//		}
+//	}
+	
 	return result;
 }
 
