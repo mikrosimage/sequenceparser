@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE( MultiPaddingSequenceDetection )
 BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 

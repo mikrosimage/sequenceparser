@@ -101,6 +101,10 @@ public:
 		return _numbers.size();
 	}
 
+	struct SortByNumber
+	{
+		bool operator()( const FileNumbers& a, const FileNumbers& b ) const;
+	};
 	struct SortByPadding
 	{
 		bool operator()( const FileNumbers& a, const FileNumbers& b ) const;
@@ -113,7 +117,7 @@ public:
 	bool operator<(const This& v )
 	{
 		// by default sort by padding
-		return SortByPadding()( *this, v );
+		return SortByNumber()( *this, v );
 	}
 
 	bool rangeEquals( const This& v, const size_t begin, const size_t end ) const

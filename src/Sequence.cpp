@@ -191,8 +191,8 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 	if( !boost::filesystem::exists( _directory ) )
 		return true; // an empty sequence
 
-	std::list<std::string> allTimesStr;
-	std::list<Time> allTimes;
+	std::vector<std::string> allTimesStr;
+	std::vector<Time> allTimes;
 	bfs::directory_iterator itEnd;
 
 	for( bfs::directory_iterator iter( _directory ); iter != itEnd; ++iter )
@@ -207,7 +207,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 		// if the file is inside the sequence
 		if( isIn( iter->path().filename().string(), time, timeStr ) )
 		{
-			// create a big list of all times in our sequence
+			// create a big vector of all times in our sequence
 			allTimesStr.push_back( timeStr );
 			allTimes.push_back( time );
 		}
@@ -221,7 +221,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 		//std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
 		return true; // an empty sequence
 	}
-	allTimes.sort();
+	//allTimes.sort();
 	extractStep( allTimes );
 	extractPadding( allTimesStr );
 	extractIsStrictPadding( allTimesStr, _padding );
@@ -251,9 +251,9 @@ void Sequence::extractStep( const std::set<std::size_t>& steps )
 }
 
 /**
- * @brief Extract step from a sorted list of time values.
+ * @brief Extract step from a sorted vector of time values.
  */
-void Sequence::extractStep( const std::list<Time>& times )
+void Sequence::extractStep( const std::vector<Time>& times )
 {
 	if( times.size() <= 1 )
 	{
@@ -261,7 +261,7 @@ void Sequence::extractStep( const std::list<Time>& times )
 		return;
 	}
 	std::set<std::size_t> allSteps;
-	for( std::list<Time>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
+	for( std::vector<Time>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
 	{
 		allSteps.insert( *itB - *itA );
 	}
@@ -269,9 +269,9 @@ void Sequence::extractStep( const std::list<Time>& times )
 }
 
 /**
- * @brief Extract step from a sorted list of time values.
+ * @brief Extract step from a sorted vector of time values.
  */
-void Sequence::extractStep( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
+void Sequence::extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
 {
 	if( std::distance( timesBegin, timesEnd ) <= 1 )
 	{
@@ -279,7 +279,7 @@ void Sequence::extractStep( const std::list<detail::FileNumbers>::const_iterator
 		return;
 	}
 	std::set<std::size_t> allSteps;
-	for( std::list<detail::FileNumbers>::const_iterator itA = timesBegin, itB = boost::next(timesBegin), itEnd = timesEnd; itB != itEnd; ++itA, ++itB )
+	for( std::vector<detail::FileNumbers>::const_iterator itA = timesBegin, itB = boost::next(timesBegin), itEnd = timesEnd; itB != itEnd; ++itA, ++itB )
 	{
 		allSteps.insert( itB->getTime( i ) - itA->getTime( i ) );
 	}
@@ -300,10 +300,10 @@ std::size_t Sequence::getPaddingFromStringNumber( const std::string& timeStr )
 }
 
 /**
- * @brief extract the padding from a list of frame numbers
- * @param[in] timesStr list of frame numbers in string format
+ * @brief extract the padding from a vector of frame numbers
+ * @param[in] timesStr vector of frame numbers in string format
  */
-void Sequence::extractPadding( const std::list<std::string>& timesStr )
+void Sequence::extractPadding( const std::vector<std::string>& timesStr )
 {
 	BOOST_ASSERT( timesStr.size() > 0 );
 	const std::size_t padding = getPaddingFromStringNumber( timesStr.front() );
@@ -319,14 +319,14 @@ void Sequence::extractPadding( const std::list<std::string>& timesStr )
 	_padding = padding;
 }
 
-void Sequence::extractPadding( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
+void Sequence::extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
 {
 	BOOST_ASSERT( timesBegin != timesEnd );
 
 	std::set<std::size_t> padding;
 	std::set<std::size_t> nbDigits;
 	
-	for( std::list<detail::FileNumbers>::const_iterator s = timesBegin;
+	for( std::vector<detail::FileNumbers>::const_iterator s = timesBegin;
 		 s != timesEnd;
 		 ++s )
 	{
@@ -355,10 +355,10 @@ void Sequence::extractPadding( const std::list<detail::FileNumbers>::const_itera
 
 /**
  * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
- * @param[in] timesStr list of frame numbers in string format
+ * @param[in] timesStr vector of frame numbers in string format
  * @param[in] padding previously detected padding
  */
-void Sequence::extractIsStrictPadding( const std::list<std::string>& timesStr, const std::size_t padding )
+void Sequence::extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding )
 {
 	if( padding == 0 )
 	{
@@ -377,7 +377,7 @@ void Sequence::extractIsStrictPadding( const std::list<std::string>& timesStr, c
 	_strictPadding = false;
 }
 
-void Sequence::extractIsStrictPadding( const std::list<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
+void Sequence::extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
 {
 	if( padding == 0 )
 	{

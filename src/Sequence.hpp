@@ -134,34 +134,34 @@ public:
 	void extractStep( const std::set<std::size_t>& steps );
 
 	/**
-	 * @brief Extract step from a sorted list of time values.
+	 * @brief Extract step from a sorted vector of time values.
 	 */
-	void extractStep( const std::list<Time>& times );
+	void extractStep( const std::vector<Time>& times );
 
 private:
 	/**
-	 * @brief Extract step from a sorted list of time values.
+	 * @brief Extract step from a sorted vector of time values.
 	 */
-	void extractStep( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
+	void extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
 
 	std::size_t getPaddingFromStringNumber( const std::string& timeStr );
 
 	/**
-	 * @brief extract the padding from a list of frame numbers
-	 * @param[in] timesStr list of frame numbers in string format
+	 * @brief extract the padding from a vector of frame numbers
+	 * @param[in] timesStr vector of frame numbers in string format
 	 */
-	void extractPadding( const std::list<std::string>& timesStr );
+	void extractPadding( const std::vector<std::string>& timesStr );
 
-	void extractPadding( const std::list<detail::FileNumbers>::const_iterator& timesBegin, const std::list<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
+	void extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
 
 	/**
 	 * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
-	 * @param[in] timesStr list of frame numbers in string format
+	 * @param[in] timesStr vector of frame numbers in string format
 	 * @param[in] padding previously detected padding
 	 */
-	void extractIsStrictPadding( const std::list<std::string>& timesStr, const std::size_t padding );
+	void extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding );
 
-	void extractIsStrictPadding( const std::list<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
+	void extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
 
 public:
 	inline std::string getAbsoluteFilenameAt( const Time time ) const;
@@ -230,10 +230,18 @@ public:
 
 	bool operator==(const Sequence& other ) const
 	{
+		/*
+		std::cout << "_prefix: " << _prefix << " -> " << other._prefix << std::endl;
+		std::cout << "_suffix: " << _suffix << " -> " << other._suffix << std::endl;
+		std::cout << "_padding: " << _padding << " -> " << other._padding << std::endl;
+		std::cout << "_step: " << _step << " -> " << other._step << std::endl;
+		std::cout << "_firstTime: " << _firstTime << " -> " << other._firstTime << std::endl;
+		std::cout << "_lastTime: " << _lastTime << " -> " << other._lastTime << std::endl;
+		std::cout << "_nbFiles: " << _nbFiles << " -> " << other._nbFiles << std::endl;
+		*/
 		return
 			( _prefix == other._prefix ) &&
 			( _suffix == other._suffix ) &&
-			( _strictPadding == other._strictPadding ) &&
 			( _padding == other._padding ) &&
 			( _step == other._step ) &&
 			( _firstTime == other._firstTime ) &&

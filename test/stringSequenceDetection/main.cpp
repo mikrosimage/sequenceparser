@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_SUITE( SimpleDetections )
 BOOST_AUTO_TEST_CASE( Nothing )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( Nothing )
 BOOST_AUTO_TEST_CASE( SingleFilename )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( SingleFilename )
 BOOST_AUTO_TEST_CASE( SingleSequence )
 {
 	sequenceParser::Detector detector;
-	std::list< boost::shared_ptr<sequenceParser::Sequence> > listSequence1;
+	std::vector< boost::shared_ptr<sequenceParser::Sequence> > listSequence1;
 
 	{
 		std::vector<boost::filesystem::path> paths;
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 		listSequence1 = detector.sequenceFromFilenameList( paths );
 	}
 
-	std::list< boost::shared_ptr<sequenceParser::Sequence> > listSequence2;
+	std::vector< boost::shared_ptr<sequenceParser::Sequence> > listSequence2;
 	{
 		std::vector<boost::filesystem::path> paths;
 		boost::assign::push_back( paths )
@@ -65,9 +65,9 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 		BOOST_CHECK( listSequence2.size() == 1 );
 	}
 
-	BOOST_CHECK( *( listSequence1.front() ) == *( listSequence2.front() ) );
+	BOOST_CHECK( ( *listSequence1.front() ) == ( *listSequence2.front() ) );
 
-	std::list< boost::shared_ptr<sequenceParser::Sequence> > listSequence3;
+	std::vector< boost::shared_ptr<sequenceParser::Sequence> > listSequence3;
 	{
 		std::vector<boost::filesystem::path> paths;
 		boost::assign::push_back( paths )

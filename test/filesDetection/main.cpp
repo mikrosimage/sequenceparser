@@ -128,10 +128,10 @@ void clearTmp()
 void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
     sequenceParser::Detector detector;
-    std::list<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
-    std::list<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
-    std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
-    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    std::vector<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
+    std::vector<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
+    std::vector<boost::shared_ptr<sequenceParser::File       > > listFile;
+    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
     listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
     listFolder     = detector.folderInDirectory      ( path );
@@ -139,7 +139,7 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
     listSequence   = detector.sequenceInDirectory    ( path );
 
     std::cout << "test path: " << std::left << std::setw(60) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
-	std::list<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
 	for(it=listSequence.begin() ; it != listSequence.end(); it++)
 		std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 
@@ -152,10 +152,10 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
 void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
     sequenceParser::Detector detector;
-    std::list<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
-    std::list<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
-    std::list<boost::shared_ptr<sequenceParser::File       > > listFile;
-    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    std::vector<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
+    std::vector<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
+    std::vector<boost::shared_ptr<sequenceParser::File       > > listFile;
+    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
     listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) ,  options );
     listFolder     = detector.folderInDirectory      ( path, options );
@@ -163,9 +163,14 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
     listSequence   = detector.sequenceInDirectory    ( path, options );
 
     std::cout << "test path: " << std::left << std::setw(60) << path << std::right << std::setw(8) << listFolder.size() << " | " << std::setw(8) << listFile.size() << " | " << std::setw(8) << listSequence.size() << " | " << std::setw(11) << listFileObject.size() << std::endl;
-	std::list<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
 	for(it=listSequence.begin() ; it != listSequence.end(); it++)
 		std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
+	
+	std::cout << "listFileObject.size(): " << listFileObject.size() << " -> " << numberOfFileObjects << std::endl;
+	std::cout << "listFolder.size(): " << listFolder.size() << " -> " << numberOfFolders << std::endl;
+	std::cout << "listFiles.size(): " << listFile.size() << " -> " << numberOfFiles << std::endl;
+	std::cout << "listSequence.size(): " << listSequence.size() << " -> " << numberOfSequences << std::endl;
     BOOST_CHECK( listFileObject.size() == numberOfFileObjects );
     BOOST_CHECK( listFolder.size()     == numberOfFolders     );
     BOOST_CHECK( listFile.size()       == numberOfFiles       );
@@ -175,7 +180,7 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
 void testFirstSequenceLimits  ( const char* path, const int minValue, const int maxValue )
 {
     sequenceParser::Detector detector;
-    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
     listSequence   = detector.sequenceInDirectory    ( path );
 
@@ -190,7 +195,7 @@ void testFirstSequenceLimits  ( const char* path, const int minValue, const int 
 void testFirstSequenceLimits  ( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
 {
     sequenceParser::Detector detector;
-    std::list<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
 
     listSequence   = detector.sequenceInDirectory    ( path, options );
 

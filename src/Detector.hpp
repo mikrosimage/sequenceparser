@@ -30,80 +30,46 @@ public:
 	 ** fileInDirectory methods
 	 **
 	 **/
-	std::list<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
 														 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::list<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
 														 std::vector<std::string>& filters,
 														 const EMaskOptions desc = eMaskOptionsDefault );
 
-	void printFileInDirectory( const std::string& directory,
-							   const EMaskOptions desc = eMaskOptionsDefault );
-
-	void printFileInDirectory( const std::string& directory,
-							   std::vector<std::string>& filters,
-							   const EMaskOptions desc = eMaskOptionsDefault );
-
-
-	std::list<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
 																 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::list<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
 																 std::vector<std::string>& filters,
 																 const EMaskOptions desc = eMaskOptionsDefault );
 
 
-	std::list<boost::shared_ptr<Sequence> > sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
+	std::vector<boost::shared_ptr<Sequence> > sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
 
 
-	void printSequenceInDirectory( const std::string& directory,
-								   const EMaskOptions desc = eMaskOptionsDefault );
-
-	std::list<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
 																		  const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::list<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
 																		  std::vector<std::string>& filters,
 																		  const EMaskOptions desc = eMaskOptionsDefault );
 
-	void printFileAndSequenceInDirectory( const std::string& directory,
-										  const EMaskOptions desc = eMaskOptionsDefault );
-
-	void printFileAndSequenceInDirectory( const std::string& directory,
-										  std::vector<std::string>& filters,
-										  const EMaskOptions desc = eMaskOptionsDefault );
-
-	std::list<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
 															 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::list<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
 															 std::vector<std::string>& filters,
 															 const EMaskOptions desc = eMaskOptionsDefault );
 
-	void printFolderInDirectory( const std::string& directory,
-								 const EMaskOptions desc = eMaskOptionsDefault );
-
-	void printFolderInDirectory( const std::string& directory,
-								 std::vector<std::string>& filters,
-								 const EMaskOptions desc = eMaskOptionsDefault );
-
-	std::list<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
 																	 const EMaskType mask = eMaskTypeDefault,
 																	 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::list<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
+	std::vector<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
 																	 std::vector<std::string>& filters,
 																	 const EMaskType mask = eMaskTypeDefault,
 																	 const EMaskOptions desc = eMaskOptionsDefault );
-
-	void printFileObjectInDirectory( const std::string& directory,
-									 const EMaskType mask = eMaskTypeDefault,
-									 const EMaskOptions desc = eMaskOptionsDefault );
-
-	void printFileObjectInDirectory( const std::string& directory,
-									 std::vector<std::string>& filters,
-									 const EMaskType mask = eMaskTypeDefault,
-									 const EMaskOptions desc = eMaskOptionsDefault );
 
 private:
 	/**
@@ -120,34 +86,34 @@ private:
 	Sequence privateBuildSequence(
 			const Sequence& defaultSeq,
 			const detail::FileStrings& stringParts,
-			const std::list<detail::FileNumbers>::const_iterator& numberPartsBegin,
-			const std::list<detail::FileNumbers>::const_iterator& numberPartsEnd,
+			const std::vector<detail::FileNumbers>::const_iterator& numberPartsBegin,
+			const std::vector<detail::FileNumbers>::const_iterator& numberPartsEnd,
 			const std::size_t index,
 			const std::size_t padding,
 			const bool strictPadding
 		) const;
 	
 	void privateBuildSequencesAccordingToPadding(
-		std::list<Sequence>& result,
+		std::vector<Sequence>& result,
 		const Sequence& defaultSeq,
 		const detail::FileStrings& stringParts,
-		const std::list<detail::FileNumbers>::iterator& numberPartsBegin,
-		const std::list<detail::FileNumbers>::iterator numberPartsEnd,
+		const std::vector<detail::FileNumbers>::iterator& numberPartsBegin,
+		const std::vector<detail::FileNumbers>::iterator numberPartsEnd,
 		const int index ) const;
 
 	
 	/**
-	 * @brief Create a list of sequences from a list of FileNumbers associated to a common FileStrings.
+	 * @brief Create a vector of sequences from a vector of FileNumbers associated to a common FileStrings.
 	 * 
 	 * @param[in] stringParts the sequence identifier
-	 * @param[inout] numberParts the list of sequence of number inside each filename
+	 * @param[inout] numberParts the vector of sequence of number inside each filename
 	 * @param[in] desc detection flags
 	 * 
 	 * @warning We modify @p numberParts in place, because we don't use it after
 	 *          so there is no reason to create a copy.
 	 * @return a sequence object with all informations
 	 */
-	std::list<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::list<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
+	std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
 
 	/**
 	 * @brief Extract number and string parts from a filename.
@@ -159,8 +125,8 @@ private:
 	 * numberParts = [1, 22, 3]
 	 * 
 	 * @param[in] str the string to process (filename)
-	 * @param[out] stringParts list of strings
-	 * @param[out] numberParts list of integers
+	 * @param[out] stringParts vector of strings
+	 * @param[out] numberParts vector of integers
 	 * 
 	 * @return number of decteted numbers
 	 */

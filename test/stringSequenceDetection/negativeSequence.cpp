@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE( NegativeSequenceDetection )
 BOOST_AUTO_TEST_CASE( NoNegativeValues )
 {
 	sequenceParser::Detector detector;
-	std::list<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 {
 	using namespace sequenceParser;
 	Detector detector;
-	std::list<boost::shared_ptr<Sequence> > listSequence;
+	std::vector<boost::shared_ptr<Sequence> > listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
