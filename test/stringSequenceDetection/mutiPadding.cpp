@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 	listSequence = detector.sequenceFromFilenameList( paths );
 
 	std::cout << "AA: " << listSequence.size() << std::endl;
-//	BOOST_CHECK( listSequence.size() == 2 ); // @todo bug to fix !
+	BOOST_CHECK( listSequence.size() == 2 );
 }
 
 

@@ -330,6 +330,7 @@ std::vector<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( co
 	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
+		//std::cout << "FileStrings: " << p.first << std::endl;
 		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
@@ -835,48 +836,132 @@ void Detector::privateBuildSequencesAccordingToPadding(
 	}
 }
 
+
+bool getVaryingNumber( std::ssize_t& index, const FileNumbers& a, const FileNumbers& b )
+{
+	BOOST_ASSERT( a.size() == b.size() );
+	bool foundOne = false;
+	for( std::size_t i = 0; i < a.size(); ++i )
+	{
+		if( a.getString(i) != b.getString(i) )
+		{
+			if( foundOne )
+			{
+				index = -1;
+				return false; // more than one element founded
+			}
+			foundOne = true;
+			index = i;
+		}
+	}
+	if( !foundOne )
+		index = -1;
+	return foundOne; // we found one varying index
+}
+
 std::vector<Sequence> Detector::buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EMaskOptions& desc )
 {
 	Sequence defaultSeq( directory, desc );
-//	numberParts.sort();
 	BOOST_ASSERT( numberParts.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( numberParts.front().size() == numberParts.back().size() );
 	const std::size_t len = numberParts.front().size();
-
+	std::vector<Sequence> result;
+	
+	if( numberParts.size() <= 1 )
+	{
+		privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, numberParts.begin(), numberParts.end(), len-1 );
+		return result;
+	}
+	
 	// detect which part is the sequence number
 	// for the moment, accept only one sequence
 	// but we can easily support multi-sequences
 	std::vector<std::size_t> allIndex; // vector of indices (with 0 < index < len) with value changes
 	for( std::size_t i = 0; i < len; ++i )
 	{
-		const Time t = numberParts.front().getTime( i );
+		const std::string t = numberParts.front().getString( i );
 
 		BOOST_FOREACH( const FileNumbers& sn, numberParts )
 		{
-			if( sn.getTime( i ) != t )
+			if( sn.getString( i ) != t )
 			{
 				allIndex.push_back( i );
 				break;
 			}
 		}
 	}
-	std::vector<Sequence> result;
+	
+	//std::cout << "allIndex.size(): " << allIndex.size() << std::endl;
+	
 	if( allIndex.size() == 1 )
 	{
 		// if it's a simple sequence, but may be mix multiple paddings
 		privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, numberParts.begin(), numberParts.end(), allIndex.front() );
+		return result;
 	}
-	else
+	
+	// it's a multi-sequence
+	
+	// ambiguous example
+	// 1 2 3
+	// 1 3 3
+	// 1 4 3
+	// 1 5 3 // could go in both sequences
+	//// split here
+	// 1 5 4
+	// 1 5 5
+	// 1 5 6
+	// 1 5 7
+	
+	std::sort( numberParts.begin(), numberParts.end(), FileNumbers::SortByPadding() );
+
+	std::vector<FileNumbers>::iterator start = numberParts.begin();
+	std::vector<FileNumbers>::iterator it = boost::next(start);
+	std::vector<FileNumbers>::iterator itEnd = numberParts.end();
+	std::ssize_t previousIndex = -1;
+	std::ssize_t index = -1;
+	bool split = false;
+	
+	for( ; it != itEnd; ++it )
 	{
-		// it's a multi-sequence
+		//std::cout << "________________________________________" <<  std::endl;
+		//std::cout << "start: " << *start <<  std::endl;
+		//std::cout << "it: " << *it <<  std::endl;
+		if( getVaryingNumber( index, *start, *it ) )
+		{
+			if( previousIndex != -1 && // we previously have a sequence and
+			    index != previousIndex ) // the index is not the same than previous: split!
+			{
+				split = true;
+			}
+//			else
+//			{
+//				// we don't have a sequence before, there is now one varying number,
+//				// so it's the next sequence
+//			}
+		}
+		else
+		{
+			// more than one varying number: split in all cases!
+			split = true;
+			// if no sequence before... the file is alone...
+			// Set the number as the last number.
+			if( previousIndex == -1 )
+				previousIndex = start->size() - 1;
+		}
+		if( split )
+		{
+			privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, start, it, previousIndex );
+			split = false;
+			index = -1;
+			start = it;
+		}
+		previousIndex = index;
 	}
-//	BOOST_FOREACH( const FileNumbers& sn, numberParts )
-//	{
-//		if( !sn.rangeEquals( *previous, idChangeBegin, idChangeEnd ) )
-//		{
-//		}
-//	}
+	if( previousIndex == -1 )
+		previousIndex = start->size() - 1;
+	privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, start, it, previousIndex );
 	
 	return result;
 }

@@ -221,7 +221,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 		//std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
 		return true; // an empty sequence
 	}
-	//allTimes.sort();
+	std::sort( allTimes.begin(), allTimes.end() );
 	extractStep( allTimes );
 	extractPadding( allTimesStr );
 	extractIsStrictPadding( allTimesStr, _padding );
