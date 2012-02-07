@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE( MultiPaddingSequenceDetection )
 BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -25,15 +25,15 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 
 	BOOST_CHECK( listSequence.size() == 1 );
 	
-	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
-	BOOST_CHECK( seq->getPadding() == 3 );
-	BOOST_CHECK( seq->isStrictPadding() == true );
+	const sequenceParser::Sequence& seq = listSequence.front();
+	BOOST_CHECK( seq.getPadding() == 3 );
+	BOOST_CHECK( seq.isStrictPadding() == true );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -49,16 +49,16 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 
 	BOOST_CHECK( listSequence.size() == 1 );
 	
-	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
-	std::cout << "seq padding: " << seq->getPadding() << std::endl;
-	BOOST_CHECK( seq->getPadding() == 3 );
-	BOOST_CHECK( seq->isStrictPadding() == true );
+	const sequenceParser::Sequence& seq = listSequence.front();
+	std::cout << "seq padding: " << seq.getPadding() << std::endl;
+	BOOST_CHECK( seq.getPadding() == 3 );
+	BOOST_CHECK( seq.isStrictPadding() == true );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -75,20 +75,20 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 	std::cout << "AA: " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 1 );
 
-	const boost::shared_ptr<sequenceParser::Sequence> seq = listSequence.front();
-	BOOST_CHECK( seq->getPadding() == 0 );
-	BOOST_CHECK( seq->getFirstTime() == 99 );
-	BOOST_CHECK( seq->getLastTime() == 123456 );
-	BOOST_CHECK( seq->getNbFiles() == 5 );
-	BOOST_CHECK( seq->hasMissingFile() == true );
-	std::cout << "seq->getStep(): " << seq->getStep() << std::endl;
-	BOOST_CHECK( seq->getStep() == 1 );
+	const sequenceParser::Sequence& seq = listSequence.front();
+	BOOST_CHECK( seq.getPadding() == 0 );
+	BOOST_CHECK( seq.getFirstTime() == 99 );
+	BOOST_CHECK( seq.getLastTime() == 123456 );
+	BOOST_CHECK( seq.getNbFiles() == 5 );
+	BOOST_CHECK( seq.hasMissingFile() == true );
+	std::cout << "seq.getStep(): " << seq.getStep() << std::endl;
+	BOOST_CHECK( seq.getStep() == 1 );
 }
 
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 

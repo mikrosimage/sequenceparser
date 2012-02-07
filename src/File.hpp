@@ -14,6 +14,11 @@ public:
 	FileObject( directory, eMaskTypeFile, options ),
 	_filename( filename ) { }
 
+	File( const File& other )
+	: FileObject( other )
+	, _filename( other._filename )
+	{}
+	
 	~File() { }
 
 public:
@@ -36,6 +41,8 @@ public:
 		FileObject::clear();
 		_filename.clear();
 	}
+	
+	File* clone() const { return new File(*this); }
 
 private:
 	std::string _filename;

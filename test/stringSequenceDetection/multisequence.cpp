@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE( MutiSequenceDetection )
 BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -56,11 +56,11 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 //	std::cout << "AA: " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 2 );
 	
-	std::cout << listSequence.front()->getNbFiles() << std::endl;
-	BOOST_CHECK( listSequence.front()->getNbFiles() == 3 );
+	std::cout << listSequence.front().getNbFiles() << std::endl;
+	BOOST_CHECK( listSequence.front().getNbFiles() == 3 );
 	
-	std::cout << listSequence.back()->getNbFiles() << std::endl;
-	BOOST_CHECK( listSequence.back()->getNbFiles() == 4 );
+	std::cout << listSequence.back().getNbFiles() << std::endl;
+	BOOST_CHECK( listSequence.back().getNbFiles() == 4 );
 }
 
 BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 	sequenceParser::Detector detector;
 	
 	{
-		std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+		boost::ptr_vector<sequenceParser::Sequence> listSequence;
 		std::vector<boost::filesystem::path> paths;
 		boost::assign::push_back( paths )
 			( "aaa/bbb/a1b2c1.j2c" )
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 		BOOST_CHECK( listSequence.size() == 2 );
 	}
 	{
-		std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+		boost::ptr_vector<sequenceParser::Sequence> listSequence;
 		std::vector<boost::filesystem::path> paths;
 		boost::assign::push_back( paths )
 			( "aaa/bbb/a1b2c1.j2c" )
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPaddingWithNegValues )
 	using namespace sequenceParser;
 	Detector detector;
 	
-	std::vector<boost::shared_ptr<Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 	std::vector<boost::filesystem::path> paths;
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c1.j2c" )

@@ -69,15 +69,12 @@ public:
 	 */
 	Sequence( const boost::filesystem::path& directory, const EMaskOptions options = eMaskOptionsDefault, const EPattern accept = ePatternDefault );
 
-	Sequence( const Sequence& v ) :
-	FileObject( v._options )
+	Sequence( const Sequence& v )
 	{
 		operator=( v );
-		_options = v._options;
 	}
 
-	Sequence( const boost::filesystem::path& directory, const Sequence& v, const EMaskOptions& options ) :
-	FileObject( options )
+	Sequence( const boost::filesystem::path& directory, const Sequence& v, const EMaskOptions& options )
 	{
 		operator=( v );
 		_options = options;
@@ -86,6 +83,22 @@ public:
 
 	~Sequence();
 
+	Sequence& operator=( const Sequence& other )
+	{
+		FileObject::operator=( other );
+		_prefix = other._prefix;
+		_suffix = other._suffix;
+		_strictPadding = other._strictPadding;
+		_padding = other._padding;
+		_step = other._step;
+		_firstTime = other._firstTime;
+		_lastTime = other._lastTime;
+		_nbFiles = other._nbFiles;
+		return *this;
+	}
+	
+	Sequence* clone() const { return new Sequence(*this); }
+	
 private:
 	/**
 	 * @brief Construct a sequence from a pattern and given informations.

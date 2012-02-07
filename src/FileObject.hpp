@@ -10,7 +10,7 @@ namespace sequenceParser {
 /**
  * @brief A container for files, directories and sequences.
  */
-class FileObject
+class FileObject : private boost::noncopyable
 {
 public:
 
@@ -38,6 +38,24 @@ public:
 		init( directory, type, options );
 	}
 
+	FileObject( const FileObject& other )
+	{
+		operator=( other );
+	}
+	
+	FileObject& operator=( const FileObject& other )
+	{
+		_directory = other._directory;
+		_type = other._type;
+		_options = other._options;
+		_kColorStd = other._kColorStd;
+		_kColorFolder = other._kColorFolder;
+		_kColorFile = other._kColorFile;
+		_kColorSequence = other._kColorSequence;
+		_kColorError = other._kColorError;
+		return *this;
+	}
+	
 	virtual ~FileObject();
 
 #ifndef SWIG
@@ -91,7 +109,9 @@ public:
 		_type = eMaskTypeDefault;
 		_options = eMaskOptionsDefault;
 	}
-
+	
+	virtual FileObject* clone() const = 0;
+	
 private:
 
 	void init( const boost::filesystem::path& directory, const EMaskType& type, const EMaskOptions& options )
@@ -142,13 +162,25 @@ protected:
 protected:
 	boost::filesystem::path _directory; ///< directory
 	EMaskType _type; ///< specify type of object
+	
+	///@todo Remove this from here!
+	///@{
 	EMaskOptions _options; ///< specify output options of object, common for each objects
 	std::string _kColorStd;
 	std::string _kColorFolder;
 	std::string _kColorFile;
 	std::string _kColorSequence;
 	std::string _kColorError;
+	///@}
 };
+
+#ifndef SWIG
+inline FileObject* new_clone( const FileObject& a )
+{
+	return a.clone();
+}
+#endif
+
 
 }
 

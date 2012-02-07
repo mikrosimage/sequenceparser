@@ -106,15 +106,15 @@ Detector::~Detector()
 {
 }
 
-std::vector<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<File> Detector::fileInDirectory( const std::string& directory, const EMaskOptions desc )
 {
 	std::vector<std::string> filters;
 	return fileInDirectory( directory, filters, desc );
 }
 
-std::vector<boost::shared_ptr<File> > Detector::fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<File> Detector::fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	std::vector<boost::shared_ptr<File> > outputFiles;
+	boost::ptr_vector<File> outputFiles;
 	std::string tmpDir( dir );
 
 	if( !detectDirectoryInResearch( tmpDir, filters ) )
@@ -168,8 +168,7 @@ std::vector<boost::shared_ptr<File> > Detector::fileInDirectory( const std::stri
 				{
 					if( ! bfs::is_directory( directory / iter->path().filename().string() ) )
 					{
-						boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-						outputFiles.push_back( f );
+						outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
 					}
 				}
 			}
@@ -184,23 +183,22 @@ std::vector<boost::shared_ptr<File> > Detector::fileInDirectory( const std::stri
 			filename += p.second[0].getString(0);
 			filename += p.first[1];
 			//std::cout << "FILENAME = " << filename << std::endl;
-			boost::shared_ptr<File> file( new File( directory, filename, desc ) );
-			outputFiles.push_back( file );
+			outputFiles.push_back( new File( directory, filename, desc ) );
 		}
 	}
 
 	return outputFiles;
 }
 
-std::vector<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<Sequence> Detector::sequenceInDirectory( const std::string& directory, const EMaskOptions desc )
 {
 	std::vector<std::string> filters;
 	return sequenceInDirectory( directory, filters, desc );
 }
 
-std::vector<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<Sequence> Detector::sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	std::vector<boost::shared_ptr<Sequence> > outputSequences;
+	boost::ptr_vector<Sequence> outputSequences;
 	std::string tmpDir( dir );
 
 	if( !detectDirectoryInResearch( tmpDir, filters ) )
@@ -263,8 +261,7 @@ std::vector<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const s
 			{
 				if( !( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
-					boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
-					outputSequences.push_back( seq );
+					outputSequences.push_back( new Sequence( directory, s, desc ) );
 				}
 			}
 		}
@@ -273,10 +270,10 @@ std::vector<boost::shared_ptr<Sequence> > Detector::sequenceInDirectory( const s
 	return outputSequences;
 }
 
-std::vector<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc )
+boost::ptr_vector<Sequence> Detector::sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc )
 {
 	std::vector<std::string> filters; // @todo as argument !
-	std::vector<boost::shared_ptr<Sequence> > outputSequences;
+	boost::ptr_vector<Sequence> outputSequences;
 
 	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
@@ -335,8 +332,7 @@ std::vector<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( co
 			{
 				if( !( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 				{
-					boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
-					outputSequences.push_back( seq );
+					outputSequences.push_back( new Sequence( directory, s, desc ) );
 				}
 			}
 		}
@@ -345,17 +341,17 @@ std::vector<boost::shared_ptr<Sequence> > Detector::sequenceFromFilenameList( co
 	return outputSequences;
 }
 
-std::vector<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<FileObject> Detector::fileAndSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
 {
 	std::vector<std::string> filters;
 	return fileAndSequenceInDirectory( directory, filters, desc );
 }
 
-std::vector<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<FileObject> Detector::fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	std::vector<boost::shared_ptr<FileObject> > output;
-	std::vector<boost::shared_ptr<FileObject> > outputFiles;
-	std::vector<boost::shared_ptr<FileObject> > outputSequences;
+	boost::ptr_vector<FileObject> output;
+	boost::ptr_vector<FileObject> outputFiles;
+	boost::ptr_vector<FileObject> outputSequences;
 	std::string tmpDir( dir );
 
 	if( ! detectDirectoryInResearch( tmpDir, filters ) )
@@ -404,8 +400,7 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory
 				}
 				else
 				{
-					boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-					outputFiles.push_back( f );
+					outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
 				}
 			}
 		}
@@ -420,8 +415,7 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory
 			filename += p.second[0].getString(0);
 			filename += p.first[1];
 			//std::cout << "FILENAME = " << filename << std::endl;
-			boost::shared_ptr<File> file( new File( directory, filename, desc ) );
-			outputFiles.push_back( file );
+			outputFiles.push_back( new File( directory, filename, desc ) );
 		}
 		else
 		{
@@ -434,33 +428,31 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileAndSequenceInDirectory
 				{
 					if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 					{
-						boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
-						outputFiles.push_back( file );
+						outputFiles.push_back( new File( directory, s.getFirstFilename(), desc ) );
 					}
 					else
 					{
-						boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
-						outputSequences.push_back( seq );
+						outputSequences.push_back( new Sequence( directory, s, desc ) );
 					}
 				}
 			}
 		}
 	}
 
-	output.insert( output.begin(), outputFiles.begin(), outputFiles.end() );
-	output.insert( output.begin(), outputSequences.begin(), outputSequences.end() );
+	output.transfer( output.begin(), outputFiles );
+	output.transfer( output.begin(), outputSequences );
 	return output;
 }
 
-std::vector<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<Folder> Detector::folderInDirectory( const std::string& directory, const EMaskOptions desc )
 {
 	std::vector<std::string> filters;
 	return folderInDirectory( directory, filters, desc );
 }
 
-std::vector<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<Folder> Detector::folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
 {
-	std::vector<boost::shared_ptr<Folder> > outputFolders;
+	boost::ptr_vector<Folder> outputFolders;
 	bfs::path directory;
 
 	if( bfs::exists( dir ) )
@@ -490,26 +482,25 @@ std::vector<boost::shared_ptr<Folder> > Detector::folderInDirectory( const std::
 			// detect if is a folder
 			if( bfs::is_directory( iter->status() ) )
 			{
-				boost::shared_ptr<Folder> d( new Folder( directory, iter->path().filename().string(), desc ) );
-				outputFolders.push_back( d );
+				outputFolders.push_back( new Folder( directory, iter->path().filename().string(), desc ) );
 			}
 		}
 	}
 	return outputFolders;
 }
 
-std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const std::string& directory, const EMaskType mask, const EMaskOptions desc )
+boost::ptr_vector<FileObject> Detector::fileObjectInDirectory( const std::string& directory, const EMaskType mask, const EMaskOptions desc )
 {
 	std::vector<std::string> filters;
 	return fileObjectInDirectory( directory, filters, mask, desc );
 }
 
-std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+boost::ptr_vector<FileObject> Detector::fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
 {
-	std::vector<boost::shared_ptr<FileObject> > output;
-	std::vector<boost::shared_ptr<FileObject> > outputFolders;
-	std::vector<boost::shared_ptr<FileObject> > outputFiles;
-	std::vector<boost::shared_ptr<FileObject> > outputSequences;
+	boost::ptr_vector<FileObject> output;
+	boost::ptr_vector<FileObject> outputFolders;
+	boost::ptr_vector<FileObject> outputFiles;
+	boost::ptr_vector<FileObject> outputSequences;
 	std::string tmpDir( dir );
 
 	if( !detectDirectoryInResearch( tmpDir, filters ) )
@@ -540,8 +531,7 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( con
 			// detect if is a folder
 			if( bfs::is_directory( iter->status() ) )
 			{
-				boost::shared_ptr<Folder> d( new Folder( directory, iter->path().filename().string(), desc ) );
-				outputFolders.push_back( d );
+				outputFolders.push_back( new Folder( directory, iter->path().filename().string(), desc ) );
 			}
 			else // it's a file or a file of a sequence
 			{
@@ -566,8 +556,7 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( con
 					}
 					else
 					{
-						boost::shared_ptr<File> f( new File( directory, iter->path().filename().string(), desc ) );
-						outputFiles.push_back( f );
+						outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
 					}
 				}
 			}
@@ -583,8 +572,7 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( con
 			filename += p.second[0].getString(0);
 			filename += p.first[1];
 			//std::cout << "FILENAME = " << filename << std::endl;
-			boost::shared_ptr<File> file( new File( directory, filename, desc ) );
-			outputFiles.push_back( file );
+			outputFiles.push_back( new File( directory, filename, desc ) );
 		}
 		else
 		{
@@ -597,13 +585,11 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( con
 				{
 					if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
 					{
-						boost::shared_ptr<File> file( new File( directory, s.getFirstFilename(), desc ) );
-						outputFiles.push_back( file );
+						outputFiles.push_back( new File( directory, s.getFirstFilename(), desc ) );
 					}
 					else
 					{
-						boost::shared_ptr<Sequence> seq( new Sequence( directory, s, desc ) );
-						outputSequences.push_back( seq );
+						outputSequences.push_back( new Sequence( directory, s, desc ) );
 					}
 				}
 				// else
@@ -616,17 +602,17 @@ std::vector<boost::shared_ptr<FileObject> > Detector::fileObjectInDirectory( con
 
 	if( mask & eMaskTypeDirectory )
 	{
-		output.insert( output.end(), outputFolders.begin(), outputFolders.end() );
+		output.transfer( output.end(), outputFolders );
 	}
 	// add files in the output vector
 	if( mask & eMaskTypeFile )
 	{
-		output.insert( output.end(), outputFiles.begin(), outputFiles.end() );
+		output.transfer( output.end(), outputFiles );
 	}
 	// add sequences in the output vector
 	if( mask & eMaskTypeSequence )
 	{
-		output.insert( output.end(), outputSequences.begin(), outputSequences.end() );
+		output.transfer( output.end(), outputSequences );
 	}
 	return output;
 }
