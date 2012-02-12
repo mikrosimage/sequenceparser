@@ -1,0 +1,5 @@
+project :	requirements <include>.
+		:	usage-requirements <include>.
+			; 
+
+lib sequence : [ glob-tree *.cpp ] : <library>/boost//filesystem ;

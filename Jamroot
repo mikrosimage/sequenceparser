@@ -1,0 +1,6 @@
+import boost ; 
+import path ;
+
+use-project /boost : /home/clitte/boost_1_48_0 ; 
+
+use-project /sequence : src ;

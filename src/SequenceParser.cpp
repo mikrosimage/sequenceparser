@@ -6,7 +6,7 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include "sequence/Item.h"
+#include "sequence/BrowseItem.h"
 
 #include <boost/function.hpp>
 #include <iostream>
