@@ -5,15 +5,15 @@ using boost::filesystem::path;
 
 namespace sequence {
 
-BrowseItem folder(const path &path) {
+BrowseItem create_folder(const path &path) {
     return BrowseItem(FOLDER, path);
 }
 
-BrowseItem file(const path &filename) {
+BrowseItem create_file(const path &filename) {
     return BrowseItem(UNITFILE, filename);
 }
 
-BrowseItem sequence(const boost::filesystem::path &path, //
+BrowseItem create_sequence(const boost::filesystem::path &path, //
                 const SequencePattern &pattern, //
                 const Range &range, //
                 const unsigned short step) {

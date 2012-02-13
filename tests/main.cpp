@@ -3,6 +3,7 @@
 
 #include <sequence/Range.h>
 #include <sequence/Sequence.h>
+#include <sequence/BrowseItem.h>
 
 #include <map>
 
@@ -170,8 +171,8 @@ BOOST_AUTO_TEST_CASE( parse_pattern_test )
         const pair<path, SequencePattern> pair = parsePattern("prefix#suffix");
         BOOST_CHECK( pair.first.empty() );
         BOOST_CHECK_EQUAL( 1U, pair.second.padding );
-        BOOST_CHECK_EQUAL( string("prefix"), pair.second.prefix );
-        BOOST_CHECK_EQUAL( string("suffix"), pair.second.suffix );
+        BOOST_CHECK_EQUAL( "prefix", pair.second.prefix );
+        BOOST_CHECK_EQUAL( "suffix", pair.second.suffix );
     }
     {
         const pair<path, SequencePattern> pair = parsePattern("path/####");
@@ -204,5 +205,34 @@ BOOST_AUTO_TEST_CASE( instanciate_pattern_test )
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//BOOST_AUTO_TEST_SUITE( SequenceTestSuite )
-//BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE( BrowseItemTestSuite )
+
+BOOST_AUTO_TEST_CASE( browse_item_test )
+{
+    {
+        BOOST_CHECK_EQUAL( UNDEFINED, BrowseItem().type );
+    }
+    {
+        const BrowseItem item = create_folder("folder");
+        BOOST_CHECK_EQUAL( FOLDER, item.type );
+        BOOST_CHECK_EQUAL( "folder", item.path );
+    }
+    {
+        const BrowseItem item = create_file("file");
+        BOOST_CHECK_EQUAL( UNITFILE, item.type );
+        BOOST_CHECK_EQUAL( "file", item.path );
+    }
+    {
+        const BrowseItem item = create_sequence("path", SequencePattern("pre","suf",3), Range(0,10));
+        BOOST_CHECK_EQUAL( SEQUENCE, item.type );
+        BOOST_CHECK_EQUAL( "path", item.path );
+        BOOST_CHECK_EQUAL( "pre", item.sequence.pattern.prefix );
+        BOOST_CHECK_EQUAL( "suf", item.sequence.pattern.suffix );
+        BOOST_CHECK_EQUAL( 3U, item.sequence.pattern.padding );
+        BOOST_CHECK_EQUAL( 0U , item.sequence.range.first );
+        BOOST_CHECK_EQUAL( 10U , item.sequence.range.last );
+        BOOST_CHECK_EQUAL( 1U , item.sequence.step );
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
