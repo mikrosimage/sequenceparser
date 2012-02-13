@@ -10,7 +10,7 @@ using namespace std;
 
 namespace sequence {
 
-unsigned int srcFromRec(const Range &source, const Range &record, const unsigned int recFrame, const bool reverse) {
+unsigned int interpolateSource(const unsigned int recFrame, const Range &source, const Range &record, const bool reverse) {
     assert(source.valid());
     assert(record.valid());
     assert(record.contains(recFrame));
@@ -24,13 +24,13 @@ unsigned int srcFromRec(const Range &source, const Range &record, const unsigned
     	++srcDuration;
     }
 //    cout << "srcDuration : " << boost::rational_cast<double>(srcDuration) << endl;
-    const Rational recOffset = recFrame - record.first;
+    const Rational recOffset = reverse ? record.last - recFrame : recFrame - record.first;
 //    cout << "recOffset : " << boost::rational_cast<double>(recOffset) << endl;
     const Rational srcOffset = recDuration == 0 ? 0 : (recOffset * srcDuration / recDuration);
 //    cout << "srcOffset : " << boost::rational_cast<double>(srcOffset) << endl;
-    const Rational srcFrame = reverse ? srcDuration + source.first - srcOffset : srcOffset + source.first;
+    const Rational srcFrame = srcOffset + source.first;
 //    cout << ">> srcFrame : " << boost::rational_cast<double>(srcFrame) << endl;
-    return std::min( boost::rational_cast<unsigned int>(srcFrame), source.last );
+    return boost::rational_cast<unsigned int>(srcFrame);
 }
 
 unsigned int Range::duration() const {

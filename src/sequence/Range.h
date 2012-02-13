@@ -19,7 +19,7 @@ struct Range {
     unsigned int offsetLoopFrame(unsigned int current, int offset) const;
 };
 
-unsigned int srcFromRec(const Range &source, const Range &record, const unsigned int recFrame, const bool reverse);
+unsigned int interpolateSource(const unsigned int atRecIndex, const Range &source, const Range &record, const bool reverse);
 
 } /* namespace sequence */
 #endif /* RANGE_H_ */

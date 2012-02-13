@@ -1,6 +1,7 @@
+import os ; 
 import boost ; 
 import path ;
 
-use-project /boost : /home/clitte/boost_1_48_0 ; 
+use-project /boost : [ modules.peek : BOOST_ROOT ] ; 
 
 use-project /sequence : src ;

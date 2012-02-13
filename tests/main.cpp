@@ -2,75 +2,79 @@
 #include <boost/test/unit_test.hpp>
 
 #include <sequence/Range.h>
+#include <sequence/Sequence.h>
+
+#include <map>
 
 using namespace sequence;
+using namespace std;
 
 BOOST_AUTO_TEST_SUITE( RangeTestSuite )
 
 BOOST_AUTO_TEST_CASE( empty_range )
 {
-	Range range;
-	BOOST_CHECK_EQUAL(0u, range.first);
-	BOOST_CHECK_EQUAL(0u, range.last);
+    Range range;
+    BOOST_CHECK_EQUAL(0u, range.first);
+    BOOST_CHECK_EQUAL(0u, range.last);
 }
 
 BOOST_AUTO_TEST_CASE( range_ctor )
 {
-	Range range(1,2);
-	BOOST_CHECK_EQUAL(1u, range.first);
-	BOOST_CHECK_EQUAL(2u, range.last);
+    Range range(1,2);
+    BOOST_CHECK_EQUAL(1u, range.first);
+    BOOST_CHECK_EQUAL(2u, range.last);
 
-	// 'last' must be greater or equal to 'first'
-	BOOST_CHECK_THROW( Range(1,0), std::logic_error );
+    // 'last' must be greater or equal to 'first'
+    BOOST_CHECK_THROW( Range(1,0), logic_error );
 }
 
 BOOST_AUTO_TEST_CASE( range_contains )
 {
-	Range range(1,2);
-	BOOST_CHECK( !range.contains(0) );
-	BOOST_CHECK( range.contains(1) );
-	BOOST_CHECK( range.contains(2) );
-	BOOST_CHECK( !range.contains(3) );
+    Range range(1,2);
+    BOOST_CHECK( !range.contains(0) );
+    BOOST_CHECK( range.contains(1) );
+    BOOST_CHECK( range.contains(2) );
+    BOOST_CHECK( !range.contains(3) );
 }
 
 BOOST_AUTO_TEST_CASE( range_valid )
 {
-	Range range;
+    Range range;
 
-	range.first = 10;
-	BOOST_CHECK( !range.valid() ); // [10,0] is not a valid range
+    range.first = 10;
+    BOOST_CHECK( !range.valid() ); // [10,0] is not a valid range
 
-	range.last = 10;
-	BOOST_CHECK( range.valid() );// [10,10] is a valid range
+    range.last = 10;
+    BOOST_CHECK( range.valid() );// [10,10] is a valid range
 }
 
 BOOST_AUTO_TEST_CASE( range_duration )
 {
-	Range range;
-	BOOST_CHECK_EQUAL(1u, range.duration());
+    Range range;
+    BOOST_CHECK_EQUAL(1u, range.duration());
 
-	range = Range(0,9);
-	BOOST_CHECK_EQUAL(10u, range.duration());
+    range = Range(0,9);
+    BOOST_CHECK_EQUAL(10u, range.duration());
 
-	range = Range(10,10);
-	BOOST_CHECK_EQUAL(1u, range.duration());
+    range = Range(10,10);
+    BOOST_CHECK_EQUAL(1u, range.duration());
 }
 
 BOOST_AUTO_TEST_CASE( range_offsets )
 {
-	Range range(5,10);
+    Range range(5,10);
 
-	BOOST_CHECK_EQUAL( 7u, range.offsetClampFrame(7, 0) ); // no offset
-	BOOST_CHECK_EQUAL( 8u, range.offsetClampFrame(7, 1) );// still in range
-	BOOST_CHECK_EQUAL( 6u, range.offsetClampFrame(7,-1) );// still in range
-	BOOST_CHECK_EQUAL(10u, range.offsetClampFrame(7, 9) );// out of range
-	BOOST_CHECK_EQUAL( 5u, range.offsetClampFrame(7,-9) );// out of range
+    BOOST_CHECK_EQUAL( 7u, range.offsetClampFrame(7, 0) ); // no offset
+    BOOST_CHECK_EQUAL( 8u, range.offsetClampFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( 6u, range.offsetClampFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL(10u, range.offsetClampFrame(7, 9) );// out of range
+    BOOST_CHECK_EQUAL( 5u, range.offsetClampFrame(7,-9) );// out of range
 
-	BOOST_CHECK_EQUAL( 7u, range.offsetLoopFrame(7, 0) );// no offset
-	BOOST_CHECK_EQUAL( 8u, range.offsetLoopFrame(7, 1) );// still in range
-	BOOST_CHECK_EQUAL( 6u, range.offsetLoopFrame(7,-1) );// still in range
-	BOOST_CHECK_EQUAL( 5u, range.offsetLoopFrame(7, 4) );// out of range
-	BOOST_CHECK_EQUAL(10u, range.offsetLoopFrame(7,-3) );// out of range
+    BOOST_CHECK_EQUAL( 7u, range.offsetLoopFrame(7, 0) );// no offset
+    BOOST_CHECK_EQUAL( 8u, range.offsetLoopFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( 6u, range.offsetLoopFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL( 5u, range.offsetLoopFrame(7, 4) );// out of range
+    BOOST_CHECK_EQUAL(10u, range.offsetLoopFrame(7,-3) );// out of range
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -79,61 +83,126 @@ BOOST_AUTO_TEST_SUITE( InterpolationTestSuite )
 
 BOOST_AUTO_TEST_CASE( same_ranges )
 {
-	Range source(0,2);
+    Range source(0,2);
 
-	// forward
-	BOOST_CHECK_EQUAL( 0u, srcFromRec(source, source, 0, false) );
-	BOOST_CHECK_EQUAL( 1u, srcFromRec(source, source, 1, false) );
-	BOOST_CHECK_EQUAL( 2u, srcFromRec(source, source, 2, false) );
+    // forward
+    BOOST_CHECK_EQUAL( 0u, interpolateSource(0, source, source, false) );
+    BOOST_CHECK_EQUAL( 1u, interpolateSource(1, source, source, false) );
+    BOOST_CHECK_EQUAL( 2u, interpolateSource(2, source, source, false) );
 
-	// reverse
-	BOOST_CHECK_EQUAL( 2u, srcFromRec(source, source, 0, true) );
-	BOOST_CHECK_EQUAL( 1u, srcFromRec(source, source, 1, true) );
-	BOOST_CHECK_EQUAL( 0u, srcFromRec(source, source, 2, true) );
+    // reverse
+    BOOST_CHECK_EQUAL( 2u, interpolateSource(0, source, source, true) );
+    BOOST_CHECK_EQUAL( 1u, interpolateSource(1, source, source, true) );
+    BOOST_CHECK_EQUAL( 0u, interpolateSource(2, source, source, true) );
 }
 
 BOOST_AUTO_TEST_CASE( offset_ranges )
 {
-	Range source(2,4);
-	Range record(0,2);
+    Range source(2,4);
+    Range record(0,2);
 
-	// forward
-	BOOST_CHECK_EQUAL( 2u, srcFromRec(source, record, 0, false) );
-	BOOST_CHECK_EQUAL( 3u, srcFromRec(source, record, 1, false) );
-	BOOST_CHECK_EQUAL( 4u, srcFromRec(source, record, 2, false) );
+    // forward
+    BOOST_CHECK_EQUAL( 2u, interpolateSource(0, source, record, false) );
+    BOOST_CHECK_EQUAL( 3u, interpolateSource(1, source, record, false) );
+    BOOST_CHECK_EQUAL( 4u, interpolateSource(2, source, record, false) );
 
-	// reverse
-	BOOST_CHECK_EQUAL( 4u, srcFromRec(source, record, 0, true) );
-	BOOST_CHECK_EQUAL( 3u, srcFromRec(source, record, 1, true) );
-	BOOST_CHECK_EQUAL( 2u, srcFromRec(source, record, 2, true) );
+    // reverse
+    BOOST_CHECK_EQUAL( 4u, interpolateSource(0, source, record, true) );
+    BOOST_CHECK_EQUAL( 3u, interpolateSource(1, source, record, true) );
+    BOOST_CHECK_EQUAL( 2u, interpolateSource(2, source, record, true) );
 }
 
 BOOST_AUTO_TEST_CASE( scaled_ranges )
 {
-	Range source(0,10);
-	Range record(0,2);
+    Range source(0,10);
+    Range record(0,2);
 
-	// forward
-	BOOST_CHECK_EQUAL( 0u, srcFromRec(source, record, 0, false) );
-	BOOST_CHECK_EQUAL( 5u, srcFromRec(source, record, 1, false) );
-	BOOST_CHECK_EQUAL(10u, srcFromRec(source, record, 2, false) );
+    // forward
+    BOOST_CHECK_EQUAL( 0u, interpolateSource(0, source, record, false) );
+    BOOST_CHECK_EQUAL( 5u, interpolateSource(1, source, record, false) );
+    BOOST_CHECK_EQUAL(10u, interpolateSource(2, source, record, false) );
 
-	// reverse
-	BOOST_CHECK_EQUAL(10u, srcFromRec(source, record, 0, true) );
-	BOOST_CHECK_EQUAL( 5u, srcFromRec(source, record, 1, true) );
-	BOOST_CHECK_EQUAL( 0u, srcFromRec(source, record, 2, true) );
+    // reverse
+    BOOST_CHECK_EQUAL(10u, interpolateSource(0, source, record, true) );
+    BOOST_CHECK_EQUAL( 5u, interpolateSource(1, source, record, true) );
+    BOOST_CHECK_EQUAL( 0u, interpolateSource(2, source, record, true) );
 }
 
-BOOST_AUTO_TEST_CASE( complex_ranges )
+BOOST_AUTO_TEST_CASE( subsampling_ranges )
 {
-	Range source(5,8);
-	Range record(0,150);
+    Range source(5,8);
+    const unsigned int count = 50;
+    Range record(1,4*count); // duration = 200
 
-	for(size_t i = record.first;i<=record.last;++i)
-		std::cout << srcFromRec(source, record, i, false);
-	std::cout << std::endl;
-	for(size_t i = record.first;i<=record.last;++i)
-		std::cout << srcFromRec(source, record, i, true);
+    // the pattern should be
+    // 5555...6666...7777...8888...
+    // each individual one repeated 50 times for both forward and reverse traversal
+
+    { // forward
+        map<unsigned int, size_t> index;
+        for(size_t i = record.first;i<=record.last;++i)
+            ++index[ interpolateSource(i, source, record, false) ];
+        BOOST_CHECK_EQUAL(4u, index.size() );
+        for(size_t i = source.first;i<=source.last;++i)
+            BOOST_CHECK_EQUAL(count, index[i] );
+    }
+    { // reverse
+        map<unsigned int, size_t> index;
+        for(size_t i = record.first;i<=record.last;++i)
+            ++index[ interpolateSource(i, source, record, true) ];
+        BOOST_CHECK_EQUAL(4u, index.size() );
+        for(size_t i = source.first;i<=source.last;++i)
+            BOOST_CHECK_EQUAL(count, index[i] );
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE( SequenceTestSuite )
+
+BOOST_AUTO_TEST_CASE( parse_pattern_test )
+{
+    using boost::filesystem::path;
+    BOOST_CHECK_THROW( parsePattern(""), std::runtime_error );
+    BOOST_CHECK_THROW( parsePattern("no_pattern_inside_me"), std::runtime_error );
+
+    {
+        const pair<path, SequencePattern> pair = parsePattern("prefix#suffix");
+        BOOST_CHECK( pair.first.empty() );
+        BOOST_CHECK_EQUAL( 1U, pair.second.padding );
+        BOOST_CHECK_EQUAL( string("prefix"), pair.second.prefix );
+        BOOST_CHECK_EQUAL( string("suffix"), pair.second.suffix );
+    }
+    {
+        const pair<path, SequencePattern> pair = parsePattern("path/####");
+        BOOST_CHECK_EQUAL( path("path"), pair.first );
+        BOOST_CHECK_EQUAL( 4U, pair.second.padding );
+        BOOST_CHECK( pair.second.prefix.empty() );
+        BOOST_CHECK( pair.second.suffix.empty() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( instanciate_pattern_test )
+{
+    { // no prefix / suffix
+        const SequencePattern pattern("", "",1);
+        BOOST_CHECK_EQUAL( "1", instanciatePattern(pattern,1));
+    }
+    { // no padding
+        const SequencePattern pattern("p", "s",1);
+        BOOST_CHECK_EQUAL( "p100s", instanciatePattern(pattern,100));
+    }
+    { // 1000 can't fit in a pattern of size 2
+        const SequencePattern pattern("", "",2);
+        BOOST_CHECK_THROW( instanciatePattern(pattern,1000), runtime_error );
+    }
+    { // padding 3
+        const SequencePattern pattern("prefix", "suffix",5);
+        BOOST_CHECK_EQUAL( "prefix00018suffix", instanciatePattern(pattern,18));
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+//BOOST_AUTO_TEST_SUITE( SequenceTestSuite )
+//BOOST_AUTO_TEST_SUITE_END()
