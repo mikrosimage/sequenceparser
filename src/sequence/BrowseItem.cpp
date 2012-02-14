@@ -13,7 +13,7 @@ BrowseItem create_file(const path &filename) {
     return BrowseItem(UNITFILE, filename);
 }
 
-BrowseItem create_sequence(const boost::filesystem::path &path, //
+BrowseItem create_sequence(const path &path, //
                 const SequencePattern &pattern, //
                 const Range &range, //
                 const unsigned short step) {

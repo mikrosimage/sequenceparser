@@ -3,8 +3,7 @@
 
 #include "Sequence.h"
 
-#include <boost/filesystem.hpp>
-#include <string>
+#include <boost/filesystem/path.hpp>
 
 namespace sequence {
 

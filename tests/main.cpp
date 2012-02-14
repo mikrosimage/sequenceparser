@@ -1,11 +1,14 @@
-#define BOOST_TEST_MODULE Sequence
-#include <boost/test/unit_test.hpp>
 
 #include <sequence/Range.h>
 #include <sequence/Sequence.h>
 #include <sequence/BrowseItem.h>
 
 #include <map>
+
+#include <boost/filesystem.hpp>
+
+#define BOOST_TEST_MODULE Sequence
+#include <boost/test/unit_test.hpp>
 
 using namespace sequence;
 using namespace std;

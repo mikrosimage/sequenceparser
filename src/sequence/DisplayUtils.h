@@ -1,12 +1,15 @@
 #ifndef DISPLAYUTILS_H_
 #define DISPLAYUTILS_H_
 
-#include "Range.h"
-#include "Sequence.h"
 #include "BrowseItem.h"
+
 #include <ostream>
 
 namespace sequence {
+
+struct Range;
+struct SequencePattern;
+struct Sequence;
 
 const char* toString(const BrowseItemType type);
 
