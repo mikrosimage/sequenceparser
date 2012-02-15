@@ -2,6 +2,7 @@
 #include <boost/rational.hpp>
 #include <cassert>
 #include <stdexcept>
+#include <climits>
 
 using namespace std;
 
@@ -11,7 +12,7 @@ unsigned int interpolateSource(const unsigned int recFrame, const Range &source,
     assert(source.valid());
     assert(record.valid());
     assert(record.contains(recFrame));
-    typedef boost::rational<unsigned int> Rational;
+    typedef boost::rational<int64_t> Rational;
     Rational recDuration = record.last - record.first;
     Rational srcDuration = source.last - source.first;
     if(recDuration>srcDuration){
