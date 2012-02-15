@@ -3,9 +3,6 @@
 #include <cassert>
 #include <stdexcept>
 
-
-// TODO remove me
-#include <iostream>
 using namespace std;
 
 namespace sequence {
@@ -15,21 +12,15 @@ unsigned int interpolateSource(const unsigned int recFrame, const Range &source,
     assert(record.valid());
     assert(record.contains(recFrame));
     typedef boost::rational<unsigned int> Rational;
-//    cout << ">> recFrame : " << recFrame << endl;
     Rational recDuration = record.last - record.first;
-//    cout << "recDuration : " << boost::rational_cast<double>(recDuration) << endl;
     Rational srcDuration = source.last - source.first;
     if(recDuration>srcDuration){
     	++recDuration;
     	++srcDuration;
     }
-//    cout << "srcDuration : " << boost::rational_cast<double>(srcDuration) << endl;
     const Rational recOffset = reverse ? record.last - recFrame : recFrame - record.first;
-//    cout << "recOffset : " << boost::rational_cast<double>(recOffset) << endl;
     const Rational srcOffset = recDuration == 0 ? 0 : (recOffset * srcDuration / recDuration);
-//    cout << "srcOffset : " << boost::rational_cast<double>(srcOffset) << endl;
     const Rational srcFrame = srcOffset + source.first;
-//    cout << ">> srcFrame : " << boost::rational_cast<double>(srcFrame) << endl;
     return boost::rational_cast<unsigned int>(srcFrame);
 }
 
