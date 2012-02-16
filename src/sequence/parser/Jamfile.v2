@@ -5,4 +5,4 @@ project :
 			<library>/sequence//sequence
 		;
 
-lib sequence_parser : [ glob *.cpp ] ;
+lib sequence_parser : [ glob-tree *.cpp ] ;
