@@ -1,0 +1,8 @@
+project :	
+			requirements
+			<library>/sequence//sequence
+		:	usage-requirements
+			<library>/sequence//sequence
+		;
+
+lib sequence_parser : [ glob *.cpp ] ;

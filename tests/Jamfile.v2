@@ -1,10 +1,10 @@
+project :
+			requirements 
+            <define>BOOST_TEST_MAIN
+            <define>BOOST_TEST_DYN_LINK
+            <library>/boost//unit_test_framework
+        ;
+            
+unit-test seq_tests : sequence_tests.cpp /sequence//sequence ;
 
-
-unit-test tests : 
-		main.cpp
-		/sequence//sequence
-		/boost//unit_test_framework
-	: : :
-    	<define>BOOST_TEST_MAIN
-		<define>BOOST_TEST_DYN_LINK
-	;
+unit-test parse_tests : parser_tests.cpp /sequence_parser//sequence_parser ;

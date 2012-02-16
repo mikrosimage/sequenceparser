@@ -4,4 +4,5 @@ import path ;
 
 use-project /boost : [ modules.peek : BOOST_ROOT ] ; 
 
-use-project /sequence : src ;
+use-project /sequence : src/sequence ;
+use-project /sequence_parser : src/sequence/parser ;
