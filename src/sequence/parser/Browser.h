@@ -15,7 +15,6 @@ namespace parser {
 
 struct Browser {
     Browser();
-    ChooseNumberLocation chooseNumberLocation;
 };
 
 } /* namespace parser */

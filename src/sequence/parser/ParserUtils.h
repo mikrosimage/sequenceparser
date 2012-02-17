@@ -8,8 +8,10 @@
 #ifndef PARSERUTILS_H_
 #define PARSERUTILS_H_
 
+#include <sequence/BrowseItem.h>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <set>
 #include <map>
@@ -18,42 +20,57 @@
 namespace sequence {
 namespace parser {
 
-struct NumberLocation {
+struct Location {
     unsigned char first;
     unsigned char count;
-    NumberLocation() { }
-    NumberLocation(unsigned char first, unsigned char count) : first(first), count(count) { }
+    Location() { }
+    Location(unsigned char first, unsigned char count) : first(first), count(count) { }
 };
 
-struct NumberLocationInstance {
-    NumberLocation location;
+struct LocationWithValue {
+    Location location;
     unsigned int value;
 };
 
 typedef std::vector<unsigned int> Values;
-typedef std::set<unsigned int> ValueSet;
-typedef std::vector<NumberLocation> NumberLocations;
-typedef std::vector<NumberLocationInstance> NumberLocationInstances;
+typedef std::vector<Location> Locations;
 
-void extractPattern(const std::string &filename, std::string &pattern, NumberLocationInstances &numbers);
+void extractPattern(std::string &pattern, Locations &locations, Values &numbers);
 
+struct PatternAggregator : public Values {
+    typedef std::set<unsigned int> Set;
+    typedef std::vector<Set> Sets;
 
+    PatternAggregator(const std::string &key, const Locations& locations) : key(key), locations(locations), sets(locations.size()) {}
 
-struct PatternKey {
+    void append(const Values &values);
+    size_t files() const{return locations.empty() ? 1 : size() / locationCount();}
+    size_t locationCount() const{return locations.size();}
+    inline bool isOptimized()const{return isSingleFile()||locationCount()==1;}
+    inline bool isSingleFile()const{return files()==1;}
+    const Sets& getSets()const{return sets;}
+    PatternAggregator optimize() const;
+public:
     std::string key;
-    std::vector<NumberLocation> numberLocations;
-    PatternKey(const std::string& key, const NumberLocations &locations);
-    bool operator<(const PatternKey&other)const{return key<other.key;}
-    bool operator==(const PatternKey&other)const{return key==other.key;}
+    Locations locations;
+private:
+    Sets sets;
 };
 
-typedef std::map<PatternKey, Values> KeyMap;
+struct FilenameAggregator : boost::unordered_map<std::string, PatternAggregator> {
+    const PatternAggregator& operator()(std::string filename);
+    void optimize();
+private:
+    Values tmpValues;
+    Locations tmpLocations;
+};
 
-typedef std::map<boost::filesystem::path, KeyMap> FolderMap;
+typedef std::map<boost::filesystem::path, FilenameAggregator> FolderMap;
 
-struct PatternAggregator {
-    void operator()(const boost::filesystem::path& path);
+struct Parser {
+    const PatternAggregator& operator()(const boost::filesystem::path& filename);
     const FolderMap& getFolderMap() const { return folderMap; }
+    std::vector<BrowseItem> finalize() ;
 private:
     FolderMap folderMap;
 };

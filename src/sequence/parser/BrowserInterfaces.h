@@ -8,7 +8,7 @@
 #ifndef BROWSERINTERFACES_H_
 #define BROWSERINTERFACES_H_
 
-#include "PatternAggregator.h"
+#include "ParserUtils.h"
 
 #include <sequence/BrowseItem.h>
 
@@ -21,12 +21,12 @@ namespace parser {
  * Function called to select which location will be used as a counter within
  * the pattern. If the pattern is suspected to be file/folder just return NULL.
  */
-typedef boost::function<const NumberLocation*(const PatternKey&)> ChooseNumberLocation;
+//typedef boost::function<const Location*(const PatternKey&)> ChooseNumberLocation;
 
 /**
  * Takes a pattern and generates a vector of BrowseItem from it
  */
-typedef boost::function<std::vector<BrowseItem>(const PatternKey&)> GenerateItems;
+//typedef boost::function<std::vector<BrowseItem>(const PatternKey&)> GenerateItems;
 
 } /* namespace parser */
 } /* namespace sequence */
