@@ -166,23 +166,20 @@ BOOST_AUTO_TEST_SUITE( SequenceTestSuite )
 
 BOOST_AUTO_TEST_CASE( parse_pattern_test )
 {
-    using boost::filesystem::path;
     BOOST_CHECK_THROW( parsePattern(""), std::runtime_error );
     BOOST_CHECK_THROW( parsePattern("no_pattern_inside_me"), std::runtime_error );
 
     {
-        const pair<path, SequencePattern> pair = parsePattern("prefix#suffix");
-        BOOST_CHECK( pair.first.empty() );
-        BOOST_CHECK_EQUAL( 1U, pair.second.padding );
-        BOOST_CHECK_EQUAL( "prefix", pair.second.prefix );
-        BOOST_CHECK_EQUAL( "suffix", pair.second.suffix );
+        const SequencePattern pattern = parsePattern("prefix#suffix");
+        BOOST_CHECK_EQUAL( 1U, pattern.padding );
+        BOOST_CHECK_EQUAL( "prefix", pattern.prefix );
+        BOOST_CHECK_EQUAL( "suffix", pattern.suffix );
     }
     {
-        const pair<path, SequencePattern> pair = parsePattern("path/####");
-        BOOST_CHECK_EQUAL( path("path"), pair.first );
-        BOOST_CHECK_EQUAL( 4U, pair.second.padding );
-        BOOST_CHECK( pair.second.prefix.empty() );
-        BOOST_CHECK( pair.second.suffix.empty() );
+        const SequencePattern pattern = parsePattern("####");
+        BOOST_CHECK_EQUAL( 4U, pattern.padding );
+        BOOST_CHECK( pattern.prefix.empty() );
+        BOOST_CHECK( pattern.suffix.empty() );
     }
 }
 

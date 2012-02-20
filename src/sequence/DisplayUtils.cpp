@@ -3,6 +3,7 @@
 #include "Range.h"
 #include "Sequence.h"
 
+#include <boost/filesystem.hpp>
 #include <ostream>
 
 using namespace std;
@@ -51,10 +52,10 @@ ostream& operator<<(ostream &stream, const Sequence &sequence) {
 }
 
 ostream& operator<<(ostream &stream, const BrowseItem &item) {
-    stream << item.type << ' ' << item.path;
+    stream << item.type << ' ' << item.path.string();
 
     if (item.type == SEQUENCE)
-        stream << ' ' << item.sequence;
+        stream << boost::filesystem::path("/").make_preferred().string() << item.sequence;
 
     return stream;
 }

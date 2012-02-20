@@ -1,7 +1,10 @@
+#include <sequence/parser/Browser.h>
 #include <sequence/parser/ParserUtils.h>
 #include <sequence/DisplayUtils.h>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/assign/std/set.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <sstream>
 #include <ostream>
@@ -9,7 +12,8 @@
 #define BOOST_TEST_MODULE Parser
 #include <boost/test/unit_test.hpp>
 
-using namespace sequence::parser;
+using namespace sequence;
+using namespace sequence::parser::details;
 using namespace std;
 
 static inline void check_equals(const Location &a, const Location &b) {
@@ -17,7 +21,51 @@ static inline void check_equals(const Location &a, const Location &b) {
     BOOST_CHECK_EQUAL(a.count, b.count);
 }
 
+static inline void check_equals(const Range &a, const Range &b) {
+    BOOST_CHECK_EQUAL(a.first, b.first);
+    BOOST_CHECK_EQUAL(a.last, b.last);
+}
+
 BOOST_AUTO_TEST_SUITE( ParsingSuite )
+
+BOOST_AUTO_TEST_CASE( LocationValueSetGetStepTest )
+{
+    unsigned step;
+    {
+        LocationValueSet set;
+        boost::assign::insert(set)(1)(2)(5)(6)(11)(12)(13)(14)(20)(22)(24)(26)(28)(30)(34)(36);
+        BOOST_CHECK( !set.isConstant() );
+        std::vector<Range> ranges = set.getRanges(step);
+        BOOST_CHECK_EQUAL( step, 1u );
+        BOOST_CHECK_EQUAL( ranges.size(), 11u );
+        check_equals( ranges[0], Range(1,2));
+        check_equals( ranges[1], Range(5,6));
+        check_equals( ranges[2], Range(11,14));
+        check_equals( ranges[3], Range(20,20));
+        check_equals( ranges[4], Range(22,22));
+        check_equals( ranges[5], Range(24,24));
+        check_equals( ranges[6], Range(26,26));
+        check_equals( ranges[7], Range(28,28));
+        check_equals( ranges[8], Range(30,30));
+        check_equals( ranges[9], Range(34,34));
+        check_equals( ranges[10], Range(36,36));
+    }
+    {
+        LocationValueSet set;
+        boost::assign::insert(set)(20)(22)(24)(26)(28)(30)(34)(36);
+        BOOST_CHECK( !set.isConstant() );
+        std::vector<sequence::Range> ranges = set.getRanges(step);
+        BOOST_CHECK_EQUAL( step, 2u );
+        BOOST_CHECK_EQUAL( ranges.size(), 2u );
+        check_equals( ranges[0], Range(20,30));
+        check_equals( ranges[1], Range(34,36));
+    }
+    {
+        LocationValueSet set;
+        boost::assign::insert(set)(1);
+        BOOST_CHECK( set.isConstant() );
+    }
+}
 
 BOOST_AUTO_TEST_CASE( PatternKeyTest )
 {
@@ -38,18 +86,13 @@ BOOST_AUTO_TEST_CASE( PatternKeyTest )
 
 BOOST_AUTO_TEST_CASE( AggregatorTest )
 {
-    Parser parser;
-    parser("path/p2.sgi");
-    parser("path/p3.sgi");
+    SequenceDetector map;
+    map("p2.sgi");
+    map("p3.sgi");
 
-    const FolderMap &folderMap = parser.getFolderMap();
-    BOOST_CHECK_EQUAL( folderMap.size() ,1u );
-    FolderMap::const_iterator itr = folderMap.find("path");
-    BOOST_CHECK( itr != parser.getFolderMap().end() );
-    const FilenameAggregator &map = itr->second;
     const PatternAggregator &va = map.begin()->second;
     BOOST_CHECK_EQUAL( va.locationCount(), 1u );
-    BOOST_CHECK_EQUAL( va.files(), 2u );
+    BOOST_CHECK_EQUAL( va.fileCount(), 2u );
     BOOST_CHECK_EQUAL( va.key,"p#.sgi");
     check_equals(va.locations[0], Location(1,1));
     BOOST_CHECK_EQUAL( va.size(),2u );
@@ -59,9 +102,9 @@ BOOST_AUTO_TEST_CASE( AggregatorTest )
 
 BOOST_AUTO_TEST_CASE( ValueAggregatorSetsTest )
 {
-    Parser parser;
+    SequenceDetector parser;
     const PatternAggregator &va = parser("p2.cr2");
-    const PatternAggregator::Sets &sets = va.getSets();
+    const PatternAggregator::LocationValueSets &sets = va.getSets();
     BOOST_CHECK_EQUAL( sets.size(),2u );
     BOOST_CHECK_EQUAL( sets[0].size(),1u );
     BOOST_CHECK_EQUAL( sets[1].size(),1u );
@@ -75,22 +118,22 @@ BOOST_AUTO_TEST_CASE( ValueAggregatorSetsTest )
 
 BOOST_AUTO_TEST_CASE( SimplifyingTest )
 {
-    Parser parser;
+    SequenceDetector parser;
     const PatternAggregator &va = parser("0_0_012");
     parser("0_1_012");
     parser("0_2_012");
     {
         BOOST_CHECK_EQUAL( va.key , "#_#_###" );
-        const PatternAggregator::Sets &sets = va.getSets();
+        const PatternAggregator::LocationValueSets &sets = va.getSets();
         BOOST_CHECK_EQUAL( sets.size(),3u );
         BOOST_CHECK_EQUAL( sets[0].size(),1u );
         BOOST_CHECK_EQUAL( sets[1].size(),3u );
         BOOST_CHECK_EQUAL( sets[2].size(),1u );
     }
     {
-        const PatternAggregator another = va.morphIfNeeded();
+        const PatternAggregator another = va.removeConstantLocations();
         BOOST_CHECK_EQUAL( another.key,"0_#_012" );
-        const PatternAggregator::Sets &sets = another.getSets();
+        const PatternAggregator::LocationValueSets &sets = another.getSets();
         BOOST_CHECK_EQUAL( sets.size(),1u );
         BOOST_CHECK_EQUAL( sets[0].size(),3u );
     }
@@ -100,13 +143,25 @@ BOOST_AUTO_TEST_CASE( SimplifyingTest )
 BOOST_AUTO_TEST_CASE( FinalizeTest )
 {
     using sequence::BrowseItem;
-    Parser parser;
-    parser("path/pouet.txt");
-    parser("path/_00132_file11.cr2");
-    parser("path/_00132_file12.cr2");
-    parser("path/_00132_file13.cr2");
-    const std::vector<BrowseItem> items = parser.finalize();
+    SequenceDetector parser("c:\\path");
+    parser("pouet.txt");
+    parser("_00132_file11.cr2");
+    parser("_00132_file12.cr2");
+    parser("_00132_file13.cr2");
+    parser("p13.cr2");
+    parser("p18.cr2");
+    parser("p23.cr2");
+    parser("p28.cr2");
+    const std::vector<BrowseItem> items = parser.getResults();
     copy(items.begin(), items.end(), ostream_iterator<BrowseItem>(cout , "\n"));
+    cout << endl;
+}
+
+BOOST_AUTO_TEST_CASE( BrowseTest )
+{
+    const std::vector<BrowseItem> items = sequence::parser::browseRecursive("T:\\sequences");
+    copy(items.begin(), items.end(), ostream_iterator<BrowseItem>(cout , "\n"));
+    cout << endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

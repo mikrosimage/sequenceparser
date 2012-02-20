@@ -10,8 +10,7 @@
 
 #include <sequence/BrowseItem.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/unordered_map.hpp>
+#include <boost/filesystem.hpp>
 
 #include <set>
 #include <map>
@@ -19,17 +18,16 @@
 
 namespace sequence {
 namespace parser {
+namespace details {
 
 struct Location {
     unsigned char first;
     unsigned char count;
-    Location() { }
-    Location(unsigned char first, unsigned char count) : first(first), count(count) { }
-};
-
-struct LocationWithValue {
-    Location location;
-    unsigned int value;
+    Location() {
+    }
+    Location(unsigned char first, unsigned char count) :
+                    first(first), count(count) {
+    }
 };
 
 typedef std::vector<unsigned int> Values;
@@ -37,47 +35,74 @@ typedef std::vector<Location> Locations;
 
 void extractPattern(std::string &pattern, Locations &locations, Values &numbers);
 
-struct PatternAggregator : public Values {
-    typedef std::set<unsigned int> Set;
-    typedef std::vector<Set> Sets;
+struct LocationValueSet : public std::set<unsigned int> {
+    bool isConstant() const {
+        return size() == 1;
+    }
+    value_type getConstantValue() const {
+        return *begin();
+    }
+    std::vector<Range> getRanges(value_type &step) const;
+};
 
-    PatternAggregator(const std::string &key, const Locations& locations) : key(key), locations(locations), sets(locations.size()) {}
+struct PatternAggregator : public Values {
+    typedef std::vector<LocationValueSet> LocationValueSets;
+
+    PatternAggregator(const std::string &key, const Locations& locations) :
+                    key(key), locations(locations), locationValueSets(locations.size()) {
+    }
 
     void append(const Values &values);
-    size_t files() const{return locations.empty() ? 1 : size() / locationCount();}
-    size_t locationCount() const{return locations.size();}
-    inline bool isValid()const{return isSingleFile()||locationCount()==1;}
-    inline bool isSingleFile()const{return files()==1;}
-    const Sets& getSets()const{return sets;}
-    PatternAggregator morphIfNeeded() const;
+    size_t fileCount() const {
+        return locations.empty() ? 1 : size() / locationCount();
+    }
+    size_t locationCount() const {
+        return locations.size();
+    }
+    inline bool isValid() const {
+        return isSingleFile() || locationCount() == 1;
+    }
+    inline bool isSingleFile() const {
+        return fileCount() == 1;
+    }
+    const LocationValueSets& getSets() const {
+        return locationValueSets;
+    }
+    const LocationValueSet& getSelectedSet() const {
+        assert(locationCount()==1);
+        return locationValueSets[0];
+    }
+    PatternAggregator removeConstantLocations() const;
 public:
     std::string key;
     Locations locations;
 private:
-    PatternAggregator generateCopy(const std::vector<bool> &) const;
+    PatternAggregator createCopyWithLocations(const std::vector<bool> &) const;
 private:
-    Sets sets;
+    LocationValueSets locationValueSets;
 };
 
-struct FilenameAggregator : boost::unordered_map<std::string, PatternAggregator> {
+struct SequenceDetector : private std::map<std::string, PatternAggregator> {
+    SequenceDetector(const boost::filesystem::path &path = "") :
+                    path(path) {
+    }
     const PatternAggregator& operator()(std::string filename);
-    void optimize();
-    void appendResultsTo(std::vector<BrowseItem> &container, const boost::filesystem::path &path) const;
+    const std::vector<BrowseItem>& getResults();
 private:
-    Values tmpValues;
-    Locations tmpLocations;
+    void process(const value_type&);
+    void reduce();
+    boost::filesystem::path path;
+    Values extractedValues;
+    Locations extractedLocations;
+    std::vector<BrowseItem> results;
+    typedef std::map<std::string, PatternAggregator> ME;
+public:
+    using ME::begin;
+    using ME::end;
+    using ME::value_type;
 };
 
-typedef std::map<boost::filesystem::path, FilenameAggregator> FolderMap;
-
-struct Parser {
-    const PatternAggregator& operator()(const boost::filesystem::path& filename);
-    const FolderMap& getFolderMap() const { return folderMap; }
-    std::vector<BrowseItem> finalize() ;
-private:
-    FolderMap folderMap;
-};
-
+} /* namespace details */
 } /* namespace parser */
 } /* namespace sequence */
 #endif /* PARSERUTILS_H_ */

@@ -29,7 +29,7 @@ struct Sequence {
     Sequence(const SequencePattern &pattern, const Range &range = Range(), unsigned short step=1) : pattern(pattern), range(range), step(step){}
 };
 
-std::pair<boost::filesystem::path, SequencePattern> parsePattern(const std::string& absoluteFilename);
+SequencePattern parsePattern(const std::string& filename);
 
 std::string instanciatePattern(const SequencePattern &pattern, unsigned int frame);
 

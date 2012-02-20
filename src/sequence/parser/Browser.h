@@ -1,21 +1,21 @@
 /*
  * Browser.h
  *
- *  Created on: 16 févr. 2012
+ *  Created on: 16 fevr. 2012
  *      Author: Guillaume Chatelet
  */
 
 #ifndef BROWSER_H_
 #define BROWSER_H_
 
-#include "BrowserInterfaces.h"
+#include <sequence/BrowseItem.h>
+#include <vector>
 
 namespace sequence {
 namespace parser {
 
-struct Browser {
-    Browser();
-};
+std::vector<sequence::BrowseItem> browse(const char* directory);
+std::vector<sequence::BrowseItem> browseRecursive(const char* directory);
 
 } /* namespace parser */
 } /* namespace sequence */
