@@ -1,4 +1,5 @@
 #include <sequence/parser/ParserUtils.h>
+#include <sequence/DisplayUtils.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -35,25 +36,16 @@ BOOST_AUTO_TEST_CASE( PatternKeyTest )
     BOOST_CHECK_EQUAL( values[2], 456u );
 }
 
-//BOOST_AUTO_TEST_CASE( TooMuchNumberTest )
-//{
-//    const string filename( "0.1.2.3.4.5.6.7.8.9" );
-//    PatternKey pk(filename);
-//    BOOST_CHECK_EQUAL( pk.key, filename );
-//    BOOST_CHECK( pk.values.empty() );
-//    BOOST_CHECK( pk.locations.empty() );
-//}
-
 BOOST_AUTO_TEST_CASE( AggregatorTest )
 {
-    Parser aggregator;
-    aggregator("path/p2.sgi");
-    aggregator("path/p3.sgi");
+    Parser parser;
+    parser("path/p2.sgi");
+    parser("path/p3.sgi");
 
-    const FolderMap &folderMap = aggregator.getFolderMap();
+    const FolderMap &folderMap = parser.getFolderMap();
     BOOST_CHECK_EQUAL( folderMap.size() ,1u );
     FolderMap::const_iterator itr = folderMap.find("path");
-    BOOST_CHECK( itr != aggregator.getFolderMap().end() );
+    BOOST_CHECK( itr != parser.getFolderMap().end() );
     const FilenameAggregator &map = itr->second;
     const PatternAggregator &va = map.begin()->second;
     BOOST_CHECK_EQUAL( va.locationCount(), 1u );
@@ -67,26 +59,26 @@ BOOST_AUTO_TEST_CASE( AggregatorTest )
 
 BOOST_AUTO_TEST_CASE( ValueAggregatorSetsTest )
 {
-    Parser aggregator;
-    const PatternAggregator &va = aggregator("p2.cr2");
+    Parser parser;
+    const PatternAggregator &va = parser("p2.cr2");
     const PatternAggregator::Sets &sets = va.getSets();
     BOOST_CHECK_EQUAL( sets.size(),2u );
     BOOST_CHECK_EQUAL( sets[0].size(),1u );
     BOOST_CHECK_EQUAL( sets[1].size(),1u );
-    aggregator("p3.cr2");
+    parser("p3.cr2");
     BOOST_CHECK_EQUAL( sets[0].size(),2u );
     BOOST_CHECK_EQUAL( sets[1].size(),1u );
-    aggregator("p3.cr1");
+    parser("p3.cr1");
     BOOST_CHECK_EQUAL( sets[0].size(),2u );
     BOOST_CHECK_EQUAL( sets[1].size(),2u );
 }
 
 BOOST_AUTO_TEST_CASE( SimplifyingTest )
 {
-    Parser aggregator;
-    const PatternAggregator &va = aggregator("0_0_012");
-    aggregator("0_1_012");
-    aggregator("0_2_012");
+    Parser parser;
+    const PatternAggregator &va = parser("0_0_012");
+    parser("0_1_012");
+    parser("0_2_012");
     {
         BOOST_CHECK_EQUAL( va.key , "#_#_###" );
         const PatternAggregator::Sets &sets = va.getSets();
@@ -96,7 +88,7 @@ BOOST_AUTO_TEST_CASE( SimplifyingTest )
         BOOST_CHECK_EQUAL( sets[2].size(),1u );
     }
     {
-        const PatternAggregator another = va.optimize();
+        const PatternAggregator another = va.morphIfNeeded();
         BOOST_CHECK_EQUAL( another.key,"0_#_012" );
         const PatternAggregator::Sets &sets = another.getSets();
         BOOST_CHECK_EQUAL( sets.size(),1u );
@@ -107,39 +99,14 @@ BOOST_AUTO_TEST_CASE( SimplifyingTest )
 
 BOOST_AUTO_TEST_CASE( FinalizeTest )
 {
-    Parser aggregator;
-    aggregator("path/pouet.txt");
-    aggregator("path/_00132_file11.cr2");
-    aggregator("path/_00132_file12.cr2");
-    aggregator("path/_00132_file13.cr2");
-    aggregator.finalize();
+    using sequence::BrowseItem;
+    Parser parser;
+    parser("path/pouet.txt");
+    parser("path/_00132_file11.cr2");
+    parser("path/_00132_file12.cr2");
+    parser("path/_00132_file13.cr2");
+    const std::vector<BrowseItem> items = parser.finalize();
+    copy(items.begin(), items.end(), ostream_iterator<BrowseItem>(cout , "\n"));
 }
-//BOOST_AUTO_TEST_CASE( RemoveTrivialLocationTest )
-//{
-//    PatternKey pk("image1-000.cr2");
-//    pk.append(PatternKey("image1-001.cr2"));
-//    pk.append(PatternKey("image1-002.cr2"));
-//    pk.append(PatternKey("image1-003.cr2"));
-//
-//    BOOST_CHECK_EQUAL( pk.locationCount(), 3u );
-//    removeConstantLocations(pk);
-//    BOOST_CHECK_EQUAL( pk.locationCount(), 1u );
-//}
 
-//BOOST_AUTO_TEST_CASE( ChooseLocationDefaultTest )
-//{
-//    PatternKey pk("_023__1_456");
-//    BOOST_CHECK_EQUAL( pk.locationCount(), 3u );
-//
-//    // only one file, it can't be a sequence
-//    BOOST_CHECK_EQUAL( chooseNumberLocation(pk), (Location*) NULL );
-//
-//    // two file, we can tell which one is moving
-//    pk.append(PatternKey("_023__2_456"));
-//    BOOST_CHECK_EQUAL( chooseNumberLocation(pk), &pk.locations[1] );
-//
-//    // three files now but we can't draw any conclusions
-//    pk.append(PatternKey("_023__1_466"));
-//    BOOST_CHECK_EQUAL( chooseNumberLocation(pk), (Location*) NULL );
-//}
 BOOST_AUTO_TEST_SUITE_END()

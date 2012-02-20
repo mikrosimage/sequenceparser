@@ -1,7 +1,7 @@
 /*
  * ParserUtils.cpp
  *
- *  Created on: 16 févr. 2012
+ *  Created on: 16 fevr. 2012
  *      Author: Guillaume Chatelet
  */
 
@@ -10,6 +10,7 @@
 #include <sequence/Sequence.h>
 
 #include <boost/bind/mem_fn.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -46,12 +47,12 @@ void extractPattern(std::string &pattern, Locations &locations, Values &values) 
     while ((current = find_if(current, end, isDigit)) != end) {
         Location location;
         location.first = distance(begin, current);
-        const Itr pastEnd = find_if(current, end, isNonDigit);
-        location.count = distance(current, pastEnd);
-        values.push_back(atoi(current, pastEnd));
+        const Itr pastDigitEnd = find_if(current, end, isNonDigit);
+        location.count = distance(current, pastDigitEnd);
+        values.push_back(atoi(current, pastDigitEnd));
         locations.push_back(location);
-        fill(current, pastEnd, '#');
-        current = pastEnd;
+        fill(current, pastDigitEnd, '#');
+        current = pastDigitEnd;
     }
 }
 
@@ -63,21 +64,23 @@ void PatternAggregator::append(const Values& values) {
 }
 
 typedef vector<size_t> SizeVector;
-typedef set<size_t> SizeSet;
+typedef vector<bool> BoolVector;
 
-static inline SizeSet keepIndices(const SizeVector &v) {
-    SizeSet result;
-    const SizeVector::const_iterator begin = v.begin();
-    SizeVector::const_iterator current = begin;
-    const SizeVector::const_iterator end = v.end();
-    for (; current != end; ++current)
-        if (*current != 1)
-            result.insert(distance(begin, current));
+static inline BoolVector generateKeepLookup(const SizeVector &v) {
+    BoolVector result(v.size());
+    for (size_t i = 0; i < v.size(); ++i)
+        result[i] = v[i] != 1;
     return result;
 }
 
+static inline SizeVector grabSetsSizes(const PatternAggregator::Sets& sets) {
+    SizeVector sizes(sets.size());
+    transform(sets.begin(), sets.end(), sizes.begin(), mem_fun_ref(&PatternAggregator::Set::size));
+    return sizes;
+}
+
 static inline void instanciateNumberAt(string &key, const Location &location, unsigned int value) {
-    details::CharStack<char, 32> stack(value);
+    details::CharStack<> stack(value);
     while (stack.size() < location.count)
         stack.push('0');
     char* ptr = &key[location.first];
@@ -85,26 +88,21 @@ static inline void instanciateNumberAt(string &key, const Location &location, un
         *ptr = stack.top();
 }
 
-PatternAggregator PatternAggregator::optimize() const {
-    SizeVector setSizes(sets.size());
-    transform(sets.begin(), sets.end(), setSizes.begin(), mem_fun_ref(&Set::size));
-    const SizeSet indices(keepIndices(setSizes));
+PatternAggregator PatternAggregator::generateCopy(const BoolVector &keepLookup) const {
     string newKey = key;
     Locations newLocations;
-    for (size_t i = 0; i < locationCount(); ++i) {
-        const bool suppressLocation = indices.count(i) == 0;
-        const Location &location = locations[i];
-        if (suppressLocation)
-            instanciateNumberAt(newKey, location, *sets[i].begin());
-        else
+    for (size_t locationIndex = 0; locationIndex < locationCount(); ++locationIndex) {
+        const Location &location = locations[locationIndex];
+        if (keepLookup[locationIndex])
             newLocations.push_back(location);
+        else
+            instanciateNumberAt(newKey, location, *(sets[locationIndex].begin()));
     }
     PatternAggregator result(newKey, newLocations);
-    PatternAggregator::const_iterator itr = begin();
-    size_t selector = 0;
     Values tmp;
-    for (; itr != end(); ++itr, ++selector, selector %= locationCount()) {
-        if (indices.count(selector) > 0)
+    PatternAggregator::const_iterator itr = begin();
+    for (size_t locationIndex = 0; itr != end(); ++itr, ++locationIndex, locationIndex %= locationCount()) {
+        if (keepLookup[locationIndex])
             tmp.push_back(*itr);
         if (tmp.size() == result.locationCount()) {
             result.append(tmp);
@@ -114,20 +112,45 @@ PatternAggregator PatternAggregator::optimize() const {
     return result;
 }
 
+PatternAggregator PatternAggregator::morphIfNeeded() const {
+    const SizeVector setsSizes = grabSetsSizes(sets);
+    const BoolVector keepLookup = generateKeepLookup(setsSizes);
+    const size_t locationsToRemove = count(keepLookup.begin(), keepLookup.end(), false);
+    assert(locationsToRemove>0);
+    return generateCopy(keepLookup);
+}
+
 void FilenameAggregator::optimize() {
     vector<PatternAggregator> optimized;
     vector<string> toDelete;
     for (const_iterator itr = begin(); itr != end(); ++itr) {
         const PatternAggregator &current = itr->second;
-        if (current.isOptimized())
+        if (current.isValid())
             continue;
-        optimized.push_back(current.optimize());
+        const PatternAggregator newOne = current.morphIfNeeded();
+        if (!newOne.isValid()) {
+            printf("I'm only a poor little parser and I can't do anything with %s\n", current.key.c_str());
+            continue;
+        }
+        optimized.push_back(newOne);
         toDelete.push_back(itr->first);
     }
     for (vector<string>::const_iterator itr = toDelete.begin(); itr != toDelete.end(); ++itr)
         erase(*itr);
     for (vector<PatternAggregator>::const_iterator itr = optimized.begin(); itr != optimized.end(); ++itr)
         insert(make_pair(itr->key, *itr));
+}
+
+static inline void convert(const FilenameAggregator::value_type & pair, std::vector<BrowseItem> &container, const boost::filesystem::path &path) {
+    const PatternAggregator &pattern = pair.second;
+    if (pattern.isSingleFile()) {
+        container.push_back(sequence::create_file(path / pattern.key));
+        return;
+    }
+}
+
+void FilenameAggregator::appendResultsTo(std::vector<BrowseItem> &container, const boost::filesystem::path &path) const {
+    for_each(begin(), end(), boost::bind(convert, _1, boost::ref(container), boost::ref(path)));
 }
 
 const PatternAggregator& FilenameAggregator::operator()(std::string key) {
@@ -143,13 +166,16 @@ const PatternAggregator& Parser::operator()(const boost::filesystem::path& path)
     return folderMap[path.parent_path()](path.filename().string());
 }
 
-static inline void optimize(FolderMap::value_type &pair) {
-    pair.second.optimize();
+static inline void optimize(std::vector<BrowseItem>& results, FolderMap::value_type &pair) {
+    FilenameAggregator &aggregator = pair.second;
+    aggregator.optimize();
+    aggregator.appendResultsTo(results, pair.first);
 }
 
 std::vector<BrowseItem> Parser::finalize() {
-    for_each(folderMap.begin(), folderMap.end(), &optimize);
-    return std::vector<BrowseItem>();
+    std::vector<BrowseItem> results;
+    for_each(folderMap.begin(), folderMap.end(), boost::bind(optimize, boost::ref(results), _1));
+    return results;
 }
 
 } /* namespace parser */

@@ -1,7 +1,7 @@
 /*
  * ParserUtils.h
  *
- *  Created on: 16 févr. 2012
+ *  Created on: 16 fevr. 2012
  *      Author: Guillaume Chatelet
  */
 
@@ -46,13 +46,15 @@ struct PatternAggregator : public Values {
     void append(const Values &values);
     size_t files() const{return locations.empty() ? 1 : size() / locationCount();}
     size_t locationCount() const{return locations.size();}
-    inline bool isOptimized()const{return isSingleFile()||locationCount()==1;}
+    inline bool isValid()const{return isSingleFile()||locationCount()==1;}
     inline bool isSingleFile()const{return files()==1;}
     const Sets& getSets()const{return sets;}
-    PatternAggregator optimize() const;
+    PatternAggregator morphIfNeeded() const;
 public:
     std::string key;
     Locations locations;
+private:
+    PatternAggregator generateCopy(const std::vector<bool> &) const;
 private:
     Sets sets;
 };
@@ -60,6 +62,7 @@ private:
 struct FilenameAggregator : boost::unordered_map<std::string, PatternAggregator> {
     const PatternAggregator& operator()(std::string filename);
     void optimize();
+    void appendResultsTo(std::vector<BrowseItem> &container, const boost::filesystem::path &path) const;
 private:
     Values tmpValues;
     Locations tmpLocations;

@@ -35,19 +35,19 @@ std::string instanciatePattern(const SequencePattern &pattern, unsigned int fram
 
 namespace details {
 
-template<typename T, size_t count>
+template<size_t count=32>
 struct CharStack {
     CharStack(unsigned int value) : index(0) {
         for (; value; value /= 10)
             push("0123456789"[value % 10]);
     }
-    void push(T c) { assert(index<count); buffer[index++] = c; }
+    void push(char c) { assert(index<count); buffer[index++] = c; }
     size_t size() const { return index; }
     bool empty() const { return index == 0; }
-    const T top() const { return buffer[index - 1]; }
+    const char top() const { return buffer[index - 1]; }
     void pop() { assert(index!=0); --index; }
 private:
-    T buffer[count];
+    char buffer[count];
     size_t index;
 };
 

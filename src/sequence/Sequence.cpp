@@ -29,7 +29,7 @@ std::string instanciatePattern(const SequencePattern &pattern, unsigned int fram
 	result.reserve(100);
 	result += pattern.prefix;
 	const bool padding = pattern.padding > 1;
-	details::CharStack<unsigned char, 32> stack(frame);
+	details::CharStack<> stack(frame);
 	if (padding) {
 		if (stack.size() > pattern.padding) {
 			ostringstream ss;
