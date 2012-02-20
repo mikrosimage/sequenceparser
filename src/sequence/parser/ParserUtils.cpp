@@ -70,7 +70,7 @@ static inline SizeVector grabSetsSizes(const PatternAggregator::LocationValueSet
     return sizes;
 }
 
-static inline void write(unsigned int value, string &inString, const Location &atLocation) {
+static inline void overwrite(unsigned int value, string &inString, const Location &atLocation) {
     sequence::details::CharStack<> stack(value);
     while (stack.size() < atLocation.count)
         stack.push('0');
@@ -79,7 +79,7 @@ static inline void write(unsigned int value, string &inString, const Location &a
         *ptr = stack.top();
 }
 
-std::vector<Range> LocationValueSet::getRanges(LocationValueSet::value_type &step) const {
+std::vector<Range> LocationValueSet::getConsecutiveRanges(LocationValueSet::value_type &step) const {
     assert(!isConstant());
     typedef std::vector<value_type> V;
     typedef V::const_iterator VItr;
@@ -100,30 +100,30 @@ std::vector<Range> LocationValueSet::getRanges(LocationValueSet::value_type &ste
 
 typedef vector<bool> BoolVector;
 
-static inline BoolVector generateKeepLookup(const SizeVector &v) {
+static inline BoolVector sizeEqualsToOne(const SizeVector &v) {
     BoolVector result(v.size());
-    for (size_t i = 0; i < v.size(); ++i)
-        result[i] = v[i] != 1;
+    typedef equal_to<unsigned int> Equal;
+    transform(v.begin(), v.end(), result.begin(), binder1st<Equal>(Equal(), 1));
     return result;
 }
 
-PatternAggregator PatternAggregator::createCopyWithLocations(const BoolVector &keepLocation) const {
+PatternAggregator PatternAggregator::discard(const BoolVector &discardLocation) const {
     string newKey = key;
     Locations newLocations;
     for (size_t locationIndex = 0; locationIndex < locationCount(); ++locationIndex) {
         const Location &location = locations[locationIndex];
-        if (keepLocation[locationIndex])
-            newLocations.push_back(location);
-        else {
+        if (discardLocation[locationIndex]) {
             const value_type value = *(locationValueSets[locationIndex].begin());
-            write(value, newKey, location);
+            overwrite(value, newKey, location);
+        } else {
+            newLocations.push_back(location);
         }
     }
     PatternAggregator result(newKey, newLocations);
     Values tmp;
     PatternAggregator::const_iterator itr = begin();
     for (size_t locationIndex = 0; itr != end(); ++itr, ++locationIndex, locationIndex %= locationCount()) {
-        if (keepLocation[locationIndex])
+        if (!discardLocation[locationIndex])
             tmp.push_back(*itr);
         if (tmp.size() == result.locationCount()) {
             result.append(tmp);
@@ -134,9 +134,10 @@ PatternAggregator PatternAggregator::createCopyWithLocations(const BoolVector &k
 }
 
 PatternAggregator PatternAggregator::removeConstantLocations() const {
-    const SizeVector setsSizes = grabSetsSizes(locationValueSets);
-    const BoolVector keepLocations = generateKeepLookup(setsSizes);
-    return createCopyWithLocations(keepLocations);
+    const BoolVector discardLocations = isSingleFile() ? //
+                    BoolVector(locationCount(), true) : // single file, discarding all values
+                    sizeEqualsToOne(grabSetsSizes(locationValueSets)); // keeping sets with more than one value
+    return discard(discardLocations);
 }
 
 void SequenceDetector::reduce() {
@@ -144,14 +145,13 @@ void SequenceDetector::reduce() {
     vector<string> toDelete;
     for (const_iterator itr = begin(); itr != end(); ++itr) {
         const PatternAggregator &current = itr->second;
-        if (current.isValid())
-            continue;
         const PatternAggregator newOne = current.removeConstantLocations();
-        if (!newOne.isValid()) {
+        if (newOne.isReady()) {
+            toAdd.push_back(newOne);
+        } else { // still more than one location, splitting according to first locations
             printf("I'm only a poor little parser and I can't do a thing with %s\n", current.key.c_str());
             continue;
         }
-        toAdd.push_back(newOne);
         toDelete.push_back(itr->first);
     }
     for (vector<string>::const_iterator itr = toDelete.begin(); itr != toDelete.end(); ++itr)
@@ -162,14 +162,17 @@ void SequenceDetector::reduce() {
 
 void SequenceDetector::process(const value_type& pair) {
     const PatternAggregator &pattern = pair.second;
-    assert(pattern.isValid());
+    if (!pattern.isReady()) {
+        printf("Skipping pattern %s\n", pattern.key.c_str());
+        return;
+    }
     if (pattern.isSingleFile()) {
         results.push_back(sequence::create_file(path / pattern.key));
         return;
     }
     const SequencePattern sequencePattern = sequence::parsePattern(pattern.key);
     unsigned int step = 0;
-    const std::vector<Range> ranges = pattern.getSelectedSet().getRanges(step);
+    const std::vector<Range> ranges = pattern.getSelectedSet().getConsecutiveRanges(step);
     for (std::vector<Range>::const_iterator itr = ranges.begin(); itr != ranges.end(); ++itr)
         results.push_back(create_sequence(path, sequencePattern, *itr, step));
 }

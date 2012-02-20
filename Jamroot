@@ -2,6 +2,14 @@ import os ;
 import boost ; 
 import path ;
 
+project : requirements
+            <toolset>gcc:<cxxflags>-isystem$(BOOST_ROOT) # will prevent warnings within boost
+            <toolset>clang:<cxxflags>-isystem$(BOOST_ROOT) # will prevent warnings within boost
+            <os>NT:<define>WIN32_LEAN_AND_MEAN
+            <os>NT:<define>VC_EXTRALEAN
+            <os>NT:<define>_WIN32_WINNT=0x0501
+        : build-dir bin	;
+
 use-project /boost : [ modules.peek : BOOST_ROOT ] ; 
 
 use-project /sequence : src/sequence ;

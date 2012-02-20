@@ -1,0 +1,1 @@
+exe ls : main.cpp /sequence_parser//sequence_parser/<link>static ;
