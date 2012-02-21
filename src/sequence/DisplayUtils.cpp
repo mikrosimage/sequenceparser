@@ -59,12 +59,12 @@ ostream& operator<<(ostream &stream, const BrowseItem &item) {
         const Sequence &sequence = item.sequence;
         ostringstream pattern;
         pattern << sequence.pattern;
-        stream << (item.path / pattern.str());
+        stream << (item.path / pattern.str()).make_preferred();
         stream << ' ' << sequence.range;
         if (sequence.step > 1)
             stream << " (" << sequence.step << ')';
     } else
-        stream << item.path;
+        stream << boost::filesystem::path(item.path).make_preferred();
 
     return stream;
 }

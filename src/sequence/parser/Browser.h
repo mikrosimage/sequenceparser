@@ -14,8 +14,7 @@
 namespace sequence {
 namespace parser {
 
-std::vector<sequence::BrowseItem> browse(const char* directory);
-std::vector<sequence::BrowseItem> browseRecursive(const char* directory);
+std::vector<sequence::BrowseItem> browse(const char* directory, bool recursive=false);
 
 } /* namespace parser */
 } /* namespace sequence */

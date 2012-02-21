@@ -33,6 +33,15 @@ BOOST_AUTO_TEST_CASE( LocationValueSetGetStepTest )
     unsigned step;
     {
         LocationValueSet set;
+        boost::assign::insert(set)(0)(1)(2)(3)(4);
+        BOOST_CHECK( !set.isConstant() );
+        std::vector<Range> ranges = set.getConsecutiveRanges(step);
+        BOOST_CHECK_EQUAL( step, 1u );
+        BOOST_CHECK_EQUAL( ranges.size(), 1u );
+        check_equals( ranges[0], Range(0,4));
+    }
+    {
+        LocationValueSet set;
         boost::assign::insert(set)(1)(2)(5)(6)(11)(12)(13)(14)(20)(22)(24)(26)(28)(30)(34)(36);
         BOOST_CHECK( !set.isConstant() );
         std::vector<Range> ranges = set.getConsecutiveRanges(step);

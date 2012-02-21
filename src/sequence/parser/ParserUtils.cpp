@@ -36,7 +36,7 @@ static inline size_t atoi(string::const_iterator begin, const string::const_iter
     return value;
 }
 
-void extractPattern(std::string &pattern, Locations &locations, Values &values) {
+void extractPattern(string &pattern, Locations &locations, Values &values) {
     locations.clear();
     values.clear();
     typedef string::iterator Itr;
@@ -79,14 +79,14 @@ static inline void overwrite(unsigned int value, string &inString, const Locatio
         *ptr = stack.top();
 }
 
-std::vector<Range> LocationValueSet::getConsecutiveRanges(LocationValueSet::value_type &step) const {
+vector<Range> LocationValueSet::getConsecutiveRanges(LocationValueSet::value_type &step) const {
     assert(!isConstant());
-    typedef std::vector<value_type> V;
+    typedef vector<value_type> V;
     typedef V::const_iterator VItr;
     V derivative(size());
     adjacent_difference(begin(), end(), derivative.begin());
-    step = *std::min_element(derivative.begin(), derivative.end());
-    std::vector<Range> ranges;
+    step = max(value_type(1), *min_element(derivative.begin(), derivative.end()));
+    vector<Range> ranges;
     const_iterator itr = begin();
     VItr d_itr = derivative.begin();
     for (; d_itr != derivative.end(); ++d_itr, ++itr) {
@@ -172,12 +172,12 @@ void SequenceDetector::process(const value_type& pair) {
     }
     const SequencePattern sequencePattern = sequence::parsePattern(pattern.key);
     unsigned int step = 0;
-    const std::vector<Range> ranges = pattern.getSelectedSet().getConsecutiveRanges(step);
-    for (std::vector<Range>::const_iterator itr = ranges.begin(); itr != ranges.end(); ++itr)
+    const vector<Range> ranges = pattern.getSelectedSet().getConsecutiveRanges(step);
+    for (vector<Range>::const_iterator itr = ranges.begin(); itr != ranges.end(); ++itr)
         results.push_back(create_sequence(path, sequencePattern, *itr, step));
 }
 
-const std::vector<BrowseItem>& SequenceDetector::getResults() {
+const vector<BrowseItem>& SequenceDetector::getResults() {
     if (results.empty()) {
         reduce();
         for_each(begin(), end(), boost::bind(&SequenceDetector::process, this, _1));
@@ -185,9 +185,9 @@ const std::vector<BrowseItem>& SequenceDetector::getResults() {
     return results;
 }
 
-const PatternAggregator& SequenceDetector::operator()(std::string key) {
+const PatternAggregator& SequenceDetector::operator()(string key) {
     if (!results.empty())
-        throw std::logic_error("Already processed");
+        throw logic_error("Already processed");
     assert(key.find('/')==string::npos);
     assert(key.find('\\')==string::npos);
     extractPattern(key, extractedLocations, extractedValues);
