@@ -1,1 +1,1 @@
-exe ls : main.cpp /sequence_parser//sequence_parser/<link>static /boost//chrono/<link>static ;
+exe ls : main.cpp /sequence_parser//sequence_parser/<link>static /boost//chrono/<link>static : <os>LINUX:<linkflags>-lrt ;
