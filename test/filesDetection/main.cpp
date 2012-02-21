@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     createTmpDiretoriesFilesAndSequences();
 
     std::cout << std::setw(85) << " " << " Folder |  File  | Sequence | FileObjects" << std::endl;
-/*
+
     testFindObjectInDiretory ( "tmpTestSequence"                                                                                                    , 1, 0, 0, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root"                                                                                               , 2, 0, 0, 2 );
     testFindObjectInDiretory ( "tmpTestSequence/root/trash/"                                                                                        , 1, 1, 0, 2 );
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(TestSequence)
 
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                                                                           , 0, 0, 3, 3 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/"                      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 );
-*/
+
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"                                                               , 0, 1, 0, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"                                                                 , 0, 1, 0, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*0050.dpx"                                                                  , 0, 1, 0, 1 );
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFindObjectInDiretory ( "./img.0050.dpx"                                                                                                     , 0, 1, 0, 1 );
     testFindObjectInDiretory ( "img.0050.dpx"                                                                                                       , 0, 1, 0, 1 );
     boost::filesystem::current_path("../../../../");
-/*
+
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/strictPadding/*0050.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
@@ -353,6 +353,6 @@ BOOST_AUTO_TEST_CASE(TestSequence)
     testFindObjectInDiretory ( "tmpTestSequence/root/film/noStrictPadding/.img.%03d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"                                                               , 0, 0, 0, 0 );
     testFindObjectInDiretory ( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
-*/
+
     //clearTmp();
 }
