@@ -7,6 +7,7 @@
 #include "File.hpp"
 #include "Folder.hpp"
 
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
@@ -30,43 +31,43 @@ public:
 	 ** fileInDirectory methods
 	 **
 	 **/
-	std::vector<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
+	boost::ptr_vector<File> fileInDirectory( const std::string& directory,
 														 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<File> > fileInDirectory( const std::string& directory,
+	boost::ptr_vector<File> fileInDirectory( const std::string& directory,
 														 std::vector<std::string>& filters,
 														 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
+	boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory,
 																 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<Sequence> > sequenceInDirectory( const std::string& directory,
+	boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory,
 																 std::vector<std::string>& filters,
 																 const EMaskOptions desc = eMaskOptionsDefault );
 
 
-	std::vector<boost::shared_ptr<Sequence> > sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
+	boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
 
 
-	std::vector<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
+	boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory,
 																		  const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<FileObject> > fileAndSequenceInDirectory( const std::string& directory,
+	boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory,
 																		  std::vector<std::string>& filters,
 																		  const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
+	boost::ptr_vector<Folder> folderInDirectory( const std::string& directory,
 															 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<Folder> > folderInDirectory( const std::string& directory,
+	boost::ptr_vector<Folder> folderInDirectory( const std::string& directory,
 															 std::vector<std::string>& filters,
 															 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
+	boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory,
 																	 const EMaskType mask = eMaskTypeDefault,
 																	 const EMaskOptions desc = eMaskOptionsDefault );
 
-	std::vector<boost::shared_ptr<FileObject> > fileObjectInDirectory( const std::string& directory,
+	boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory,
 																	 std::vector<std::string>& filters,
 																	 const EMaskType mask = eMaskTypeDefault,
 																	 const EMaskOptions desc = eMaskOptionsDefault );

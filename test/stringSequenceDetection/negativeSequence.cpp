@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE( NegativeSequenceDetection )
 BOOST_AUTO_TEST_CASE( NoNegativeValues )
 {
 	sequenceParser::Detector detector;
-	std::vector<boost::shared_ptr<sequenceParser::Sequence > > listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
@@ -21,7 +21,9 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 
 		( "aaa/bbb/a1b+3c6.j2c" )
 		( "aaa/bbb/a1b+3c2.j2c" )
+		( "aaa/bbb/a1b+3c0.j2c" )
 		( "aaa/bbb/a1b+3c3.j2c" )
+		( "aaa/bbb/a1b+3c9.j2c" )
 
 		( "aaa/bbb/a1b9c6.j2c" )
 		( "aaa/bbb/a1b9c2.j2c" )
@@ -30,14 +32,26 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 	listSequence = detector.sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 3 );
+	
+	BOOST_CHECK( listSequence[0].getNbFiles() == 3 );
+	BOOST_CHECK( listSequence[0].getFirstTime() == 1 );
+	BOOST_CHECK( listSequence[0].getLastTime() == 3 );
+	
+	BOOST_CHECK( listSequence[1].getNbFiles() == 2 );
+	BOOST_CHECK( listSequence[1].getFirstTime() == 2 );
+	BOOST_CHECK( listSequence[1].getLastTime() == 6 );
+	
+	BOOST_CHECK( listSequence[2].getNbFiles() == 5 );
+	BOOST_CHECK( listSequence[2].getFirstTime() == 0 );
+	BOOST_CHECK( listSequence[2].getLastTime() == 9 );
 }
 
 BOOST_AUTO_TEST_CASE( NegativeSequence )
 {
 	using namespace sequenceParser;
 	Detector detector;
-	std::vector<boost::shared_ptr<Sequence> > listSequence;
-
+	boost::ptr_vector<Sequence> listSequence;
+ 
 	std::vector<boost::filesystem::path> paths;
 
 	boost::assign::push_back( paths )
@@ -55,12 +69,12 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 	//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 1 );
 
-	const boost::shared_ptr<Sequence> seq = listSequence.front();
-	BOOST_CHECK( seq->getFirstTime() == -3 );
-	BOOST_CHECK( seq->getLastTime() == 3 );
-	BOOST_CHECK( seq->getNbFiles() == 7 );
-	BOOST_CHECK( seq->hasMissingFile() == false );
-	BOOST_CHECK( seq->getStep() == 1 );
+	const Sequence& seq = listSequence.front();
+	BOOST_CHECK( seq.getFirstTime() == -3 );
+	BOOST_CHECK( seq.getLastTime() == 3 );
+	BOOST_CHECK( seq.getNbFiles() == 7 );
+	BOOST_CHECK( seq.hasMissingFile() == false );
+	BOOST_CHECK( seq.getStep() == 1 );
 }
 
 

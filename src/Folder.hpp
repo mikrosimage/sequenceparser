@@ -14,6 +14,11 @@ public:
 	FileObject( directory, eMaskTypeDirectory, options ),
 	_folderName( folderName ) { }
 
+	Folder( const Folder& other )
+	: FileObject( other )
+	, _folderName( other._folderName )
+	{}
+	
 	~Folder() { }
 
 	std::ostream& getCout( std::ostream& os ) const;
@@ -26,6 +31,8 @@ public:
 		_folderName.clear();
 	}
 
+	Folder* clone() const { return new Folder(*this); }
+	
 private:
 	std::ostream& getProperties( std::ostream& os, const boost::filesystem::path& directory );
 

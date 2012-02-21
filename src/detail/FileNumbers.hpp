@@ -114,9 +114,9 @@ public:
 		bool operator()( const FileNumbers& a, const FileNumbers& b ) const;
 	};
 	
-	bool operator<(const This& v )
+	bool operator<( const This& v ) const
 	{
-		// by default sort by padding
+		// by default sort by number
 		return SortByNumber()( *this, v );
 	}
 

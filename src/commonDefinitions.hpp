@@ -85,26 +85,33 @@ enum EMaskOptions
 
 inline EMaskType operator~(const EMaskType& a )
 {
-	EMaskType b = (EMaskType) ( ~int(a ) );
-	return b;
+	return (EMaskType) ( ~int(a ) );
 }
 
 inline EMaskType operator&=( EMaskType& a, const EMaskType& b )
 {
-	a = (EMaskType) (int(b ) & int(a ) );
-	return a;
+	return a = (EMaskType) (int(b ) & int(a ) );
 }
 
 inline EMaskType operator|=( EMaskType& a, const EMaskType& b )
 {
-	a = (EMaskType) (int(b ) | int(a ) );
-	return a;
+	return a = (EMaskType) (int(b ) | int(a ) );
+}
+
+inline EMaskType operator|( const EMaskType& a, const EMaskType& b )
+{
+	return (EMaskType) (int(b ) | int(a ) );
 }
 
 inline EMaskOptions operator|=( EMaskOptions& a, const EMaskOptions& b )
 {
 	a = (EMaskOptions) (int(b ) | int(a ) );
 	return a;
+}
+
+inline EMaskOptions operator|( const EMaskOptions& a, const EMaskOptions& b )
+{
+	return (EMaskOptions) (int(b ) | int(a ) );
 }
 
 inline EMaskOptions remove( EMaskOptions& a, const EMaskOptions& b )

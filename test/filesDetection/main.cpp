@@ -128,10 +128,10 @@ void clearTmp()
 void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
     sequenceParser::Detector detector;
-    std::vector<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
-    std::vector<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
-    std::vector<boost::shared_ptr<sequenceParser::File       > > listFile;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    boost::ptr_vector<sequenceParser::FileObject> listFileObject;
+    boost::ptr_vector<sequenceParser::Folder> listFolder;
+    boost::ptr_vector<sequenceParser::File> listFile;
+    boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
     listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
     listFolder     = detector.folderInDirectory      ( path );
@@ -140,7 +140,7 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
 
     if( listFileObject.size()  != numberOfFileObjects || listFolder.size() != numberOfFolders || listFile.size() != numberOfFiles || listSequence.size() != numberOfSequences )
 	std::cout << "test path: " << std::left << std::setw(75) << path << std::right << listFolder.size() << " -> " << numberOfFolders << " | " << listFile.size() << " -> " << numberOfFiles << " | " << listSequence.size() << " -> " << numberOfSequences << " | " << listFileObject.size() << " -> " << numberOfFileObjects  << std::endl;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+    boost::ptr_vector<sequenceParser::Sequence>::iterator it;
     /*for(it=listSequence.begin() ; it != listSequence.end(); it++)
 	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
 
@@ -153,10 +153,10 @@ void testFindObjectInDiretory ( const char* path, const size_t numberOfFolders, 
 void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
     sequenceParser::Detector detector;
-    std::vector<boost::shared_ptr<sequenceParser::FileObject > > listFileObject;
-    std::vector<boost::shared_ptr<sequenceParser::Folder     > > listFolder;
-    std::vector<boost::shared_ptr<sequenceParser::File       > > listFile;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    boost::ptr_vector<sequenceParser::FileObject> listFileObject;
+    boost::ptr_vector<sequenceParser::Folder> listFolder;
+    boost::ptr_vector<sequenceParser::File> listFile;
+    boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
     listFileObject = detector.fileObjectInDirectory  ( path, (sequenceParser::EMaskType) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) ,  options );
     listFolder     = detector.folderInDirectory      ( path, options );
@@ -165,7 +165,7 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
 
     if( listFileObject.size()  != numberOfFileObjects || listFolder.size() != numberOfFolders || listFile.size() != numberOfFiles || listSequence.size() != numberOfSequences )
 	std::cout << "test path [" << options << "]: " << std::left << std::setw(75) << path << std::right << listFolder.size() << " -> " << numberOfFolders << " | " << listFile.size() << " -> " << numberOfFiles << " | " << listSequence.size() << " -> " << numberOfSequences << " | " << listFileObject.size() << " -> " << numberOfFileObjects  << std::endl;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > >::iterator it;
+    boost::ptr_vector<sequenceParser::Sequence>::iterator it;
     /*for(it=listSequence.begin() ; it != listSequence.end(); it++)
 	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
 
@@ -178,32 +178,32 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
 void testFirstSequenceLimits  ( const char* path, const int minValue, const int maxValue )
 {
     sequenceParser::Detector detector;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
     listSequence   = detector.sequenceInDirectory    ( path );
 
-    boost::shared_ptr<sequenceParser::Sequence   > seq =listSequence.front();
+    sequenceParser::Sequence& seq = listSequence.front();
 
-    if ( seq->getFirstTime() != minValue || seq->getLastTime() != maxValue )
-	std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue << " found " << seq->getFirstTime() << " -> " << seq->getLastTime() << std::endl;
+    if ( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
+	std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
 
-    BOOST_CHECK( seq->getFirstTime()  == minValue );
-    BOOST_CHECK( seq->getLastTime()   == maxValue );
+    BOOST_CHECK( seq.getFirstTime()  == minValue );
+    BOOST_CHECK( seq.getLastTime()   == maxValue );
 }
 
 void testFirstSequenceLimits  ( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
 {
     sequenceParser::Detector detector;
-    std::vector<boost::shared_ptr<sequenceParser::Sequence   > > listSequence;
+    boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
     listSequence   = detector.sequenceInDirectory    ( path, options );
 
-    boost::shared_ptr<sequenceParser::Sequence   > seq = listSequence.front();
-    if ( seq->getFirstTime() != minValue || seq->getLastTime() != maxValue )
-	std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found " << seq->getFirstTime() << " -> " << seq->getLastTime() << std::endl;
+    sequenceParser::Sequence& seq = listSequence.front();
+    if ( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
+	std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
 
-    BOOST_CHECK( seq->getFirstTime()  == minValue );
-    BOOST_CHECK( seq->getLastTime()   == maxValue );
+    BOOST_CHECK( seq.getFirstTime()  == minValue );
+    BOOST_CHECK( seq.getLastTime()   == maxValue );
 }
 
 BOOST_AUTO_TEST_CASE(TestSequence)
