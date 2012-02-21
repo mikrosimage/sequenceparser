@@ -8,10 +8,12 @@
 #include "Browser.h"
 #include "ParserUtils.h"
 
+#include <boost/filesystem.hpp>
+#include <boost/unordered_map.hpp>
+
 #include <string>
 #include <iostream>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace sequence;
@@ -32,7 +34,7 @@ std::vector<BrowseItem> browse(const char* directory, bool recursive) {
     const path folder = getDirectory(directory);
     recursive_directory_iterator end;
     path lastParent = folder.parent_path();
-    typedef map<path, SequenceDetector> Map;
+    typedef boost::unordered_map<path, SequenceDetector> Map;
     typedef Map::iterator MapItr;
     Map detectors;
     for (recursive_directory_iterator itr(folder, recursive ? symlink_option::recurse : symlink_option::no_recurse); itr != end; ++itr) {
@@ -44,6 +46,7 @@ std::vector<BrowseItem> browse(const char* directory, bool recursive) {
         found->second(_path.filename().string());
     }
     vector<BrowseItem> items;
+    items.reserve(200);
     for (MapItr itr = detectors.begin(); itr != detectors.end(); ++itr) {
         const vector<BrowseItem> &currentItems = itr->second.getResults();
         items.insert(items.end(), currentItems.begin(), currentItems.end());

@@ -11,6 +11,7 @@
 #include <sequence/BrowseItem.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <set>
 #include <map>
@@ -148,7 +149,7 @@ private:
  * - generate the according BrowserItem
  * - return the list of BrowseItem
  */
-struct SequenceDetector : private std::map<std::string, PatternAggregator> {
+struct SequenceDetector : private boost::unordered_map<std::string, PatternAggregator> {
     SequenceDetector(const boost::filesystem::path &path = "") : path(path) { }
     const PatternAggregator& operator()(std::string filename);
     const std::vector<BrowseItem>& getResults();
@@ -159,7 +160,7 @@ private:
     Values extractedValues;
     Locations extractedLocations;
     std::vector<BrowseItem> results;
-    typedef std::map<std::string, PatternAggregator> ME;
+    typedef boost::unordered_map<std::string, PatternAggregator> ME;
 public:
     using ME::begin;
     using ME::end;

@@ -44,8 +44,10 @@ int main(int argc, char **argv) {
         typedef vector<sequence::BrowseItem> Items;
         const Items items = sequence::parser::browse(argv[argc == 3 ? 2 : 1], recursive);
 
-        cout << "Listing " << items.size() << " items took " << duration_cast<milliseconds>(high_resolution_clock::now() - start) << endl;
-        copy(items.begin(), items.end(), ostream_iterator<sequence::BrowseItem>(cout, "\n"));
+        ostringstream stream;
+        stream << "Listing " << items.size() << " items took " << duration_cast<milliseconds>(high_resolution_clock::now() - start) << endl;
+        copy(items.begin(), items.end(), ostream_iterator<sequence::BrowseItem>(stream, "\n"));
+        printf("%s\n", stream.str().c_str());
 
         return EXIT_SUCCESS;
     } catch (exception& e) {
