@@ -148,6 +148,13 @@ BOOST_AUTO_TEST_CASE( SimplifyingTest )
     }
 }
 
+bool less(const BrowseItem&a, const BrowseItem&b) {
+    ostringstream a_out,b_out;
+    a_out << a;
+    b_out << b;
+    return a_out.str()<b_out.str();
+}
+
 BOOST_AUTO_TEST_CASE( FinalizeTest )
 {
     using sequence::BrowseItem;
@@ -161,7 +168,8 @@ BOOST_AUTO_TEST_CASE( FinalizeTest )
     parser("p18.cr2");
     parser("p23.cr2");
     parser("p28.cr2");
-    const std::vector<BrowseItem> items = parser.getResults();
+    std::vector<BrowseItem> items = parser.getResults();
+    sort(items.begin(), items.end(), &less);
 // the result will be sorted lexicographically
     {
         const BrowseItem &item = items[0];
@@ -176,16 +184,6 @@ BOOST_AUTO_TEST_CASE( FinalizeTest )
     }
     {
         const BrowseItem &item = items[1];
-        BOOST_CHECK_EQUAL( item.type, UNITFILE);
-        BOOST_CHECK_EQUAL( item.path, "path/afile.txt");
-    }
-    {
-        const BrowseItem &item = items[2];
-        BOOST_CHECK_EQUAL( item.type, UNITFILE);
-        BOOST_CHECK_EQUAL( item.path, "path/file_with_numbers_0213.txt");
-    }
-    {
-        const BrowseItem &item = items[3];
         BOOST_CHECK_EQUAL( item.type, SEQUENCE);
         BOOST_CHECK_EQUAL( item.path, "path");
         BOOST_CHECK_EQUAL( item.sequence.pattern.prefix, "p");
@@ -195,7 +193,17 @@ BOOST_AUTO_TEST_CASE( FinalizeTest )
         BOOST_CHECK_EQUAL( item.sequence.range.last, 28u);
         BOOST_CHECK_EQUAL( item.sequence.step, 5u);
     }
-    copy(items.begin(), items.end(), ostream_iterator<sequence::BrowseItem>(cout, "\n"));
+    {
+        const BrowseItem &item = items[2];
+        BOOST_CHECK_EQUAL( item.type, UNITFILE);
+        BOOST_CHECK_EQUAL( item.path, "path/afile.txt");
+    }
+    {
+        const BrowseItem &item = items[3];
+        BOOST_CHECK_EQUAL( item.type, UNITFILE);
+        BOOST_CHECK_EQUAL( item.path, "path/file_with_numbers_0213.txt");
+    }
+//    copy(items.begin(), items.end(), ostream_iterator<sequence::BrowseItem>(cout, "\n"));
 }
 
 BOOST_AUTO_TEST_CASE( TrickyTestCaseWithSeveralIncrementingCounter )
