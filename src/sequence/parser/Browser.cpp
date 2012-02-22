@@ -8,6 +8,7 @@
 #include "Browser.h"
 #include "ParserUtils.h"
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 
@@ -30,30 +31,20 @@ static inline path getDirectory(const char* directory) {
     return folder;
 }
 
+static inline void changeTypeIfNeeded(BrowseItem &item) {
+    if (item.type == UNITFILE && is_directory(item.path))
+        item.type = FOLDER;
+}
+
 std::vector<BrowseItem> browse(const char* directory, bool recursive) {
     const path folder = getDirectory(directory);
-    recursive_directory_iterator end;
-    path lastParent = folder.parent_path();
-    typedef boost::unordered_map<path, SequenceDetector> Map;
-    typedef Map::iterator MapItr;
-    Map detectors;
-    for (recursive_directory_iterator itr(folder, recursive ? symlink_option::recurse : symlink_option::no_recurse); itr != end; ++itr) {
-        const path& _path = itr->path();
-        const path parent = _path.parent_path();
-        MapItr found = detectors.find(parent);
-        if (found == detectors.end())
-            found = detectors.insert(make_pair(parent, SequenceDetector(parent))).first;
-        found->second(_path.filename().string());
-    }
-    vector<BrowseItem> items;
-    items.reserve(200);
-    for (MapItr itr = detectors.begin(); itr != detectors.end(); ++itr) {
-        const vector<BrowseItem> &currentItems = itr->second.getResults();
-        items.insert(items.end(), currentItems.begin(), currentItems.end());
-    }
-    for (vector<BrowseItem>::iterator itr = items.begin(); itr != items.end(); ++itr)
-        if (itr->type == UNITFILE && is_directory(itr->path))
-            itr->type = FOLDER;
+    const symlink_option::enum_type option = recursive ? symlink_option::recurse : symlink_option::no_recurse;
+    Parser parser;
+    for_each(recursive_directory_iterator(folder, option), //
+             recursive_directory_iterator(), //
+             boost::bind(&Parser::operator(), boost::ref(parser), _1));
+    vector<BrowseItem> items = parser.getResults();
+    for_each(items.begin(), items.end(), &changeTypeIfNeeded);
     return items;
 }
 

@@ -1,1 +1,11 @@
-exe ls : main.cpp /sequence_parser//sequence_parser/<link>static /boost//chrono/<link>static : <os>LINUX:<linkflags>-lrt ;
+project :
+			requirements
+			<library>/sequence_parser//sequence_parser
+			<library>/boost//chrono
+			<os>LINUX:<linkflags>-lrt
+			<link>static
+		;
+
+exe ls : main.cpp ;
+
+exe performance_test : performance_test.cpp ;

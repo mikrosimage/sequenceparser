@@ -167,6 +167,11 @@ public:
     using ME::value_type;
 };
 
+struct Parser : private boost::unordered_map<boost::filesystem::path, SequenceDetector>, private boost::noncopyable{
+    void operator()(const boost::filesystem::path &);
+    std::vector<BrowseItem> getResults();
+};
+
 } /* namespace details */
 } /* namespace parser */
 } /* namespace sequence */

@@ -198,6 +198,26 @@ const PatternAggregator& SequenceDetector::operator()(string key) {
     return keyItr->second;
 }
 
+using namespace boost::filesystem;
+
+void Parser::operator ()(const path &_path) {
+    const path parent = _path.parent_path();
+    iterator found = find(parent);
+    if (found == end())
+        found = insert(make_pair(parent, SequenceDetector(parent))).first;
+    found->second(_path.filename().string());
+}
+
+std::vector<BrowseItem> Parser::getResults() {
+    std::vector<BrowseItem> items;
+    items.reserve(200);
+    for (iterator itr = begin(); itr != end(); ++itr) {
+        const vector<BrowseItem> &currentItems = itr->second.getResults();
+        items.insert(items.end(), currentItems.begin(), currentItems.end());
+    }
+    return items;
+}
+
 } /* namespace details */
 } /* namespace parser */
 } /* namespace sequence */
