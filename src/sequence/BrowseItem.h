@@ -26,6 +26,7 @@ struct BrowseItem {
     Sequence sequence;
     BrowseItem() : type(UNDEFINED) {}
     BrowseItem(const BrowseItemType type, const boost::filesystem::path &_path, const Sequence &sequence = Sequence()) : type(type), path(_path), sequence(sequence) { }
+    std::string extension() const;
 };
 
 /**

@@ -20,4 +20,17 @@ BrowseItem create_sequence(const path &path, //
     return BrowseItem(SEQUENCE, path, Sequence(pattern, range, step));
 }
 
+string BrowseItem::extension() const{
+    switch (type) {
+        case sequence::UNITFILE:
+            return path.extension().string();
+        case sequence::SEQUENCE:
+            return boost::filesystem::path(sequence.pattern.suffix).extension().string();
+        case sequence::FOLDER:
+        case sequence::UNDEFINED:
+        default:
+            return "";
+    }
+}
+
 } /* namespace sequence */
