@@ -6,6 +6,6 @@ project :
 			<link>static
 		;
 
-exe ls : main.cpp ;
+exe lss : main.cpp ;
 
 exe performance_test : performance_test.cpp ;

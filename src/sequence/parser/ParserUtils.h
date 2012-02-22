@@ -12,6 +12,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/container/flat_set.hpp>
 
 #include <set>
 #include <map>
@@ -170,6 +171,12 @@ public:
 struct Parser : private boost::unordered_map<boost::filesystem::path, SequenceDetector>, private boost::noncopyable{
     void operator()(const boost::filesystem::path &);
     std::vector<BrowseItem> getResults();
+    struct Proxy {
+        Proxy(Parser *ptr) : ptr(ptr) {}
+        inline void operator()(const boost::filesystem::path &path){ (*ptr)(path); }
+        Parser *ptr;
+    };
+    Proxy functor(){ return Proxy(this); }
 };
 
 } /* namespace details */

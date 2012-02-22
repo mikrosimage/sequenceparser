@@ -8,7 +8,6 @@
 #include "Browser.h"
 #include "ParserUtils.h"
 
-#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 
@@ -42,7 +41,7 @@ std::vector<BrowseItem> browse(const char* directory, bool recursive) {
     Parser parser;
     for_each(recursive_directory_iterator(folder, option), //
              recursive_directory_iterator(), //
-             boost::bind(&Parser::operator(), boost::ref(parser), _1));
+             parser.functor());
     vector<BrowseItem> items = parser.getResults();
     for_each(items.begin(), items.end(), &changeTypeIfNeeded);
     return items;
