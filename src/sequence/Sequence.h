@@ -19,6 +19,8 @@ struct SequencePattern {
     unsigned char padding;
     SequencePattern() : padding(1) {}
     SequencePattern(std::string prefix, std::string suffix, unsigned char padding = 1) : prefix(prefix), suffix(suffix), padding(padding) {}
+    bool match(const std::string &filename) const;
+    std::string string() const;
 };
 
 struct Sequence {

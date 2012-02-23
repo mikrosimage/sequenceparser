@@ -8,6 +8,17 @@ using namespace std;
 
 namespace sequence {
 
+bool SequencePattern::match(const std::string &filename) const {
+    return equal(prefix.begin(), prefix.end(), filename.begin()) && equal(suffix.rbegin(), suffix.rend(), filename.rbegin());
+}
+
+string SequencePattern::string() const{
+    std::string result(prefix);
+    result.insert(result.size(), padding, gPaddingChar);
+    result += suffix;
+    return result;
+}
+
 SequencePattern parsePattern(const std::string& filename) {
     typedef string::const_iterator CItr;
     const CItr paddingBegin = std::find(filename.begin(), filename.end(), gPaddingChar);

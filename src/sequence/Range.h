@@ -12,6 +12,7 @@ struct Range {
     Range(unsigned int first, unsigned int last) : first(first), last(last) {
         if(!valid()) throw std::logic_error("Invalid range, 'first' must not be greater than 'last'");
     }
+    static Range weak(unsigned int first, unsigned int count);
     bool contains(unsigned int frame) const { return first <= frame && frame <= last; }
     bool valid() const { return first<=last; }
     unsigned int duration() const;

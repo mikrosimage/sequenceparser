@@ -8,6 +8,12 @@ using namespace std;
 
 namespace sequence {
 
+Range Range::weak(unsigned int first, unsigned int count) {
+    assert(count>0);
+    assert(UINT_MAX-count>first);
+    return Range(first, first + count - 1);
+}
+
 unsigned int interpolateSource(const unsigned int recFrame, const Range &source, const Range &record, const bool reverse) {
     assert(source.valid());
     assert(record.valid());
@@ -15,9 +21,9 @@ unsigned int interpolateSource(const unsigned int recFrame, const Range &source,
     typedef boost::rational<int64_t> Rational;
     Rational recDuration = record.last - record.first;
     Rational srcDuration = source.last - source.first;
-    if(recDuration>srcDuration){
-    	++recDuration;
-    	++srcDuration;
+    if (recDuration > srcDuration) {
+        ++recDuration;
+        ++srcDuration;
     }
     const Rational recOffset = reverse ? record.last - recFrame : recFrame - record.first;
     const Rational srcOffset = recDuration == 0 ? 0 : (recOffset * srcDuration / recDuration);
@@ -48,7 +54,7 @@ static inline unsigned int offsetFrame(const Range &range, unsigned int current,
     const bool forward = offset > 0;
     const uint32_t positiveOffset = forward ? offset : -offset;
     const uint32_t distanceToLast = Range(current, range.last).duration();
-    const uint32_t distanceToFirst = Range(range.first,current).duration();
+    const uint32_t distanceToFirst = Range(range.first, current).duration();
     const uint32_t semiRangeDuration = forward ? distanceToLast : distanceToFirst;
     // inside
     if (positiveOffset < semiRangeDuration)
