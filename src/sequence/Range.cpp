@@ -59,11 +59,14 @@ static inline unsigned int offsetFrame(const Range &range, unsigned int current,
     // inside
     if (positiveOffset < semiRangeDuration)
         return forward ? current + positiveOffset : current - positiveOffset;
-    const unsigned int reduced = loopReducedOffset(range, offset);
-    if (forward)
-        return isCycling ? range.first + reduced - distanceToLast : range.last;
-    else
-        return isCycling ? range.last - reduced + distanceToFirst : range.first;
+    if (isCycling) {
+        const unsigned int reduced = loopReducedOffset(range, offset);
+        if (reduced == 0)
+            return current;
+        return forward ? range.first + reduced - distanceToLast : range.last - reduced + distanceToFirst;
+    } else {
+        return forward ? range.last : range.first;
+    }
 }
 
 unsigned int Range::offsetClampFrame(unsigned int current, int offset) const {

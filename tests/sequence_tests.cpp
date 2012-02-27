@@ -1,4 +1,3 @@
-
 #include <sequence/Range.h>
 #include <sequence/Sequence.h>
 #include <sequence/BrowseItem.h>
@@ -81,6 +80,13 @@ BOOST_AUTO_TEST_CASE( range_offsets )
     BOOST_CHECK_EQUAL(10u, range.offsetLoopFrame(7,-3) );// out of range
 }
 
+BOOST_AUTO_TEST_CASE( range_offsets2 )
+{
+    Range range(1,1);
+    BOOST_CHECK_EQUAL( 1u, range.offsetLoopFrame(1, 1) );
+    BOOST_CHECK_EQUAL( 1u, range.offsetClampFrame(1, 1) );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( InterpolationTestSuite )
@@ -145,18 +151,18 @@ BOOST_AUTO_TEST_CASE( subsampling_ranges )
     { // forward
         map<unsigned int, size_t> index;
         for(size_t i = record.first;i<=record.last;++i)
-            ++index[ interpolateSource(i, source, record, false) ];
+        ++index[ interpolateSource(i, source, record, false) ];
         BOOST_CHECK_EQUAL(4u, index.size() );
         for(size_t i = source.first;i<=source.last;++i)
-            BOOST_CHECK_EQUAL(count, index[i] );
+        BOOST_CHECK_EQUAL(count, index[i] );
     }
     { // reverse
         map<unsigned int, size_t> index;
         for(size_t i = record.first;i<=record.last;++i)
-            ++index[ interpolateSource(i, source, record, true) ];
+        ++index[ interpolateSource(i, source, record, true) ];
         BOOST_CHECK_EQUAL(4u, index.size() );
         for(size_t i = source.first;i<=source.last;++i)
-            BOOST_CHECK_EQUAL(count, index[i] );
+        BOOST_CHECK_EQUAL(count, index[i] );
     }
 }
 
