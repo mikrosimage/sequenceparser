@@ -18,6 +18,7 @@ struct Range {
     unsigned int duration() const;
     unsigned int offsetClampFrame(unsigned int current, int offset) const;
     unsigned int offsetLoopFrame(unsigned int current, int offset) const;
+    unsigned int clampFrame(unsigned int current) const;
 };
 
 unsigned int interpolateSource(const unsigned int atRecIndex, const Range &source, const Range &record, const bool reverse);

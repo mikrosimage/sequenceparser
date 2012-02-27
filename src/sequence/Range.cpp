@@ -77,4 +77,8 @@ unsigned int Range::offsetLoopFrame(unsigned int current, int offset) const {
     return offsetFrame<true>(*this, current, offset);
 }
 
+unsigned int Range::clampFrame(unsigned int current) const {
+    return max(min(current, last),first);
+}
+
 } /* namespace sequence */

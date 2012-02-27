@@ -87,6 +87,24 @@ BOOST_AUTO_TEST_CASE( range_offsets2 )
     BOOST_CHECK_EQUAL( 1u, range.offsetClampFrame(1, 1) );
 }
 
+BOOST_AUTO_TEST_CASE( range_clamp )
+{
+    {
+        Range range(1,1);
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(1) );
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(10) );
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(0) );
+    }
+    {
+        Range range(5,10);
+        BOOST_CHECK_EQUAL( 7u, range.clampFrame(7) );
+        BOOST_CHECK_EQUAL( 5u, range.clampFrame(4) );
+        BOOST_CHECK_EQUAL( 5u, range.clampFrame(5) );
+        BOOST_CHECK_EQUAL( 10u, range.clampFrame(10) );
+        BOOST_CHECK_EQUAL( 10u, range.clampFrame(11) );
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( InterpolationTestSuite )
