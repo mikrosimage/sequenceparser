@@ -10,7 +10,6 @@
 
 #include <sequence/BrowseItem.h>
 
-#include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/container/flat_set.hpp>
 
@@ -152,7 +151,7 @@ private:
  */
 struct SequenceDetector : private boost::unordered_map<std::string, PatternAggregator> {
     SequenceDetector(const boost::filesystem::path &path = "") : path(path) { }
-    const PatternAggregator& operator()(std::string filename);
+    const PatternAggregator& operator()(const char* filename);
     const std::vector<BrowseItem>& getResults();
 private:
     void process(const value_type&);
@@ -168,12 +167,13 @@ public:
     using ME::value_type;
 };
 
-struct Parser : private boost::unordered_map<boost::filesystem::path, SequenceDetector>, private boost::noncopyable{
-    void operator()(const boost::filesystem::path &);
+struct Parser : private boost::unordered_map<std::string, SequenceDetector>, private boost::noncopyable{
+    void operator()(const std::string &);
     std::vector<BrowseItem> getResults();
     struct Proxy {
         Proxy(Parser *ptr) : ptr(ptr) {}
-        inline void operator()(const boost::filesystem::path &path){ (*ptr)(path); }
+        inline void operator()(const std::string &path){ (*ptr)(path); }
+        inline void operator()(const boost::filesystem::path &path){ (*ptr)(path.string()); }
         Parser *ptr;
     };
     Proxy functor(){ return Proxy(this); }

@@ -32,7 +32,7 @@ void printUsage(const char* prgName) {
 
 int main(int argc, char **argv) {
     try {
-        vector<path> paths;
+        vector<string> paths;
         SequencePattern p1("file-1.",".cr2",7);
         SequencePattern p2("file-.",".jpeg",6);
 

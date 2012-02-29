@@ -185,11 +185,11 @@ const vector<BrowseItem>& SequenceDetector::getResults() {
     return results;
 }
 
-const PatternAggregator& SequenceDetector::operator()(string key) {
+const PatternAggregator& SequenceDetector::operator()(const char* _key) {
+    string key(_key);
     if (!results.empty())
         throw logic_error("Already processed");
-    assert(key.find('/')==string::npos);
-    assert(key.find('\\')==string::npos);
+//    assert(key.find_first_of("/\\")==string::npos);
     extractPattern(key, extractedLocations, extractedValues);
     SequenceDetector::iterator keyItr = find(key);
     if (keyItr == end())
@@ -198,14 +198,16 @@ const PatternAggregator& SequenceDetector::operator()(string key) {
     return keyItr->second;
 }
 
-using namespace boost::filesystem;
+static const string EMPTY;
 
-void Parser::operator ()(const path &_path) {
-    const path parent = _path.parent_path();
+void Parser::operator ()(const std::string &_path) {
+    const size_t lastSeparator = _path.find_last_of("/\\");
+    const bool emptyParent = lastSeparator == string::npos;
+    const string parent = emptyParent ? EMPTY : _path.substr(0, lastSeparator);
     iterator found = find(parent);
     if (found == end())
         found = insert(make_pair(parent, SequenceDetector(parent))).first;
-    found->second(_path.filename().string());
+    found->second(emptyParent ? _path.c_str() : _path.c_str() + lastSeparator + 1);
 }
 
 std::vector<BrowseItem> Parser::getResults() {
