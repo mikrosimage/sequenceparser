@@ -45,11 +45,11 @@ static inline unsigned int loopReducedOffset(const Range &range, int32_t offset)
 }
 
 template<bool isCycling>
-static inline unsigned int offsetFrame(const Range &range, unsigned int current, int offset) {
+static inline Range::MoveResult offsetFrame(const Range &range, unsigned int current, int offset) {
     assert(range.valid());
     assert(range.contains(current));
     if (offset == 0)
-        return current;
+        return make_pair(current,false);
     // offset frame is within [first,last]
     const bool forward = offset > 0;
     const uint32_t positiveOffset = forward ? offset : -offset;
@@ -58,22 +58,22 @@ static inline unsigned int offsetFrame(const Range &range, unsigned int current,
     const uint32_t semiRangeDuration = forward ? distanceToLast : distanceToFirst;
     // inside
     if (positiveOffset < semiRangeDuration)
-        return forward ? current + positiveOffset : current - positiveOffset;
+        return make_pair(forward ? current + positiveOffset : current - positiveOffset, false);
     if (isCycling) {
         const unsigned int reduced = loopReducedOffset(range, offset);
         if (reduced == 0)
-            return current;
-        return forward ? range.first + reduced - distanceToLast : range.last - reduced + distanceToFirst;
+            return make_pair(current,true);
+        return make_pair(forward ? range.first + reduced - distanceToLast : range.last - reduced + distanceToFirst, true);
     } else {
-        return forward ? range.last : range.first;
+        return make_pair(forward ? range.last : range.first, true);
     }
 }
 
-unsigned int Range::offsetClampFrame(unsigned int current, int offset) const {
+Range::MoveResult Range::offsetClampFrame(unsigned int current, int offset) const {
     return offsetFrame<false>(*this, current, offset);
 }
 
-unsigned int Range::offsetLoopFrame(unsigned int current, int offset) const {
+Range::MoveResult Range::offsetLoopFrame(unsigned int current, int offset) const {
     return offsetFrame<true>(*this, current, offset);
 }
 

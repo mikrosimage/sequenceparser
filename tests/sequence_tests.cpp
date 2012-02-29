@@ -3,6 +3,7 @@
 #include <sequence/BrowseItem.h>
 
 #include <map>
+#include <ostream>
 
 #include <boost/filesystem.hpp>
 
@@ -11,6 +12,15 @@
 
 using namespace sequence;
 using namespace std;
+
+namespace std {
+
+ostream& operator<<(ostream& stream, const Range::MoveResult& result){
+    stream << '[' << result.first << ',' << result.second << ']';
+    return stream;
+}
+
+}  // namespace std
 
 BOOST_AUTO_TEST_SUITE( RangeTestSuite )
 
@@ -67,24 +77,24 @@ BOOST_AUTO_TEST_CASE( range_offsets )
 {
     Range range(5,10);
 
-    BOOST_CHECK_EQUAL( 7u, range.offsetClampFrame(7, 0) ); // no offset
-    BOOST_CHECK_EQUAL( 8u, range.offsetClampFrame(7, 1) );// still in range
-    BOOST_CHECK_EQUAL( 6u, range.offsetClampFrame(7,-1) );// still in range
-    BOOST_CHECK_EQUAL(10u, range.offsetClampFrame(7, 9) );// out of range
-    BOOST_CHECK_EQUAL( 5u, range.offsetClampFrame(7,-9) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 7u, false), range.offsetClampFrame(7, 0) ); // no offset
+    BOOST_CHECK_EQUAL( make_pair( 8u, false), range.offsetClampFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 6u, false), range.offsetClampFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair(10u, true ), range.offsetClampFrame(7, 9) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 5u, true ), range.offsetClampFrame(7,-9) );// out of range
 
-    BOOST_CHECK_EQUAL( 7u, range.offsetLoopFrame(7, 0) );// no offset
-    BOOST_CHECK_EQUAL( 8u, range.offsetLoopFrame(7, 1) );// still in range
-    BOOST_CHECK_EQUAL( 6u, range.offsetLoopFrame(7,-1) );// still in range
-    BOOST_CHECK_EQUAL( 5u, range.offsetLoopFrame(7, 4) );// out of range
-    BOOST_CHECK_EQUAL(10u, range.offsetLoopFrame(7,-3) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 7u, false), range.offsetLoopFrame(7, 0) );// no offset
+    BOOST_CHECK_EQUAL( make_pair( 8u, false), range.offsetLoopFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 6u, false), range.offsetLoopFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 5u, true ), range.offsetLoopFrame(7, 4) );// out of range
+    BOOST_CHECK_EQUAL( make_pair(10u, true ), range.offsetLoopFrame(7,-3) );// out of range
 }
 
 BOOST_AUTO_TEST_CASE( range_offsets2 )
 {
     Range range(1,1);
-    BOOST_CHECK_EQUAL( 1u, range.offsetLoopFrame(1, 1) );
-    BOOST_CHECK_EQUAL( 1u, range.offsetClampFrame(1, 1) );
+    BOOST_CHECK_EQUAL( make_pair( 1u, true), range.offsetLoopFrame(1, 1)  );
+    BOOST_CHECK_EQUAL( make_pair( 1u, true), range.offsetClampFrame(1, 1) );
 }
 
 BOOST_AUTO_TEST_CASE( range_clamp )
