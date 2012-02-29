@@ -1,9 +1,9 @@
-
 #include <sequence/Range.h>
 #include <sequence/Sequence.h>
 #include <sequence/BrowseItem.h>
 
 #include <map>
+#include <ostream>
 
 #include <boost/filesystem.hpp>
 
@@ -12,6 +12,15 @@
 
 using namespace sequence;
 using namespace std;
+
+namespace std {
+
+ostream& operator<<(ostream& stream, const Range::MoveResult& result){
+    stream << '[' << result.first << ',' << result.second << ']';
+    return stream;
+}
+
+}  // namespace std
 
 BOOST_AUTO_TEST_SUITE( RangeTestSuite )
 
@@ -68,17 +77,42 @@ BOOST_AUTO_TEST_CASE( range_offsets )
 {
     Range range(5,10);
 
-    BOOST_CHECK_EQUAL( 7u, range.offsetClampFrame(7, 0) ); // no offset
-    BOOST_CHECK_EQUAL( 8u, range.offsetClampFrame(7, 1) );// still in range
-    BOOST_CHECK_EQUAL( 6u, range.offsetClampFrame(7,-1) );// still in range
-    BOOST_CHECK_EQUAL(10u, range.offsetClampFrame(7, 9) );// out of range
-    BOOST_CHECK_EQUAL( 5u, range.offsetClampFrame(7,-9) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 7u, false), range.offsetClampFrame(7, 0) ); // no offset
+    BOOST_CHECK_EQUAL( make_pair( 8u, false), range.offsetClampFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 6u, false), range.offsetClampFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair(10u, true ), range.offsetClampFrame(7, 9) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 5u, true ), range.offsetClampFrame(7,-9) );// out of range
 
-    BOOST_CHECK_EQUAL( 7u, range.offsetLoopFrame(7, 0) );// no offset
-    BOOST_CHECK_EQUAL( 8u, range.offsetLoopFrame(7, 1) );// still in range
-    BOOST_CHECK_EQUAL( 6u, range.offsetLoopFrame(7,-1) );// still in range
-    BOOST_CHECK_EQUAL( 5u, range.offsetLoopFrame(7, 4) );// out of range
-    BOOST_CHECK_EQUAL(10u, range.offsetLoopFrame(7,-3) );// out of range
+    BOOST_CHECK_EQUAL( make_pair( 7u, false), range.offsetLoopFrame(7, 0) );// no offset
+    BOOST_CHECK_EQUAL( make_pair( 8u, false), range.offsetLoopFrame(7, 1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 6u, false), range.offsetLoopFrame(7,-1) );// still in range
+    BOOST_CHECK_EQUAL( make_pair( 5u, true ), range.offsetLoopFrame(7, 4) );// out of range
+    BOOST_CHECK_EQUAL( make_pair(10u, true ), range.offsetLoopFrame(7,-3) );// out of range
+}
+
+BOOST_AUTO_TEST_CASE( range_offsets2 )
+{
+    Range range(1,1);
+    BOOST_CHECK_EQUAL( make_pair( 1u, true), range.offsetLoopFrame(1, 1)  );
+    BOOST_CHECK_EQUAL( make_pair( 1u, true), range.offsetClampFrame(1, 1) );
+}
+
+BOOST_AUTO_TEST_CASE( range_clamp )
+{
+    {
+        Range range(1,1);
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(1) );
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(10) );
+        BOOST_CHECK_EQUAL( 1u, range.clampFrame(0) );
+    }
+    {
+        Range range(5,10);
+        BOOST_CHECK_EQUAL( 7u, range.clampFrame(7) );
+        BOOST_CHECK_EQUAL( 5u, range.clampFrame(4) );
+        BOOST_CHECK_EQUAL( 5u, range.clampFrame(5) );
+        BOOST_CHECK_EQUAL( 10u, range.clampFrame(10) );
+        BOOST_CHECK_EQUAL( 10u, range.clampFrame(11) );
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -145,18 +179,18 @@ BOOST_AUTO_TEST_CASE( subsampling_ranges )
     { // forward
         map<unsigned int, size_t> index;
         for(size_t i = record.first;i<=record.last;++i)
-            ++index[ interpolateSource(i, source, record, false) ];
+        ++index[ interpolateSource(i, source, record, false) ];
         BOOST_CHECK_EQUAL(4u, index.size() );
         for(size_t i = source.first;i<=source.last;++i)
-            BOOST_CHECK_EQUAL(count, index[i] );
+        BOOST_CHECK_EQUAL(count, index[i] );
     }
     { // reverse
         map<unsigned int, size_t> index;
         for(size_t i = record.first;i<=record.last;++i)
-            ++index[ interpolateSource(i, source, record, true) ];
+        ++index[ interpolateSource(i, source, record, true) ];
         BOOST_CHECK_EQUAL(4u, index.size() );
         for(size_t i = source.first;i<=source.last;++i)
-            BOOST_CHECK_EQUAL(count, index[i] );
+        BOOST_CHECK_EQUAL(count, index[i] );
     }
 }
 

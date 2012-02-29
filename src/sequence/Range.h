@@ -12,11 +12,19 @@ struct Range {
     Range(unsigned int first, unsigned int last) : first(first), last(last) {
         if(!valid()) throw std::logic_error("Invalid range, 'first' must not be greater than 'last'");
     }
+    static Range weak(unsigned int first, unsigned int count);
     bool contains(unsigned int frame) const { return first <= frame && frame <= last; }
     bool valid() const { return first<=last; }
     unsigned int duration() const;
-    unsigned int offsetClampFrame(unsigned int current, int offset) const;
-    unsigned int offsetLoopFrame(unsigned int current, int offset) const;
+
+    /**
+     * The result of the following operations
+     */
+    typedef std::pair<unsigned int, bool> MoveResult;
+
+    MoveResult offsetClampFrame(unsigned int current, int offset) const;
+    MoveResult offsetLoopFrame(unsigned int current, int offset) const;
+    unsigned int clampFrame(unsigned int current) const;
 };
 
 unsigned int interpolateSource(const unsigned int atRecIndex, const Range &source, const Range &record, const bool reverse);
