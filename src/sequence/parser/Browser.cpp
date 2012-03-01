@@ -12,7 +12,6 @@
 #include <boost/unordered_map.hpp>
 
 #include <string>
-#include <iostream>
 #include <stdexcept>
 
 using namespace std;
@@ -37,11 +36,15 @@ static inline void changeTypeIfNeeded(BrowseItem &item) {
 
 std::vector<BrowseItem> browse(const char* directory, bool recursive) {
     const path folder = getDirectory(directory);
-    const symlink_option::enum_type option = recursive ? symlink_option::recurse : symlink_option::no_recurse;
     Parser parser;
-    for_each(recursive_directory_iterator(folder, option), //
-             recursive_directory_iterator(), //
-             parser.functor());
+    if (recursive)
+        for_each(recursive_directory_iterator(folder), //
+                 recursive_directory_iterator(), //
+                 parser.functor());
+    else
+        for_each(directory_iterator(folder), //
+                 directory_iterator(), //
+                 parser.functor());
     vector<BrowseItem> items = parser.getResults();
     for_each(items.begin(), items.end(), &changeTypeIfNeeded);
     return items;
