@@ -23,7 +23,7 @@ namespace sequence {
 namespace parser {
 
 static inline path getDirectory(const char* directory) {
-    const path folder(directory);
+    const path folder(directory == NULL ? "." : directory);
     if (!exists(folder))
         throw std::ios_base::failure(string("Unable to browse ") + folder.string());
     return folder;
