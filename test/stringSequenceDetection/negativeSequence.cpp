@@ -7,6 +7,9 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE( NegativeSequenceDetection )
 
+
+bool compareSequencesByNbFiles( const sequenceParser::Sequence& a, const sequenceParser::Sequence& b ) { return a.getNbFiles() < b.getNbFiles(); }
+
 BOOST_AUTO_TEST_CASE( NoNegativeValues )
 {
 	sequenceParser::Detector detector;
@@ -33,13 +36,15 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 
 	BOOST_CHECK( listSequence.size() == 3 );
 	
-	BOOST_CHECK( listSequence[0].getNbFiles() == 3 );
-	BOOST_CHECK( listSequence[0].getFirstTime() == 1 );
-	BOOST_CHECK( listSequence[0].getLastTime() == 3 );
+	std::sort( listSequence.begin(), listSequence.end(), compareSequencesByNbFiles );
+
+	BOOST_CHECK( listSequence[0].getNbFiles() == 2 );
+	BOOST_CHECK( listSequence[0].getFirstTime() == 2 );
+	BOOST_CHECK( listSequence[0].getLastTime() == 6 );
 	
-	BOOST_CHECK( listSequence[1].getNbFiles() == 2 );
-	BOOST_CHECK( listSequence[1].getFirstTime() == 2 );
-	BOOST_CHECK( listSequence[1].getLastTime() == 6 );
+	BOOST_CHECK( listSequence[1].getNbFiles() == 3 );
+	BOOST_CHECK( listSequence[1].getFirstTime() == 1 );
+	BOOST_CHECK( listSequence[1].getLastTime() == 3 );
 	
 	BOOST_CHECK( listSequence[2].getNbFiles() == 5 );
 	BOOST_CHECK( listSequence[2].getFirstTime() == 0 );
