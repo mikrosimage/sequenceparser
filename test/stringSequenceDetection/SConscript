@@ -5,7 +5,7 @@ project.UnitTest(
 	dirs = ['.'],
 	libraries = [
 		libs.sequenceParser,
-		libs.boost_unittestframework,
+		libs.boost_unit_test_framework,
 		]
 	)
 
