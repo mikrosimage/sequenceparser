@@ -38,7 +38,7 @@ namespace sequenceParser {
 
 #ifndef SEQUENCE_PARSER_OUTPUT_COLOR_FILES
 #define SEQUENCE_PARSER_OUTPUT_COLOR_FILES
-#ifdef __LINUX__
+#if (defined __UNIX__ || defined UNIX || defined __LINUX__ && !defined LINUX )
 static const std::string kColorStd = "\E[0;0m";
 static const std::string kColorFolder = "\E[1;34m";
 static const std::string kColorFile = "\E[0;32m";
