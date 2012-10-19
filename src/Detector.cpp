@@ -568,9 +568,12 @@ boost::ptr_vector<FileObject> Detector::fileObjectInDirectory( const std::string
 	{
 		if( p.second.size() == 1 )
 		{
-			std::string filename = p.first[0];
-			filename += p.second[0].getString(0);
-			filename += p.first[1];
+			std::string filename = p.first.getId().at( 0 );
+			for( size_t i = 0; i < p.second[ 0 ].size(); i++ )
+			{
+				filename += p.second[ 0 ].getString( i );
+				filename += p.first.getId().at( i+1 );
+			}
 			//std::cout << "FILENAME = " << filename << std::endl;
 			outputFiles.push_back( new File( directory, filename, desc ) );
 		}
