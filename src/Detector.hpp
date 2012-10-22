@@ -81,7 +81,7 @@ private:
 	 *
 	 * @return return false if the research path is incorrect with a folder, a file or a pattern with an valid parent directory
 	 */
-	bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters );
+	bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters, std::string &filename );
 
 	
 	Sequence privateBuildSequence(
