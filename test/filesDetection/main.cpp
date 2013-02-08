@@ -138,16 +138,26 @@ void testFindObjectInDiretory( const char* path, const size_t numberOfFolders, c
 	listFile = detector.fileInDirectory( path );
 	listSequence = detector.sequenceInDirectory( path );
 
-	if( listFileObject.size() != numberOfFileObjects || listFolder.size() != numberOfFolders || listFile.size() != numberOfFiles || listSequence.size() != numberOfSequences )
-		std::cout << "test path: " << std::left << std::setw( 75 ) << path << std::right << listFolder.size() << " -> " << numberOfFolders << " | " << listFile.size() << " -> " << numberOfFiles << " | " << listSequence.size() << " -> " << numberOfSequences << " | " << listFileObject.size() << " -> " << numberOfFileObjects << std::endl;
+	if( listFileObject.size() != numberOfFileObjects ||
+	    listFolder.size() != numberOfFolders ||
+	    listFile.size() != numberOfFiles ||
+	    listSequence.size() != numberOfSequences )
+	{
+		std::cout << "test path: " << std::left << std::setw( 75 ) << path << std::right
+			      << listFolder.size() << " -> " << numberOfFolders << " | "
+			      << listFile.size() << " -> " << numberOfFiles << " | "
+			      << listSequence.size() << " -> " << numberOfSequences << " | "
+			      << listFileObject.size() << " -> " << numberOfFileObjects
+			      << std::endl;
+	}
 	boost::ptr_vector<sequenceParser::Sequence>::iterator it;
 	/*for(it=listSequence.begin() ; it != listSequence.end(); it++)
 	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
 
-	BOOST_CHECK( listFileObject.size() == numberOfFileObjects );
-	BOOST_CHECK( listFolder.size() == numberOfFolders );
-	BOOST_CHECK( listFile.size() == numberOfFiles );
-	BOOST_CHECK( listSequence.size() == numberOfSequences );
+	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
+	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
+	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
+	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
 }
 
 void testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
@@ -180,10 +190,10 @@ void testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOpti
 	/*for(it=listSequence.begin() ; it != listSequence.end(); it++)
 	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
 
-	BOOST_CHECK( listFileObject.size() == numberOfFileObjects );
-	BOOST_CHECK( listFolder.size() == numberOfFolders );
-	BOOST_CHECK( listFile.size() == numberOfFiles );
-	BOOST_CHECK( listSequence.size() == numberOfSequences );
+	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
+	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
+	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
+	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
 }
 
 void testFirstSequenceLimits( const char* path, const int minValue, const int maxValue )
@@ -202,8 +212,8 @@ void testFirstSequenceLimits( const char* path, const int minValue, const int ma
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
 		std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
 
-	BOOST_CHECK( seq.getFirstTime() == minValue );
-	BOOST_CHECK( seq.getLastTime() == maxValue );
+	BOOST_CHECK_EQUAL( seq.getFirstTime(), minValue );
+	BOOST_CHECK_EQUAL( seq.getLastTime(), maxValue );
 }
 
 void testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
@@ -221,8 +231,8 @@ void testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptio
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
 		std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
 
-	BOOST_CHECK( seq.getFirstTime() == minValue );
-	BOOST_CHECK( seq.getLastTime() == maxValue );
+	BOOST_CHECK_EQUAL( seq.getFirstTime(), minValue );
+	BOOST_CHECK_EQUAL( seq.getLastTime(), maxValue );
 }
 
 BOOST_AUTO_TEST_CASE( TestSequence )
