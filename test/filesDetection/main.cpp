@@ -163,8 +163,19 @@ void testFindObjectInDiretory ( const char* path, const sequenceParser::EMaskOpt
     listFile       = detector.fileInDirectory        ( path, options );
     listSequence   = detector.sequenceInDirectory    ( path, options );
 
-    if( listFileObject.size()  != numberOfFileObjects || listFolder.size() != numberOfFolders || listFile.size() != numberOfFiles || listSequence.size() != numberOfSequences )
-	std::cout << "test path [" << options << "]: " << std::left << std::setw(75) << path << std::right << listFolder.size() << " -> " << numberOfFolders << " | " << listFile.size() << " -> " << numberOfFiles << " | " << listSequence.size() << " -> " << numberOfSequences << " | " << listFileObject.size() << " -> " << numberOfFileObjects  << std::endl;
+    if( listFileObject.size() != numberOfFileObjects ||
+        listFolder.size() != numberOfFolders ||
+        listFile.size() != numberOfFiles ||
+        listSequence.size() != numberOfSequences )
+    {
+        std::cout << "test path [" << options << "]: "
+                  << std::left << std::setw(75) << path << std::right
+                  << listFolder.size() << " -> " << numberOfFolders << " | "
+                  << listFile.size() << " -> " << numberOfFiles << " | "
+                  << listSequence.size() << " -> " << numberOfSequences << " | "
+                  << listFileObject.size() << " -> " << numberOfFileObjects
+                  << std::endl;
+    }
     boost::ptr_vector<sequenceParser::Sequence>::iterator it;
     /*for(it=listSequence.begin() ; it != listSequence.end(); it++)
 	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
@@ -182,6 +193,10 @@ void testFirstSequenceLimits  ( const char* path, const int minValue, const int 
 
     listSequence   = detector.sequenceInDirectory    ( path );
 
+    BOOST_CHECK( ! listSequence.empty() );
+    if( listSequence.empty() )
+        return; // There is no sequence... so nothing to check
+
     sequenceParser::Sequence& seq = listSequence.front();
 
     if ( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
@@ -197,6 +212,10 @@ void testFirstSequenceLimits  ( const char* path, const sequenceParser::EMaskOpt
     boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
     listSequence   = detector.sequenceInDirectory    ( path, options );
+
+    BOOST_CHECK( ! listSequence.empty() );
+    if( listSequence.empty() )
+        return; // There is no sequence... so nothing to check
 
     sequenceParser::Sequence& seq = listSequence.front();
     if ( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
