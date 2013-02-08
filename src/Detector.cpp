@@ -143,7 +143,7 @@ boost::ptr_vector<File> Detector::fileInDirectory( const std::string& dir, std::
 		return outputFiles;
 	}
 
-	std::cout << "file  " << filename << std::endl;
+	//std::cout << "file  " << filename << std::endl;
 	
 	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
