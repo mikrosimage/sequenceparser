@@ -125,7 +125,7 @@ void clearTmp()
 	boost::filesystem::remove_all( "tmpTestSequence" );
 }
 
-void testFindObjectInDiretory( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
+bool testFindObjectInDiretory( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
 	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
@@ -138,6 +138,11 @@ void testFindObjectInDiretory( const char* path, const size_t numberOfFolders, c
 	listFile = detector.fileInDirectory( path );
 	listSequence = detector.sequenceInDirectory( path );
 
+	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
+	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
+	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
+	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
+
 	if( listFileObject.size() != numberOfFileObjects ||
 	    listFolder.size() != numberOfFolders ||
 	    listFile.size() != numberOfFiles ||
@@ -149,18 +154,15 @@ void testFindObjectInDiretory( const char* path, const size_t numberOfFolders, c
 			      << listSequence.size() << " -> " << numberOfSequences << " | "
 			      << listFileObject.size() << " -> " << numberOfFileObjects
 			      << std::endl;
+		return false;
 	}
-	boost::ptr_vector<sequenceParser::Sequence>::iterator it;
-	/*for(it=listSequence.begin() ; it != listSequence.end(); it++)
-	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
-
-	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
-	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
-	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
-	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
+	return true;
+//	boost::ptr_vector<sequenceParser::Sequence>::iterator it;
+//	for(it=listSequence.begin() ; it != listSequence.end(); it++)
+//	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 }
 
-void testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
+bool testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
 	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
@@ -172,6 +174,11 @@ void testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOpti
 	listFolder = detector.folderInDirectory( path, options );
 	listFile = detector.fileInDirectory( path, options );
 	listSequence = detector.sequenceInDirectory( path, options );
+
+	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
+	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
+	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
+	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
 
 	if( listFileObject.size() != numberOfFileObjects ||
 		listFolder.size() != numberOfFolders ||
@@ -185,18 +192,16 @@ void testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOpti
 			<< listSequence.size() << " -> " << numberOfSequences << " | "
 			<< listFileObject.size() << " -> " << numberOfFileObjects
 			<< std::endl;
+		return false;
 	}
-	boost::ptr_vector<sequenceParser::Sequence>::iterator it;
-	/*for(it=listSequence.begin() ; it != listSequence.end(); it++)
-	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;*/
-
-	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
-	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
-	BOOST_CHECK_EQUAL( listFile.size(), numberOfFiles );
-	BOOST_CHECK_EQUAL( listSequence.size(), numberOfSequences );
+	
+	return true;
+//	boost::ptr_vector<sequenceParser::Sequence>::iterator it;
+//	for(it=listSequence.begin() ; it != listSequence.end(); it++)
+//	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 }
 
-void testFirstSequenceLimits( const char* path, const int minValue, const int maxValue )
+bool testFirstSequenceLimits( const char* path, const int minValue, const int maxValue )
 {
 	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
@@ -205,18 +210,24 @@ void testFirstSequenceLimits( const char* path, const int minValue, const int ma
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )
-		return; // There is no sequence... so nothing to check
+		return false; // There is no sequence... so nothing to check
 
 	sequenceParser::Sequence& seq = listSequence.front();
 
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
-		std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
+	{
+		std::cout << "test sequence: " << path << " : set " << minValue << " -> " << maxValue
+		          << " found " << seq.getFirstTime() << " -> " << seq.getLastTime()
+		          << std::endl;
+		return false;
+	}
 
 	BOOST_CHECK_EQUAL( seq.getFirstTime(), minValue );
 	BOOST_CHECK_EQUAL( seq.getLastTime(), maxValue );
+	return true;
 }
 
-void testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
+bool testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
 {
 	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
@@ -225,14 +236,19 @@ void testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptio
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )
-		return; // There is no sequence... so nothing to check
+		return false; // There is no sequence... so nothing to check
 
 	sequenceParser::Sequence& seq = listSequence.front();
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
-		std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found " << seq.getFirstTime() << " -> " << seq.getLastTime() << std::endl;
-
+	{
+		std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found "
+		          << seq.getFirstTime() << " -> " << seq.getLastTime()
+		          << std::endl;
+		return false;
+	}
 	BOOST_CHECK_EQUAL( seq.getFirstTime(), minValue );
 	BOOST_CHECK_EQUAL( seq.getLastTime(), maxValue );
+	return true;
 }
 
 BOOST_AUTO_TEST_CASE( TestSequence )
@@ -241,147 +257,149 @@ BOOST_AUTO_TEST_CASE( TestSequence )
 
 	std::cout << std::setw( 85 ) << " " << " Folder |  File  | Sequence | FileObjects" << std::endl;
 
-    testFindObjectInDiretory( "tmpTestSequence"                                                                                                    , 1, 0, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root"                                                                                               , 2, 0, 0, 2 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/"                                                                                        , 1, 1, 0, 2 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/"                                                                                    , 1, 1, 0, 2 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/"                                                                           , 0, 0, 2, 2 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 0, 1, 1 );
-    testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 99 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 0, 1, 1 );
-    testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 99 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/"                      , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 1, 2, 3 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 1, 1, 2 );
-    testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, -1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 1, 1, 2 );
-    testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, -1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 );
-    testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence"                                                                                                    , 1, 0, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root"                                                                                               , 2, 0, 0, 2 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/"                                                                                        , 1, 1, 0, 2 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/"                                                                                    , 1, 1, 0, 2 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/"                                                                           , 0, 0, 2, 2 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.####.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"                                                              , 0, 99 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"                                                             , 0, 99 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/"                      , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 2, 2 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.@.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, -1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/seqTest.-@.dpx"        , sequenceParser::eMaskOptionsNegativeIndexes        , -99, -1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.#### .dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.#####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFirstSequenceLimits ( "tmpTestSequence/root/trash/dpx/negative/img.-####.dpx"         , sequenceParser::eMaskOptionsNegativeIndexes        , -99, 0 ) );
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/"                                                                           , 0, 0, 3, 3 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/"                      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/"                                                                           , 0, 0, 3, 3 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/"                      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 ) );
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"                                                               , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"                                                                 , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*0050.dpx"                                                                  , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.0050.dpx"                                                               , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/????0050.dpx"                                                               , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.####.dpx"                                                                 , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.@.dpx"                                                                    , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.####.dpx"                                                               , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.@.dpx"                                                                  , 0, 0, 1, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"                                                               , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"                                                                 , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*0050.dpx"                                                                  , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.0050.dpx"                                                               , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/????0050.dpx"                                                               , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.####.dpx"                                                                 , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.@.dpx"                                                                    , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.####.dpx"                                                               , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.@.dpx"                                                                  , 0, 0, 1, 1 ) );
 
     boost::filesystem::current_path("tmpTestSequence/root/film/strictPadding/");
-    testFindObjectInDiretory( "./img.0050.dpx"                                                                                                     , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "img.0050.dpx"                                                                                                       , 0, 1, 0, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "./img.0050.dpx"                                                                                                     , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "img.0050.dpx"                                                                                                       , 0, 1, 0, 1 ) );
     boost::filesystem::current_path("../../../../");
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*0050.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/????0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.####.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.@.dpx"               , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.####.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.@.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.50.dpx"                                                                 , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.50.dpx"            , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0500.dpx"                                                               , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0500.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.000050.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.000050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.####.dpx"                                                               , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.####.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.###.dpx"                                                                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.###.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.#####.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.#####.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%04d.dpx"                                                               , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%04d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%03d.dpx"                                                               , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%03d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%05d.dpx"                                                               , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%05d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.@.dpx"                                                                  , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.@.dpx"             , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*0050.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/????0050.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.####.dpx"            , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.@.dpx"               , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.####.dpx"          , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.@.dpx"             , sequenceParser::eMaskOptionsSequenceBasedOnFilename, 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.50.dpx"                                                                 , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.50.dpx"            , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0500.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0500.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.000050.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.000050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.####.dpx"                                                               , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.####.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.###.dpx"                                                                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.###.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.#####.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.#####.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%04d.dpx"                                                               , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%04d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%03d.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%03d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%05d.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.%05d.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.@.dpx"                                                                  , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.@.dpx"             , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0050.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0050.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.50.dpx"                                                                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.50.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0500.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0500.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.000050.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.000050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.####.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.####.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.###.dpx"                                                               , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.###.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.#####.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.#####.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%04d.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%04d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%03d.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%03d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%05d.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%05d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.@.dpx"                                                                 , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.@.dpx"            , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0050.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0050.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.50.dpx"                                                                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.50.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0500.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.0500.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.000050.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.000050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.####.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.####.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.###.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.###.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.#####.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.#####.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%04d.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%04d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%03d.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%03d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%05d.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.%05d.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.@.dpx"                                                                 , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/.img.@.dpx"            , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
 
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/"                                                                         , 0, 0, 3, 3 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/"                    , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/"                                                                         , 0, 0, 3, 3 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/"                    , sequenceParser::eMaskOptionsDotFile                , 0, 0, 4, 4 ) );
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.50.dpx"                                                               , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.50.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0500.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0500.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.####.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.####.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.###.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.###.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.#####.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.#####.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%04d.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%04d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%05d.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%05d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%03d.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%03d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.@.dpx"                                                                , 0, 0, 1, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.@.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.50.dpx"                                                               , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.50.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0500.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0500.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.0050.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.####.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.####.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.###.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.###.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.#####.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.#####.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%04d.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%04d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%05d.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%05d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%03d.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.%03d.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.@.dpx"                                                                , 0, 0, 1, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/img.@.dpx"           , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
 
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.50.dpx"                                                              , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.50.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0500.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0500.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.####.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.####.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.###.dpx"                                                             , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.###.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.#####.dpx"                                                           , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.#####.dpx"      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%04d.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%04d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%05d.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%05d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%03d.dpx"                                                            , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%03d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"                                                               , 0, 0, 0, 0 );
-    testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.50.dpx"                                                              , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.50.dpx"         , sequenceParser::eMaskOptionsDotFile                , 0, 1, 0, 1 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0500.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0500.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.0050.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.####.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.####.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.###.dpx"                                                             , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.###.dpx"        , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.#####.dpx"                                                           , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.#####.dpx"      , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%04d.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%04d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%05d.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%05d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%03d.dpx"                                                            , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.%03d.dpx"       , sequenceParser::eMaskOptionsDotFile                , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"                                                               , 0, 0, 0, 0 ) );
+    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/noStrictPadding/.img.@.dpx"          , sequenceParser::eMaskOptionsDotFile                , 0, 0, 1, 1 ) );
 
 	//clearTmp();
 }
