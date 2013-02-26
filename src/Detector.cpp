@@ -61,7 +61,6 @@ boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
 		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[0-9]+" ); // one @ correspond to one or more digits
 		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[0-9]" ); // each # in pattern correspond to a digit
 	}
-	//std::cout << "$$ " << filter << std::endl;
 	return boost::regex( filter );
 }
 
@@ -84,7 +83,7 @@ std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& 
  *
  * @return return true if the filename is filtered by filter(s)
  */
-bool isNotFilter( const std::string& filename, const std::vector<boost::regex>& filters )
+bool filenameIsNotFilter( const std::string& filename, const std::vector<boost::regex>& filters )
 {
 	if( filters.size() == 0 )
 		return true;
@@ -92,7 +91,9 @@ bool isNotFilter( const std::string& filename, const std::vector<boost::regex>& 
 	BOOST_FOREACH( const boost::regex& filter, filters )
 	{
 		if( boost::regex_match( filename, filter ) )
+		{
 			return true;
+		}
 	}
 	return false;
 }
@@ -101,17 +102,23 @@ bool isNotFilter( const bfs::path& inputPath, const std::vector<boost::regex>& f
 {
 	if( !( inputPath.filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 	{
-		if( isNotFilter( inputPath.string(), filters ) ) // filtering of entries with filters strings
+		if( filenameIsNotFilter( inputPath.filename().string(), filters ) ) // filtering of entries with filters strings
 		{
 			if( filename.size() )
 			{
 				if( filename == inputPath.string() )
+				{
 					return true;
+				}
 				else
+				{
 					return false;
+				}
 			}
 			else
+			{
 				return true;
+			}
 		}
 	}
 	return false;
@@ -142,8 +149,6 @@ boost::ptr_vector<File> Detector::fileInDirectory( const std::string& dir, std::
 	{
 		return outputFiles;
 	}
-
-	//std::cout << "file  " << filename << std::endl;
 	
 	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
 
@@ -167,7 +172,8 @@ boost::ptr_vector<File> Detector::fileInDirectory( const std::string& dir, std::
 		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
 		{
 			// it's a file or a file of a sequence
-			if( isNotFilter( iter->path().filename().string(), reFilters ) && ( ( filename.size() && filename == iter->path().filename().string() ) || !filename.size() ) ) // filtering of entries with filters strings
+			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) &&
+			    ( ( filename.size() && filename == iter->path().filename().string() ) || !filename.size() ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
 				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
@@ -250,7 +256,7 @@ boost::ptr_vector<Sequence> Detector::sequenceInDirectory( const std::string& di
 		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
 		{
 			// it's a file or a file of a sequence
-			if( isNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
 				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
@@ -318,7 +324,7 @@ boost::ptr_vector<Sequence> Detector::sequenceFromFilenameList( const std::vecto
 		if( !( iter.filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
 		{
 			// it's a file or a file of a sequence
-			if( isNotFilter( iter.filename().string(), reFilters ) ) // filtering of entries with filters strings
+			if( filenameIsNotFilter( iter.filename().string(), reFilters ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
 				if( decomposeFilename( iter.filename().string(), tmpStringParts, tmpNumberParts, desc ) )
@@ -404,7 +410,7 @@ boost::ptr_vector<FileObject> Detector::fileAndSequenceInDirectory( const std::s
 		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
 		{
 			// it's a file or a file of a sequence
-			if( isNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
 				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
@@ -658,7 +664,7 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 			if( tmpPath.has_parent_path() )
 				researchPath = tmpPath.parent_path().string();
 			else
-				researchPath = "./";
+				researchPath = ".";
 		}
 		// else
 		// the researchPath is a directory, we search into the directory without filtering
@@ -672,7 +678,8 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 			researchPath = ".";
 			return true;
 		}
-		if( !bfs::exists( tmpPath.parent_path() ) )
+		bfs::path parentPath( tmpPath.parent_path() );
+		if( !bfs::exists( parentPath ) )
 		{
 			// researchPath and it parent don't exists, could not find file/sequence/folder
 			return false;
@@ -680,7 +687,7 @@ bool Detector::detectDirectoryInResearch( std::string& researchPath, std::vector
 		// the researchPath is not a directory, but it parent is a directory
 		// we search in this parent directory, with the filtering pattern
 		filters.push_back( tmpPath.filename().string() );
-		researchPath = tmpPath.parent_path().string();
+		researchPath = parentPath.string();
 	}
 	return true;
 }
