@@ -27,6 +27,8 @@ envSwig.AppendUnique( SWIGOUTDIR = pythonOutputDir )
 envSwig.Replace( SHLIBPREFIX = '' )
 if project.macos:
 	envSwig.Replace( SHLIBSUFFIX = '.so' ) # .dyLib not recognized
+if project.windows:
+	envSwig.Replace( SHLIBSUFFIX = '.pyd' ) # .dyLib not recognized
 
 seqPython = project.SharedLibrary(
 		target = '_sequenceParser',
