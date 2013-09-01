@@ -1,4 +1,4 @@
-#include <Detector.hpp>
+#include <detector.hpp>
 
 #include <boost/assign/std/vector.hpp>
 
@@ -9,7 +9,6 @@ BOOST_AUTO_TEST_SUITE( MutiSequenceDetection )
 
 BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -27,7 +26,7 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 		( "aaa/bbb/a1b9c2.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	std::cout << "listSequence.size()" << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 3 );
@@ -35,7 +34,6 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 
 BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -51,7 +49,7 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 		( "aaa/bbb/a1b6c4.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 //	std::cout << "AA: " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 2 );
@@ -65,8 +63,6 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 
 BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 {
-	sequenceParser::Detector detector;
-	
 	{
 		boost::ptr_vector<sequenceParser::Sequence> listSequence;
 		std::vector<boost::filesystem::path> paths;
@@ -81,7 +77,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 			( "aaa/bbb/a1b6c4.j2c" )
 			;
 
-		listSequence = detector.sequenceFromFilenameList( paths );
+		listSequence = sequenceParser::sequenceFromFilenameList( paths );
 		//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 		BOOST_CHECK( listSequence.size() == 2 );
 	}
@@ -100,7 +96,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 			( "aaa/bbb/a1b6c4.j2c" )
 			;
 
-		listSequence = detector.sequenceFromFilenameList( paths );
+		listSequence = sequenceParser::sequenceFromFilenameList( paths );
 		std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 		BOOST_CHECK( listSequence.size() == 3 );
 	}
@@ -108,9 +104,6 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 
 BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPaddingWithNegValues )
 {
-	using namespace sequenceParser;
-	Detector detector;
-	
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 	std::vector<boost::filesystem::path> paths;
 	boost::assign::push_back( paths )
@@ -128,7 +121,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPaddingWithNegValues )
 		( "aaa/bbb/a1b-6c-4.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths, (eMaskOptionsDotFile | eMaskOptionsNegativeIndexes) );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eMaskOptionsDotFile | sequenceParser::eMaskOptionsNegativeIndexes) );
 	std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 4 );
 }

@@ -1,4 +1,4 @@
-#include <Detector.hpp>
+#include <detector.hpp>
 
 #define BOOST_TEST_MODULE FileSequenceDetector
 
@@ -129,16 +129,15 @@ void clearTmp()
 
 bool testFindObjectInDiretory( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
 	boost::ptr_vector<sequenceParser::Folder> listFolder;
 	boost::ptr_vector<sequenceParser::File> listFile;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
-	listFileObject = detector.fileObjectInDirectory( path, (sequenceParser::EMaskType)( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
-	listFolder = detector.folderInDirectory( path );
-	listFile = detector.fileInDirectory( path );
-	listSequence = detector.sequenceInDirectory( path );
+	listFileObject = sequenceParser::fileObjectInDirectory( path, (sequenceParser::EMaskType)( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ) );
+	listFolder = sequenceParser::folderInDirectory( path );
+	listFile = sequenceParser::fileInDirectory( path );
+	listSequence = sequenceParser::sequenceInDirectory( path );
 
 	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
 	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
@@ -170,16 +169,15 @@ bool testFindObjectInDiretory( const char* path, const size_t numberOfFolders, c
 
 bool testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOptions options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
 	boost::ptr_vector<sequenceParser::Folder> listFolder;
 	boost::ptr_vector<sequenceParser::File> listFile;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
-	listFileObject = detector.fileObjectInDirectory( path, ( sequenceParser::EMaskType ) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ), options );
-	listFolder = detector.folderInDirectory( path, options );
-	listFile = detector.fileInDirectory( path, options );
-	listSequence = detector.sequenceInDirectory( path, options );
+	listFileObject = sequenceParser::fileObjectInDirectory( path, ( sequenceParser::EMaskType ) ( sequenceParser::eMaskTypeDirectory | sequenceParser::eMaskTypeFile | sequenceParser::eMaskTypeSequence ), options );
+	listFolder = sequenceParser::folderInDirectory( path, options );
+	listFile = sequenceParser::fileInDirectory( path, options );
+	listSequence = sequenceParser::sequenceInDirectory( path, options );
 
 	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
 	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
@@ -213,10 +211,9 @@ bool testFindObjectInDiretory( const char* path, const sequenceParser::EMaskOpti
 
 bool testFirstSequenceLimits( const char* path, const int minValue, const int maxValue )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
-	listSequence = detector.sequenceInDirectory( path );
+	listSequence = sequenceParser::sequenceInDirectory( path );
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )
@@ -239,10 +236,9 @@ bool testFirstSequenceLimits( const char* path, const int minValue, const int ma
 
 bool testFirstSequenceLimits( const char* path, const sequenceParser::EMaskOptions options, const int minValue, const int maxValue )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
-	listSequence = detector.sequenceInDirectory( path, options );
+	listSequence = sequenceParser::sequenceInDirectory( path, options );
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )

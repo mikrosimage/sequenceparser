@@ -151,7 +151,7 @@ public:
 	 */
 	void extractStep( const std::vector<Time>& times );
 
-private:
+// TODO: move that ouside of that class!
 	/**
 	 * @brief Extract step from a sorted vector of time values.
 	 */

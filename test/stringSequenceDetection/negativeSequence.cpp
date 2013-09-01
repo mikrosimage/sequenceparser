@@ -1,4 +1,4 @@
-#include <Detector.hpp>
+#include <detector.hpp>
 
 #include <boost/assign/std/vector.hpp>
 
@@ -12,7 +12,6 @@ bool compareSequencesByNbFiles( const sequenceParser::Sequence& a, const sequenc
 
 BOOST_AUTO_TEST_CASE( NoNegativeValues )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -32,7 +31,7 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 		( "aaa/bbb/a1b9c2.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 3 );
 	
@@ -53,9 +52,7 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 
 BOOST_AUTO_TEST_CASE( NegativeSequence )
 {
-	using namespace sequenceParser;
-	Detector detector;
-	boost::ptr_vector<Sequence> listSequence;
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
  
 	std::vector<boost::filesystem::path> paths;
 
@@ -69,12 +66,12 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 		( "aaa/bbb/a1b2c3.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths, eMaskOptionsNegativeIndexes );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths, sequenceParser::eMaskOptionsNegativeIndexes );
 
 	//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 1 );
 
-	const Sequence& seq = listSequence.front();
+	const sequenceParser::Sequence& seq = listSequence.front();
 	BOOST_CHECK( seq.getFirstTime() == -3 );
 	BOOST_CHECK( seq.getLastTime() == 3 );
 	BOOST_CHECK( seq.getNbFiles() == 7 );

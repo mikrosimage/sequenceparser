@@ -1,4 +1,4 @@
-#include <Detector.hpp>
+#include <detector.hpp>
 
 #include <boost/assign/std/vector.hpp>
 
@@ -9,7 +9,6 @@ BOOST_AUTO_TEST_SUITE( MultiPaddingSequenceDetection )
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -21,7 +20,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 		( "aaa/bbb/a1b2c023.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 1 );
 	
@@ -32,7 +31,6 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -45,7 +43,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 		( "aaa/bbb/a1b2c999.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 1 );
 	
@@ -57,7 +55,6 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -70,7 +67,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 		( "aaa/bbb/a1b2c123456.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	std::cout << "AA: " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 1 );
@@ -87,7 +84,6 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -101,7 +97,7 @@ BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 		( "aaa/bbb/a1b2c123456.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	std::cout << "AA: " << listSequence.size() << std::endl;
 	BOOST_CHECK( listSequence.size() == 2 );

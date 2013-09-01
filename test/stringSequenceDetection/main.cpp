@@ -1,4 +1,4 @@
-#include <Detector.hpp>
+#include <detector.hpp>
 
 #include <boost/assign/std/vector.hpp>
 
@@ -11,19 +11,17 @@ BOOST_AUTO_TEST_SUITE( SimpleDetections )
 
 BOOST_AUTO_TEST_CASE( Nothing )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( SingleFilename )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 
 	std::vector<boost::filesystem::path> paths;
@@ -32,14 +30,13 @@ BOOST_AUTO_TEST_CASE( SingleFilename )
 		( "aaa/bbb/a1b2.j2c" )
 		;
 
-	listSequence = detector.sequenceFromFilenameList( paths );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
 	BOOST_CHECK( listSequence.size() == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( SingleSequence )
 {
-	sequenceParser::Detector detector;
 	boost::ptr_vector<sequenceParser::Sequence> listSequence1;
 
 	{
@@ -50,7 +47,7 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 			( "aaa/bbb/a1b4.j2c" )
 			;
 
-		listSequence1 = detector.sequenceFromFilenameList( paths );
+		listSequence1 = sequenceParser::sequenceFromFilenameList( paths );
 	}
 
 	boost::ptr_vector<sequenceParser::Sequence> listSequence2;
@@ -61,7 +58,7 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 			( "aaa/bbb/a1b4.j2c" )
 			( "aaa/bbb/a1b3.j2c" )
 			;
-		listSequence2 = detector.sequenceFromFilenameList( paths );
+		listSequence2 = sequenceParser::sequenceFromFilenameList( paths );
 		BOOST_CHECK( listSequence2.size() == 1 );
 	}
 
@@ -75,7 +72,7 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 			( "aaa/bbb/a1b5.j2c" )
 			( "aaa/bbb/a1b3.j2c" )
 			;
-		listSequence3 = detector.sequenceFromFilenameList( paths );
+		listSequence3 = sequenceParser::sequenceFromFilenameList( paths );
 		BOOST_CHECK( listSequence2.size() == 1 );
 	}
 

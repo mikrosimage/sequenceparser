@@ -5,4 +5,4 @@
 %include "File.i"
 %include "Folder.i"
 %include "Sequence.i"
-%include "Detector.i"
+%include "detector.i"
