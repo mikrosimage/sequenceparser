@@ -13,7 +13,6 @@ namespace sequenceParser {
 namespace detail {
 class FileNumbers;
 }
-class Detector;
 
 /**
  * @brief A sequence of numbered files.
@@ -22,8 +21,6 @@ class Sequence : public FileObject
 {
 
 public:
-	friend class Detector;
-
 	/**
 	 * List all recognized pattern types.
 	 */
@@ -151,7 +148,7 @@ public:
 	 */
 	void extractStep( const std::vector<Time>& times );
 
-// TODO: move that ouside of that class!
+// TODO: move that outside of that class!
 	/**
 	 * @brief Extract step from a sorted vector of time values.
 	 */
