@@ -21,12 +21,12 @@ class FileNumbers;
 }
 
 /**
- * Detect if the researchPath is a correct pattern ( a folder, a file or a pattern with an valid parent directory )
+ * Detect if the researchPath is a correct pattern ( a folder, a file or a pattern with a valid parent directory )
  *
  * @param[inout] reseachPath path/pattern to be checked, return the valid research directory
  * @param[inout] filters to add pattern of detection present in the researchPath
  *
- * @return return false if the research path is incorrect with a folder, a file or a pattern with an valid parent directory
+ * @return return false if the research path is incorrect with a folder, a file or a pattern with a valid parent directory
  */
 bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::string>& filters, std::string &filename );
 

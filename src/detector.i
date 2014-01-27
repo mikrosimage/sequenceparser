@@ -1,5 +1,9 @@
+%include "File.i"
+%include "Folder.i"
+%include "Sequence.i"
 
 %include <global.i>
+%include <std_vector.i>
 
 %{
 #include "commonDefinitions.hpp"

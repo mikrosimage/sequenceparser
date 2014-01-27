@@ -66,6 +66,15 @@ private:
 	Vec _id;
 };
 
+// NOTE How we can replace this with a wrapper?
+// Like boost::function, boost::bind,...
+struct SeqIdHash : std::unary_function<FileStrings, std::size_t>
+{
+	std::size_t operator()(const FileStrings & p ) const
+	{
+		return p.getHash();
+	}
+};
 
 }
 }

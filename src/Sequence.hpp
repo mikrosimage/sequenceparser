@@ -38,7 +38,6 @@ public:
 	};
 
 	Sequence()
-	: FileObject()
 	{
 		clear();
 	}

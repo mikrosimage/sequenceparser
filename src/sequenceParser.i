@@ -6,3 +6,4 @@
 %include "Folder.i"
 %include "Sequence.i"
 %include "detector.i"
+%include "filesystem.i"

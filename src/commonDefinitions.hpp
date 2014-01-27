@@ -53,7 +53,7 @@ static const std::string kColorError = "";
 #endif
 #endif
 
-typedef std::ssize_t Time;
+typedef ::std::ssize_t Time;
 
 /**
  * List all recognized pattern types.

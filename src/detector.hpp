@@ -8,6 +8,7 @@
 #include "Folder.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/foreach.hpp>
 
 #include <iostream>
 #include <iomanip>

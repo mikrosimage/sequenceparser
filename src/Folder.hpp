@@ -7,19 +7,21 @@ namespace sequenceParser {
 
 class Folder : public FileObject
 {
-
 public:
-
-	Folder( const boost::filesystem::path& directory, const std::string folderName, const EMaskOptions& options ) :
-	FileObject( directory, eMaskTypeDirectory, options ),
-	_folderName( folderName ) { }
+	Folder()
+	{}
+	
+	Folder( const boost::filesystem::path& directory, const std::string folderName, const EMaskOptions& options )
+	: FileObject( directory, eMaskTypeDirectory, options )
+	, _folderName( folderName )
+	{}
 
 	Folder( const Folder& other )
 	: FileObject( other )
 	, _folderName( other._folderName )
 	{}
 	
-	~Folder() { }
+	~Folder() {}
 
 	std::ostream& getCout( std::ostream& os ) const;
 

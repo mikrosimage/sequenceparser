@@ -7,12 +7,14 @@ namespace sequenceParser {
 
 class File : public FileObject
 {
-
 public:
-
+	File()
+	{}
+	
 	File( const boost::filesystem::path& directory, const std::string& filename, const EMaskOptions& options ) :
 	FileObject( directory, eMaskTypeFile, options ),
-	_filename( filename ) { }
+	_filename( filename )
+	{}
 
 	File( const File& other )
 	: FileObject( other )
