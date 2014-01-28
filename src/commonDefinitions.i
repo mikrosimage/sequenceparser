@@ -6,7 +6,7 @@
 %}
 
 namespace sequenceParser {
-typedef ::std::ssize_t Time;
+typedef int Time;
 }
 
 %include "commonDefinitions.hpp"
