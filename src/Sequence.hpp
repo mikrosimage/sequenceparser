@@ -54,10 +54,10 @@ public:
 		init( pattern, firstTime, lastTime, step, accept );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
-		: FileObject( directory, eTypeSequence, displayOptions )
+	Sequence( const boost::filesystem::path& filepath, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
+		: FileObject( filepath.parent_path(), eTypeSequence, displayOptions )
 	{
-		init( firstTime, lastTime, step, accept );
+		init( filepath.filename().string(), firstTime, lastTime, step, accept );
 	}
 
 	/**
@@ -109,13 +109,6 @@ private:
 	 * @warning the directory must be set
 	 */
 	bool init( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
-
-	/**
-	 * @brief Construct a sequence from a pattern and given informations.
-	 * @warning No check on your filesystem.
-	 * @warning the directory must be set
-	 */
-	inline bool init( const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
 
 public:
 	/**

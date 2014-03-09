@@ -57,11 +57,14 @@ Sequence::~Sequence()
 {
 }
 
-Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept ) :
-FileObject( directory, eTypeSequence, displayOptions )
+Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept )
+: FileObject( directory, eTypeSequence, displayOptions )
+, _padding(0)
+, _step(1)
+, _firstTime(0)
+, _lastTime(0)
+, _nbFiles(0)
 {
-	clear();
-	initFromDetection( accept );
 }
 
 bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeStr )

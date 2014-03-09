@@ -1,9 +1,4 @@
 
-inline bool Sequence::init( const Time first, const Time last, const Time step, const EPattern accept )
-{
-	return this->init( _directory.filename().string(), first, last, step, accept );
-}
-
 inline bool Sequence::initFromPattern( const boost::filesystem::path& dir, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
 {
 	setDirectory(dir);
