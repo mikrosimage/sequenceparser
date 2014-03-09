@@ -36,6 +36,7 @@ namespace sequenceParser {
 #endif
 
 
+#ifndef SWIG
 #ifndef SEQUENCE_PARSER_OUTPUT_COLOR_FILES
 #define SEQUENCE_PARSER_OUTPUT_COLOR_FILES
 #if (defined __UNIX__ || defined UNIX || defined __LINUX__ || defined LINUX )
@@ -50,6 +51,7 @@ static const std::string kColorFolder = "";
 static const std::string kColorFile = "";
 static const std::string kColorSequence = "";
 static const std::string kColorError = "";
+#endif
 #endif
 #endif
 
