@@ -31,18 +31,19 @@ boost::ptr_vector<File> fileInDirectory( const std::string& directory, const EDe
 	return fileInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<File> fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
+boost::ptr_vector<File> fileInDirectory( const std::string& dir, const std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<File> outputFiles;
 	std::string tmpDir( dir );
+	std::vector<std::string> tmpFilters( filters );
 	std::string filterFilename;
 
-	if( !detectDirectoryInResearch( tmpDir, filters, filterFilename ) )
+	if( !detectDirectoryInResearch( tmpDir, tmpFilters, filterFilename ) )
 	{
 		return outputFiles;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -115,18 +116,19 @@ boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory, c
 	return sequenceInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
+boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, const std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<Sequence> outputSequences;
 	std::string tmpDir( dir );
+	std::vector<std::string> tmpFilters( filters );
 	std::string filename;
 	
-	if( !detectDirectoryInResearch( tmpDir, filters, filename ) )
+	if( !detectDirectoryInResearch( tmpDir, tmpFilters, filename ) )
 	{
 		return outputSequences;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -265,20 +267,21 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 	return fileAndSequenceInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
+boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir, const std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<FileObject> output;
 	boost::ptr_vector<FileObject> outputFiles;
 	boost::ptr_vector<FileObject> outputSequences;
 	std::string tmpDir( dir );
+	std::vector<std::string> tmpFilters( filters );
 	std::string filename;
 	
-	if( ! detectDirectoryInResearch( tmpDir, filters, filename ) )
+	if( ! detectDirectoryInResearch( tmpDir, tmpFilters, filename ) )
 	{
 		return output;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -355,7 +358,7 @@ boost::ptr_vector<Folder> folderInDirectory( const std::string& directory, const
 	return folderInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
+boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, const std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<Folder> outputFolders;
 	bfs::path directory;
@@ -377,7 +380,8 @@ boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, std::vector
 		return outputFolders;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	std::vector<std::string> tmpFilters( filters );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// for all files in the directory
 	bfs::directory_iterator itEnd;
@@ -401,21 +405,22 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& director
 	return fileObjectInDirectory( directory, filters, filterByType, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EType filterByType, const EDetection detectOptions, const EDisplay displayOptions )
+boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, const std::vector<std::string>& filters, const EType filterByType, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<FileObject> output;
 	boost::ptr_vector<FileObject> outputFolders;
 	boost::ptr_vector<FileObject> outputFiles;
 	boost::ptr_vector<FileObject> outputSequences;
 	std::string tmpDir( dir );
+	std::vector<std::string> tmpFilters( filters );
 	std::string filename;
 	
-	if( !detectDirectoryInResearch( tmpDir, filters, filename ) )
+	if( !detectDirectoryInResearch( tmpDir, tmpFilters, filename ) )
 	{
 		return outputFiles;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;

@@ -27,18 +27,19 @@ namespace bfs = boost::filesystem;
 
 std::vector<Item> browse(
 		const std::string& dir,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions,
 		const EDisplay displayOptions )
 {
 	std::vector<Item> output;
 	std::string tmpDir( dir );
+	std::vector<std::string> tmpFilters( filters );
 	std::string filename;
 
-	if( ! detectDirectoryInResearch( tmpDir, filters, filename ) )
+	if( ! detectDirectoryInResearch( tmpDir, tmpFilters, filename ) )
 		return output;
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( tmpFilters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;

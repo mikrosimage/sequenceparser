@@ -48,7 +48,7 @@ public:
 
 std::vector<Item> browse(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
 

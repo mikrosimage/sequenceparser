@@ -22,7 +22,7 @@ boost::ptr_vector<File> fileInDirectory(
 
 boost::ptr_vector<File> fileInDirectory(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
 
@@ -33,7 +33,7 @@ boost::ptr_vector<Sequence> sequenceInDirectory(
 
 boost::ptr_vector<Sequence> sequenceInDirectory(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
 
@@ -51,7 +51,7 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory(
 
 boost::ptr_vector<FileObject> fileAndSequenceInDirectory(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
 
@@ -62,7 +62,7 @@ boost::ptr_vector<Folder> folderInDirectory(
 
 boost::ptr_vector<Folder> folderInDirectory(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
 
@@ -74,7 +74,7 @@ boost::ptr_vector<FileObject> fileObjectInDirectory(
 
 boost::ptr_vector<FileObject> fileObjectInDirectory(
 		const std::string& directory,
-		std::vector<std::string>& filters,
+		const std::vector<std::string>& filters,
 		const EType filterByType = eTypeSequence,
 		const EDetection detectOptions = eDetectionDefault ,
 		const EDisplay displayOptions = eDisplayDefault);
