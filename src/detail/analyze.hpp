@@ -61,7 +61,7 @@ void privateBuildSequencesAccordingToPadding(
  *          so there is no reason to create a copy.
  * @return a sequence object with all informations
  */
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EDisplay displayOptions );
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EDetection detectOptions, const EDisplay displayOptions );
 
 /**
  * @brief Extract number and string parts from a filename.

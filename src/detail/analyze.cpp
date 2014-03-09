@@ -265,7 +265,7 @@ bool getVaryingNumber( std::ssize_t& index, const FileNumbers& a, const FileNumb
 	return foundOne; // we found one varying index
 }
 
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EDisplay displayOptions )
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	Sequence defaultSeq( directory, displayOptions );
 	BOOST_ASSERT( numberParts.size() > 0 );
@@ -274,9 +274,10 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 	const std::size_t len = numberParts.front().size();
 	std::vector<Sequence> result;
 	
-	if( numberParts.size() <= 1 )
+	if( numberParts.size() == 1 )
 	{
-		privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, numberParts.begin(), numberParts.end(), len-1 );
+		std::size_t index = (detectOptions & eDetectionSingleFileSeqUseFirstNumber) ? 0 : len-1;
+		privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, numberParts.begin(), numberParts.end(), index );
 		return result;
 	}
 	

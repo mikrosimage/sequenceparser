@@ -168,7 +168,7 @@ boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::ve
 	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, detectOptions, displayOptions );
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 		{
@@ -240,7 +240,7 @@ boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::f
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
 		//std::cout << "FileStrings: " << p.first << std::endl;
-		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, detectOptions, displayOptions );
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 		{
@@ -320,36 +320,25 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 			outputFiles.push_back( new File( directory, iter->path().filename().string(), displayOptions ) );
 		}
 	}
-	// add sequences in the output vector
 
+	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		if( p.second.size() == 1 )
-		{
-			std::string filename = p.first[0];
-			filename += p.second[0].getString(0);
-			filename += p.first[1];
-			//std::cout << "FILENAME = " << filename << std::endl;
-			outputFiles.push_back( new File( directory, filename, displayOptions ) );
-		}
-		else
-		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, detectOptions, displayOptions );
 
-			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		{
+			// don't detect sequence of directories
+			if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				// don't detect sequence of directories
-				if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 				{
-					// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
-					if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
-					{
-						outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
-					}
-					else
-					{
-						outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
-					}
+					outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
+				}
+				else
+				{
+					outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
 				}
 			}
 		}
@@ -481,41 +470,27 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std
 	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		if( p.second.size() == 1 )
-		{
-			std::string filename = p.first.getId().at( 0 );
-			for( size_t i = 0; i < p.second[ 0 ].size(); i++ )
-			{
-				filename += p.second[ 0 ].getString( i );
-				filename += p.first.getId().at( i+1 );
-			}
-			//std::cout << "FILENAME = " << filename << std::endl;
-			outputFiles.push_back( new File( directory, filename, displayOptions ) );
-		}
-		else
-		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, detectOptions, displayOptions );
 
-			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		{
+			// don't detect sequence of directories
+			if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				// don't detect sequence of directories
-				if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 				{
-					// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
-					if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
-					{
-						outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
-					}
-					else
-					{
-						outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
-					}
+					outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
 				}
-				// else
-				// {
-				// @todo loop to declare direcotries !
-				// }
+				else
+				{
+					outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
+				}
 			}
+			// else
+			// {
+			// @todo loop to declare directories!
+			// }
 		}
 	}
 

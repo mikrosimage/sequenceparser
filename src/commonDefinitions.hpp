@@ -95,10 +95,17 @@ enum EType
 enum EDetection
 {
 	eDetectionNone = 0,
-	eDetectionNegative = 1,  ///< detect negative numbers (instead of detecting "-" as a non-digit character)
-	eDetectionSequenceNeedAtLeastTwoFiles = 2,  ///< A file alone with a number in the name could be considered as a simple file or a sequence of 1 item.
-	eDetectionIgnoreDotFile = 4,
-	eDetectionSequenceFromFilename = 8,  ///< detect from an existing filename of the sequence
+	/// detect negative numbers (instead of detecting "-" as a non-digit character)
+	eDetectionNegative = 1,
+	/// A file alone with a number in the filename could be considered as a simple
+	/// file or a sequence of 1 item.
+	eDetectionSequenceNeedAtLeastTwoFiles = 2,
+	/// By default, single file sequence use the latest number of the filename.
+	/// You could use this option to use the first number instead.
+	eDetectionSingleFileSeqUseFirstNumber = 4,
+	eDetectionIgnoreDotFile = 8,
+	/// detect from an existing filename of the sequence
+	eDetectionSequenceFromFilename = 16,
 	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
 };
 

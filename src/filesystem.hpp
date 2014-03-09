@@ -29,7 +29,7 @@ public:
 	Item( const Sequence& sequence, const std::string& folder )
 	: _type(eTypeSequence)
 	, _folder(folder)
-	, _filename(sequence.getIdentification())
+	, _filename(sequence.getStandardPattern())
 	, _sequence(sequence)
 	{}
 	
@@ -58,7 +58,7 @@ inline std::vector<Item> browse(
 		const EDisplay displayOptions = eDisplayDefault )
 {
 	std::vector<std::string> filters;
-	return browse( directory, filters, detectOptions );
+	return browse( directory, filters, detectOptions, displayOptions );
 }
 
 ////#ifndef SWIG

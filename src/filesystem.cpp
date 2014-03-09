@@ -89,34 +89,25 @@ std::vector<Item> browse(
 	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		if( p.second.size() == 1 )
-		{
-			std::string filename = p.first[0];
-			filename += p.second[0].getString(0);
-			filename += p.first[1];
-			output.push_back( Item( eTypeFile, filename, directory.string() ) );
-		}
-		else
-		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, detectOptions, displayOptions );
 
-			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
+		{
+			// don't detect sequence of directories
+			if( bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				// don't detect sequence of directories
-				if( bfs::is_directory( s.getAbsoluteFirstFilename() ) )
+				// TODO: declare folders individually
+			}
+			else
+			{
+				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 				{
-					// TODO: declare folders individually
+					output.push_back( Item( eTypeFile, s.getFirstFilename(), directory.string() ) );
 				}
 				else
 				{
-					if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
-					{
-						output.push_back( Item( eTypeFile, s.getFirstFilename(), directory.string() ) );
-					}
-					else
-					{
-						output.push_back( Item( Sequence( directory, s, displayOptions ), directory.string() ) );
-					}
+					output.push_back( Item( Sequence( directory, s, displayOptions ), directory.string() ) );
 				}
 			}
 		}

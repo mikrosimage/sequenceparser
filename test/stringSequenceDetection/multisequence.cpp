@@ -136,5 +136,29 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMinusSeparatorAmbiguityWithNegValues )
 	BOOST_CHECK_EQUAL( listSequence.front().getNbFiles(), 4 );
 }
 
+BOOST_AUTO_TEST_CASE( MultiSequenceSingleFile )
+{
+	std::vector<boost::filesystem::path> paths;
+	boost::assign::push_back( paths )
+		( "aaa/bbb/a1b24.jpg" )
+		;
+
+	// Use last number
+	boost::ptr_vector<sequenceParser::Sequence> listSequence_lastNumber =
+			sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative) );
+	BOOST_CHECK_EQUAL( listSequence_lastNumber.size(), 1 );
+	BOOST_CHECK_EQUAL( listSequence_lastNumber.front().getFirstTime(), 24 );
+	BOOST_CHECK_EQUAL( listSequence_lastNumber.front().getLastTime(), 24 );
+	BOOST_CHECK_EQUAL( listSequence_lastNumber.front().getNbFiles(), 1 );
+    
+	// Use first number
+	boost::ptr_vector<sequenceParser::Sequence> listSequence_firstNumber =
+			sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSingleFileSeqUseFirstNumber) );
+	BOOST_CHECK_EQUAL( listSequence_firstNumber.size(), 1 );
+	BOOST_CHECK_EQUAL( listSequence_firstNumber.front().getFirstTime(), 1 );
+	BOOST_CHECK_EQUAL( listSequence_firstNumber.front().getLastTime(), 1 );
+	BOOST_CHECK_EQUAL( listSequence_firstNumber.front().getNbFiles(), 1 );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
