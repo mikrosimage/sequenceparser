@@ -63,7 +63,7 @@ def testBrowse():
 		print("item:", item._folder)
 		print("item:", item._filename)
 		print("item:", item._type)
-		if item._type == 1:
+		if item._type == sequenceParser.eTypeSequence:
 			print("item seq:", item._sequence.getAbsoluteFirstFilename())
 			print("item seq:", item._sequence.getFirstTime(), item._sequence.getLastTime(), item._sequence.getDuration(), item._sequence.getStandardPattern())
 
