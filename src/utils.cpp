@@ -23,7 +23,7 @@ using detail::FileNumbers;
 using detail::FileStrings;
 namespace bfs = boost::filesystem;
 
-boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
+boost::regex convertFilterToRegex( std::string filter, const EDetection detectOptions )
 {
 	boost::cmatch match;
 	boost::regex expression( "(.*[%])([0-9]{2})([d].*)" ); // match to pattern like : %04d
@@ -37,12 +37,12 @@ boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
 	}
 
 	// for detect sequence based on a single file
-	if( ( desc & eMaskOptionsSequenceBasedOnFilename ) )
+	if( ( detectOptions & eDetectionSequenceFromFilename ) )
 		filter = boost::regex_replace( filter, boost::regex( "\\d" ), "[0-9]" );
 
 	filter = boost::regex_replace( filter, boost::regex( "\\*" ), "(.*)" );
 	filter = boost::regex_replace( filter, boost::regex( "\\?" ), "(.)" );
-	if( desc & eMaskOptionsNegativeIndexes )
+	if( detectOptions & eDetectionNegative )
 	{
 		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[\\-\\+]?[0-9]+" ); // one @ correspond to one or more digits
 		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[\\-\\+]?[0-9]" ); // each # in pattern correspond to a digit
@@ -55,18 +55,19 @@ boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc )
 	return boost::regex( filter );
 }
 
-std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EMaskOptions desc )
+std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EDetection detectOptions )
 {
 	std::vector<boost::regex> res;
 	BOOST_FOREACH( const std::string& filter, filters )
 	{
-		res.push_back( convertFilterToRegex( filter, desc ) );
+		res.push_back( convertFilterToRegex( filter, detectOptions ) );
 	}
 	return res;
 }
 
-bool filenameIsNotFilter( const std::string& filename, const std::vector<boost::regex>& filters )
+bool filenameRespectsFilters( const std::string& filename, const std::vector<boost::regex>& filters )
 {
+	// If there is no filter, it means that it respects filters...
 	if( filters.size() == 0 )
 		return true;
 
@@ -80,30 +81,24 @@ bool filenameIsNotFilter( const std::string& filename, const std::vector<boost::
 	return false;
 }
 
-bool isNotFilter( const bfs::path& inputPath, const std::vector<boost::regex>& filters, const std::string& filename, const EMaskOptions desc )
+bool filepathRespectsAllFilters( const bfs::path& inputFilepath, const std::vector<boost::regex>& filters, const std::string& filterFilename, const EDetection detectOptions )
 {
-	if( !( inputPath.filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
-	{
-		if( filenameIsNotFilter( inputPath.filename().string(), filters ) ) // filtering of entries with filters strings
-		{
-			if( filename.size() )
-			{
-				if( filename == inputPath.string() )
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				return true;
-			}
-		}
-	}
-	return false;
+	const std::string inputFilename = inputFilepath.filename().string();
+	if( inputFilename.empty() )
+		return false; // no sense...
+
+	// hidden files
+	if( ( detectOptions & eDetectionIgnoreDotFile ) && ( inputFilename[0] == '.' ) )
+		return false;
+
+	// filtering of entries with filters strings
+	if( ! filenameRespectsFilters( inputFilename, filters ) )
+		return false;
+
+	if( filterFilename.empty() )
+		return true;
+
+	return filterFilename == inputFilepath.string();
 }
 
 }

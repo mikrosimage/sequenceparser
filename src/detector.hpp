@@ -15,46 +15,69 @@
 
 namespace sequenceParser {
 
-boost::ptr_vector<File> fileInDirectory( const std::string& directory,
-													 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<File> fileInDirectory(
+		const std::string& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<File> fileInDirectory( const std::string& directory,
-													 std::vector<std::string>& filters,
-													 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<File> fileInDirectory(
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory,
-															 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<Sequence> sequenceInDirectory(
+		const std::string& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory,
-															 std::vector<std::string>& filters,
-															 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<Sequence> sequenceInDirectory(
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
 
-boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc = eMaskOptionsNone );
+boost::ptr_vector<Sequence> sequenceFromFilenameList(
+		const std::vector<boost::filesystem::path>& filenames,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
 
-boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory,
-																	  const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<FileObject> fileAndSequenceInDirectory(
+		const std::string& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory,
-																	  std::vector<std::string>& filters,
-																	  const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<FileObject> fileAndSequenceInDirectory(
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<Folder> folderInDirectory( const std::string& directory,
-														 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<Folder> folderInDirectory(
+		const std::string& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<Folder> folderInDirectory( const std::string& directory,
-														 std::vector<std::string>& filters,
-														 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<Folder> folderInDirectory(
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory,
-																 const EMaskType mask = eMaskTypeDefault,
-																 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<FileObject> fileObjectInDirectory(
+		const std::string& directory,
+		const EType filterByType = eTypeSequence,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
-boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory,
-																 std::vector<std::string>& filters,
-																 const EMaskType mask = eMaskTypeDefault,
-																 const EMaskOptions desc = eMaskOptionsDefault );
+boost::ptr_vector<FileObject> fileObjectInDirectory(
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EType filterByType = eTypeSequence,
+		const EDetection detectOptions = eDetectionDefault ,
+		const EDisplay displayOptions = eDisplayDefault);
 
 
 }

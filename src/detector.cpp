@@ -25,24 +25,24 @@ using detail::FileStrings;
 using detail::SeqIdHash;
 namespace bfs = boost::filesystem;
 
-boost::ptr_vector<File> fileInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<File> fileInDirectory( const std::string& directory, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters;
-	return fileInDirectory( directory, filters, desc );
+	return fileInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<File> fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<File> fileInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<File> outputFiles;
 	std::string tmpDir( dir );
-	std::string filename;
-	
-	if( !detectDirectoryInResearch( tmpDir, filters, filename ) )
+	std::string filterFilename;
+
+	if( !detectDirectoryInResearch( tmpDir, filters, filterFilename ) )
 	{
 		return outputFiles;
 	}
-	
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -60,63 +60,62 @@ boost::ptr_vector<File> fileInDirectory( const std::string& dir, std::vector<std
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filterFilename, detectOptions ) )
+			continue;
+
+		if( filterFilename.empty() || filterFilename == iter->path().filename().string() )
 		{
-			// it's a file or a file of a sequence
-			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) &&
-			    ( ( filename.size() && filename == iter->path().filename().string() ) || !filename.size() ) ) // filtering of entries with filters strings
+			// if at least one number detected
+			if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 			{
-				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+				// need to construct sequence to detect file with a pattern but with only one image
+				const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+				if( it != sequences.end() ) // is already in map
 				{
-					// need to construct sequence to detect file with a pattern but with only one image
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
+					// append the vector of numbers
+					sequences.at( tmpStringParts ).push_back( tmpNumberParts );
 				}
 				else
 				{
-					if( ! bfs::is_directory( directory / iter->path().filename().string() ) )
-					{
-						outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
-					}
+					// create an entry in the map
+					std::vector<FileNumbers> li;
+					li.push_back( tmpNumberParts );
+					sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
+				}
+			}
+			else
+			{
+				if( ! bfs::is_directory( directory / iter->path().filename().string() ) )
+				{
+					outputFiles.push_back( new File( directory, iter->path().filename().string(), displayOptions ) );
 				}
 			}
 		}
 	}
+
 	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		if( p.second.size() == 1 )
+		if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (p.second.size() == 1) )
 		{
 			std::string filename = p.first[0];
 			filename += p.second[0].getString(0);
 			filename += p.first[1];
 			//std::cout << "FILENAME = " << filename << std::endl;
-			outputFiles.push_back( new File( directory, filename, desc ) );
+			outputFiles.push_back( new File( directory, filename, displayOptions ) );
 		}
 	}
 
 	return outputFiles;
 }
 
-boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& directory, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters;
-	return sequenceInDirectory( directory, filters, desc );
+	return sequenceInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<Sequence> outputSequences;
 	std::string tmpDir( dir );
@@ -127,7 +126,7 @@ boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::ve
 		return outputSequences;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -144,45 +143,42 @@ boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::ve
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
+			continue;
+
+		// if at least one number detected
+		if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 		{
-			// it's a file or a file of a sequence
-			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+			if( it != sequences.end() ) // is already in map
 			{
-				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
-				{
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
-				}
+				// append the vector of numbers
+				sequences.at( tmpStringParts ).push_back( tmpNumberParts );
+			}
+			else
+			{
+				// create an entry in the map
+				std::vector<FileNumbers> li;
+				li.push_back( tmpNumberParts );
+				sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 			}
 		}
 	}
-	// add sequences in the output vector
 
+	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
-		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 		{
 			// don't detect sequence of directories
 			if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				if( !( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+				if( !(detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) || (s.getNbFiles() != 1) )
 				{
-					outputSequences.push_back( new Sequence( directory, s, desc ) );
+					outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
 				}
 			}
 		}
@@ -191,12 +187,12 @@ boost::ptr_vector<Sequence> sequenceInDirectory( const std::string& dir, std::ve
 	return outputSequences;
 }
 
-boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EMaskOptions desc )
+boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::filesystem::path>& filenames, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters; // @todo as argument !
 	boost::ptr_vector<Sequence> outputSequences;
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -205,35 +201,35 @@ boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::f
 	FileNumbers tmpNumberParts; // the vector of numbers inside one filename
 
 	// for all files in the directory
-
 	BOOST_FOREACH( const boost::filesystem::path& iter, filenames )
 	{
 		// clear previous infos
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( !( iter.filename().string()[0] == '.' ) || ( desc & eMaskOptionsDotFile ) ) // if we ask to show hidden files and if it is hidden
+		// hidden files
+		if( ( detectOptions & eDetectionIgnoreDotFile ) && ( iter.filename().string()[0] == '.' ) )
+			continue;
+
+		// filtering of entries with filters strings
+		if( ! filenameRespectsFilters( iter.filename().string(), reFilters ) )
+			continue;
+		
+		// if at least one number detected
+		if( decomposeFilename( iter.filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 		{
-			// it's a file or a file of a sequence
-			if( filenameIsNotFilter( iter.filename().string(), reFilters ) ) // filtering of entries with filters strings
+			const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+			if( it != sequences.end() ) // is already in map
 			{
-				// if at least one number detected
-				if( decomposeFilename( iter.filename().string(), tmpStringParts, tmpNumberParts, desc ) )
-				{
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
-				}
+				// append the vector of numbers
+				sequences.at( tmpStringParts ).push_back( tmpNumberParts );
+			}
+			else
+			{
+				// create an entry in the map
+				std::vector<FileNumbers> li;
+				li.push_back( tmpNumberParts );
+				sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 			}
 		}
 	}
@@ -244,16 +240,17 @@ boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::f
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
 		//std::cout << "FileStrings: " << p.first << std::endl;
-		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
+		const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 		{
 			// don't detect sequence of directories
 			if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				if( !( s.getNbFiles() == 1 ) ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+				if( !(detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) || (s.getNbFiles() != 1) )
 				{
-					outputSequences.push_back( new Sequence( directory, s, desc ) );
+					outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
 				}
 			}
 		}
@@ -262,13 +259,13 @@ boost::ptr_vector<Sequence> sequenceFromFilenameList( const std::vector<boost::f
 	return outputSequences;
 }
 
-boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& directory, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters;
-	return fileAndSequenceInDirectory( directory, filters, desc );
+	return fileAndSequenceInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<FileObject> output;
 	boost::ptr_vector<FileObject> outputFiles;
@@ -281,7 +278,7 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 		return output;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -298,33 +295,29 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
+			continue;
+
+		// if at least one number detected
+		if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 		{
-			// it's a file or a file of a sequence
-			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+			if( it != sequences.end() ) // is already in map
 			{
-				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
-				{
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
-				}
-				else
-				{
-					outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
-				}
+				// append the vector of numbers
+				sequences.at( tmpStringParts ).push_back( tmpNumberParts );
 			}
+			else
+			{
+				// create an entry in the map
+				std::vector<FileNumbers> li;
+				li.push_back( tmpNumberParts );
+				sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
+			}
+		}
+		else
+		{
+			outputFiles.push_back( new File( directory, iter->path().filename().string(), displayOptions ) );
 		}
 	}
 	// add sequences in the output vector
@@ -337,24 +330,25 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 			filename += p.second[0].getString(0);
 			filename += p.first[1];
 			//std::cout << "FILENAME = " << filename << std::endl;
-			outputFiles.push_back( new File( directory, filename, desc ) );
+			outputFiles.push_back( new File( directory, filename, displayOptions ) );
 		}
 		else
 		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
+			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
 
 			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 			{
 				// don't detect sequence of directories
 				if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 				{
-					if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+					// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+					if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 					{
-						outputFiles.push_back( new File( directory, s.getFirstFilename(), desc ) );
+						outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
 					}
 					else
 					{
-						outputSequences.push_back( new Sequence( directory, s, desc ) );
+						outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
 					}
 				}
 			}
@@ -366,13 +360,13 @@ boost::ptr_vector<FileObject> fileAndSequenceInDirectory( const std::string& dir
 	return output;
 }
 
-boost::ptr_vector<Folder> folderInDirectory( const std::string& directory, const EMaskOptions desc )
+boost::ptr_vector<Folder> folderInDirectory( const std::string& directory, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters;
-	return folderInDirectory( directory, filters, desc );
+	return folderInDirectory( directory, filters, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, std::vector<std::string>& filters, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<Folder> outputFolders;
 	bfs::path directory;
@@ -394,31 +388,31 @@ boost::ptr_vector<Folder> folderInDirectory( const std::string& dir, std::vector
 		return outputFolders;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// for all files in the directory
 	bfs::directory_iterator itEnd;
 	for( bfs::directory_iterator iter( directory ); iter != itEnd; ++iter )
 	{
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
 		{
 			// detect if is a folder
 			if( bfs::is_directory( iter->status() ) )
 			{
-				outputFolders.push_back( new Folder( directory, iter->path().filename().string(), desc ) );
+				outputFolders.push_back( new Folder( directory, iter->path().filename().string(), displayOptions ) );
 			}
 		}
 	}
 	return outputFolders;
 }
 
-boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory, const EMaskType mask, const EMaskOptions desc )
+boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& directory, const EType filterByType, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	std::vector<std::string> filters;
-	return fileObjectInDirectory( directory, filters, mask, desc );
+	return fileObjectInDirectory( directory, filters, filterByType, detectOptions, displayOptions );
 }
 
-boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EMaskType mask, const EMaskOptions desc )
+boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std::vector<std::string>& filters, const EType filterByType, const EDetection detectOptions, const EDisplay displayOptions )
 {
 	boost::ptr_vector<FileObject> output;
 	boost::ptr_vector<FileObject> outputFolders;
@@ -432,7 +426,7 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std
 		return outputFiles;
 	}
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -449,42 +443,42 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
+			continue;
+
+		// @todo: no check that needs to ask the status of the file here (like asking if it's a folder).
+		// detect if is a folder
+		if( bfs::is_directory( iter->status() ) )
 		{
-			// @todo: no check that needs to ask the status of the file here (like asking if it's a folder).
-			// detect if is a folder
-			if( bfs::is_directory( iter->status() ) )
+			outputFolders.push_back( new Folder( directory, iter->path().filename().string(), displayOptions ) );
+		}
+		else // it's a file or a file of a sequence
+		{
+			// if at least one number detected
+			if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 			{
-				outputFolders.push_back( new Folder( directory, iter->path().filename().string(), desc ) );
-			}
-			else // it's a file or a file of a sequence
-			{
-				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+				const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+				if( it != sequences.end() ) // is already in map
 				{
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
+					// append the vector of numbers
+					sequences.at( tmpStringParts ).push_back( tmpNumberParts );
 				}
 				else
 				{
-					outputFiles.push_back( new File( directory, iter->path().filename().string(), desc ) );
+					// create an entry in the map
+					std::vector<FileNumbers> li;
+					li.push_back( tmpNumberParts );
+					sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
 				}
+			}
+			else
+			{
+				outputFiles.push_back( new File( directory, iter->path().filename().string(), displayOptions ) );
 			}
 		}
 	}
-	// add sequences in the output vector
 
+	// add sequences in the output vector
 	BOOST_FOREACH( SeqIdMap::value_type & p, sequences )
 	{
 		if( p.second.size() == 1 )
@@ -496,24 +490,25 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std
 				filename += p.first.getId().at( i+1 );
 			}
 			//std::cout << "FILENAME = " << filename << std::endl;
-			outputFiles.push_back( new File( directory, filename, desc ) );
+			outputFiles.push_back( new File( directory, filename, displayOptions ) );
 		}
 		else
 		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
+			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
 
 			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 			{
 				// don't detect sequence of directories
 				if( !bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 				{
-					if( s.getNbFiles() == 1 ) // if it's a sequence of 1 file, it isn't a sequence but only a file
+					// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
+					if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 					{
-						outputFiles.push_back( new File( directory, s.getFirstFilename(), desc ) );
+						outputFiles.push_back( new File( directory, s.getFirstFilename(), displayOptions ) );
 					}
 					else
 					{
-						outputSequences.push_back( new Sequence( directory, s, desc ) );
+						outputSequences.push_back( new Sequence( directory, s, displayOptions ) );
 					}
 				}
 				// else
@@ -524,17 +519,17 @@ boost::ptr_vector<FileObject> fileObjectInDirectory( const std::string& dir, std
 		}
 	}
 
-	if( mask & eMaskTypeDirectory )
+	if( filterByType & eTypeFolder )
 	{
 		output.transfer( output.end(), outputFolders );
 	}
 	// add files in the output vector
-	if( mask & eMaskTypeFile )
+	if( filterByType & eTypeFile )
 	{
 		output.transfer( output.end(), outputFiles );
 	}
 	// add sequences in the output vector
-	if( mask & eMaskTypeSequence )
+	if( filterByType & eTypeSequence )
 	{
 		output.transfer( output.end(), outputSequences );
 	}

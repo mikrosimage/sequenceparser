@@ -55,13 +55,13 @@ void privateBuildSequencesAccordingToPadding(
  * 
  * @param[in] stringParts the sequence identifier
  * @param[inout] numberParts the vector of sequence of number inside each filename
- * @param[in] desc detection flags
+ * @param[in] detectOptions detection flags
  * 
  * @warning We modify @p numberParts in place, because we don't use it after
  *          so there is no reason to create a copy.
  * @return a sequence object with all informations
  */
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EMaskOptions& desc );
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EDisplay displayOptions );
 
 /**
  * @brief Extract number and string parts from a filename.
@@ -78,7 +78,7 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
  * 
  * @return number of decteted numbers
  */
-std::size_t decomposeFilename( const std::string& filename, detail::FileStrings& stringParts, detail::FileNumbers& numberParts, const EMaskOptions& options );
+std::size_t decomposeFilename( const std::string& filename, detail::FileStrings& stringParts, detail::FileNumbers& numberParts, const EDetection& options );
 
 }
 

@@ -55,70 +55,65 @@ static const std::string kColorError = "";
 
 typedef ::std::ssize_t Time;
 
-/**
- * List all recognized pattern types.
- */
-enum EMaskType
-{
+#define SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(ENUM_TYPE) \
+\
+inline ENUM_TYPE operator~(const ENUM_TYPE& a ) \
+{ \
+	return (ENUM_TYPE)(~int(a)); \
+} \
+\
+inline ENUM_TYPE operator&=( ENUM_TYPE& a, const ENUM_TYPE& b ) \
+{ \
+	return a = (ENUM_TYPE)(int(b) & int(a)); \
+} \
+\
+inline ENUM_TYPE operator&( const ENUM_TYPE& a, const ENUM_TYPE& b ) \
+{ \
+	return (ENUM_TYPE)(int(b) & int(a)); \
+} \
+\
+inline ENUM_TYPE operator|=( ENUM_TYPE& a, const ENUM_TYPE& b ) \
+{ \
+	return a = (ENUM_TYPE)(int(b) | int(a) ); \
+} \
+\
+inline ENUM_TYPE operator|( const ENUM_TYPE& a, const ENUM_TYPE& b ) \
+{ \
+	return (ENUM_TYPE)(int(b) | int(a)); \
+}
 
-	eMaskTypeUndefined = 0,
-	eMaskTypeDirectory = 1,
-	eMaskTypeFile = eMaskTypeDirectory * 2,
-	eMaskTypeSequence = eMaskTypeFile * 2,
-	eMaskTypeDefault = eMaskTypeSequence
+enum EType
+{
+	eTypeUndefined = 0,
+	eTypeFolder = 1,
+	eTypeFile = 2,
+	eTypeSequence = 4
 };
 
-enum EMaskOptions
+enum EDetection
 {
-
-	eMaskOptionsNone = 0, // 0
-	eMaskOptionsProperties = 1, // show type of FileObject
-	eMaskOptionsPath = eMaskOptionsProperties * 2, // show path of FileObject
-	eMaskOptionsAbsolutePath = eMaskOptionsPath * 2, // show absolute path of FileObject
-	eMaskOptionsRecursive = eMaskOptionsAbsolutePath * 2, // show recurssive listing
-	eMaskOptionsNegativeIndexes = eMaskOptionsRecursive * 2, // show negative indexes sequences ( seq.-0020.jpg)
-	eMaskOptionsSequenceBasedOnFilename = eMaskOptionsNegativeIndexes * 2, // list sequence based on a filename of the sequence
-	eMaskOptionsDotFile = eMaskOptionsSequenceBasedOnFilename * 2, // show files which start with a dot (hidden files)
-	eMaskOptionsColor = eMaskOptionsDotFile * 2, // output with color
-	eMaskOptionsDefault = ( eMaskOptionsPath | eMaskOptionsColor )
+	eDetectionNone = 0,
+	eDetectionNegative = 1,  ///< detect negative numbers (instead of detecting "-" as a non-digit character)
+	eDetectionSequenceNeedAtLeastTwoFiles = 2,  ///< A file alone with a number in the name could be considered as a simple file or a sequence of 1 item.
+	eDetectionIgnoreDotFile = 4,
+	eDetectionSequenceFromFilename = 8,  ///< detect from an existing filename of the sequence
+	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
 };
 
-inline EMaskType operator~(const EMaskType& a )
+/// TODO: remove that!
+enum EDisplay
 {
-	return (EMaskType) ( ~int(a ) );
-}
+	eDisplayNone = 0,
+	eDisplayProperties = 1,
+	eDisplayPath = 2,
+	eDisplayAbsolutePath = 4,
+	eDisplayColor = 8,
+	eDisplayDefault = (eDisplayPath | eDisplayColor)
+};
 
-inline EMaskType operator&=( EMaskType& a, const EMaskType& b )
-{
-	return a = (EMaskType) (int(b ) & int(a ) );
-}
-
-inline EMaskType operator|=( EMaskType& a, const EMaskType& b )
-{
-	return a = (EMaskType) (int(b ) | int(a ) );
-}
-
-inline EMaskType operator|( const EMaskType& a, const EMaskType& b )
-{
-	return (EMaskType) (int(b ) | int(a ) );
-}
-
-inline EMaskOptions operator|=( EMaskOptions& a, const EMaskOptions& b )
-{
-	a = (EMaskOptions) (int(b ) | int(a ) );
-	return a;
-}
-
-inline EMaskOptions operator|( const EMaskOptions& a, const EMaskOptions& b )
-{
-	return (EMaskOptions) (int(b ) | int(a ) );
-}
-
-inline EMaskOptions remove( EMaskOptions& a, const EMaskOptions& b )
-{
-	a = (EMaskOptions) (int(~b ) & int(a ) );
-	return a;
-}
+SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EType)
+SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EDetection)
+SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EDisplay)
 
 template<typename T>
 inline T greatestCommonDivisor( T a, T b )

@@ -22,11 +22,11 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	BOOST_CHECK( listSequence.size() == 1 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
-	BOOST_CHECK( seq.getPadding() == 3 );
-	BOOST_CHECK( seq.isStrictPadding() == true );
+	BOOST_CHECK_EQUAL( seq.getPadding(), 3 );
+	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
@@ -45,12 +45,11 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	BOOST_CHECK( listSequence.size() == 1 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
-	std::cout << "seq padding: " << seq.getPadding() << std::endl;
-	BOOST_CHECK( seq.getPadding() == 3 );
-	BOOST_CHECK( seq.isStrictPadding() == true );
+	BOOST_CHECK_EQUAL( seq.getPadding(), 3 );
+	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
@@ -69,17 +68,15 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	std::cout << "AA: " << listSequence.size() << std::endl;
-	BOOST_CHECK( listSequence.size() == 1 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 
 	const sequenceParser::Sequence& seq = listSequence.front();
-	BOOST_CHECK( seq.getPadding() == 0 );
-	BOOST_CHECK( seq.getFirstTime() == 99 );
-	BOOST_CHECK( seq.getLastTime() == 123456 );
-	BOOST_CHECK( seq.getNbFiles() == 5 );
-	BOOST_CHECK( seq.hasMissingFile() == true );
-	std::cout << "seq.getStep(): " << seq.getStep() << std::endl;
-	BOOST_CHECK( seq.getStep() == 1 );
+	BOOST_CHECK_EQUAL( seq.getPadding(), 0 );
+	BOOST_CHECK_EQUAL( seq.getFirstTime(), 99 );
+	BOOST_CHECK_EQUAL( seq.getLastTime(), 123456 );
+	BOOST_CHECK_EQUAL( seq.getNbFiles(), 5 );
+	BOOST_CHECK_EQUAL( seq.hasMissingFile(), true );
+	BOOST_CHECK_EQUAL( seq.getStep(), 1 );
 }
 
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
@@ -99,8 +96,7 @@ BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	std::cout << "AA: " << listSequence.size() << std::endl;
-	BOOST_CHECK( listSequence.size() == 2 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 2 );
 }
 
 

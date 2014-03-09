@@ -57,8 +57,8 @@ Sequence::~Sequence()
 {
 }
 
-Sequence::Sequence( const boost::filesystem::path& directory, const EMaskOptions options, const EPattern accept ) :
-FileObject( directory, eMaskTypeSequence, options )
+Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept ) :
+FileObject( directory, eTypeSequence, displayOptions )
 {
 	clear();
 	initFromDetection( accept );
@@ -86,7 +86,7 @@ bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeS
 	return true;
 }
 
-Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
+Sequence::EPattern Sequence::checkPattern( const std::string& pattern, const EDetection detectionOptions )
 {
 	if( regex_match( pattern.c_str(), regexPatternStandard ) )
 	{
@@ -96,7 +96,7 @@ Sequence::EPattern Sequence::checkPattern( const std::string& pattern )
 	{
 		return ePatternCStyle;
 	}
-	else if( ( _options & eMaskOptionsNegativeIndexes ) && regex_match( pattern.c_str(), regexPatternFrameNeg ) )
+	else if( ( detectionOptions & eDetectionNegative ) && regex_match( pattern.c_str(), regexPatternFrameNeg ) )
 	{
 		return ePatternFrameNeg;
 	}

@@ -11,12 +11,6 @@
 
 namespace sequenceParser {
 
-enum EType {
-	eTypeFolder,
-	eTypeSequence,
-	eTypeFile
-};
-
 class Item
 {
 public:
@@ -53,19 +47,24 @@ public:
 };
 
 std::vector<Item> browse(
-	const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc = eMaskOptionsDefault );
+		const std::string& directory,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault );
 
 inline std::vector<Item> browse(
-	const std::string& directory, const EMaskOptions desc = eMaskOptionsDefault )
+		const std::string& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault )
 {
 	std::vector<std::string> filters;
-	return browse( directory, filters, desc );
+	return browse( directory, filters, detectOptions );
 }
 
 ////#ifndef SWIG
 //void browse(
 //	std::vector<Folder>& outFolders, std::vector<Sequence>& outSequences, std::vector<File>& outFiles,
-//	const std::string& directory, std::vector<std::string>& filters, const EMaskOptions desc = eMaskOptionsDefault );
+//	const std::string& directory, std::vector<std::string>& filters, const EDetection detectOptions = eDetectionDefault );
 ////#endif
 }
 

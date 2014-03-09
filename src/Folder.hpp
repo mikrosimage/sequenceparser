@@ -11,8 +11,8 @@ public:
 	Folder()
 	{}
 	
-	Folder( const boost::filesystem::path& directory, const std::string folderName, const EMaskOptions& options )
-	: FileObject( directory, eMaskTypeDirectory, options )
+	Folder( const boost::filesystem::path& directory, const std::string folderName, const EDisplay& displayOptions )
+	: FileObject( directory, eTypeFolder, displayOptions )
 	, _folderName( folderName )
 	{}
 

@@ -17,25 +17,25 @@ public:
 	FileObject()
 	{
 		_directory.clear();
-		_type = eMaskTypeUndefined;
-		_options = eMaskOptionsNone;
-		setColorActive( _options & eMaskOptionsColor );
+		_type = eTypeUndefined;
+		_displayOptions = eDisplayNone;
+		setColorActive( _displayOptions & eDisplayColor );
 	}
 
-	FileObject( const EMaskOptions options )
+	FileObject( const EDisplay displayOptions )
 	{
 		_directory.clear();
-		_type = eMaskTypeUndefined;
-		_options = options;
-		setColorActive( _options & eMaskOptionsColor );
+		_type = eTypeUndefined;
+		_displayOptions = displayOptions;
+		setColorActive( _displayOptions & eDisplayColor );
 	}
 
 	/**
 	 * @brief Construct a FileObject with given informations.
 	 */
-	FileObject( const boost::filesystem::path& directory, const EMaskType& type, const EMaskOptions& options )
+	FileObject( const boost::filesystem::path& directory, const EType& type, const EDisplay& displayOptions )
 	{
-		init( directory, type, options );
+		init( directory, type, displayOptions );
 	}
 
 	FileObject( const FileObject& other )
@@ -47,7 +47,7 @@ public:
 	{
 		_directory = other._directory;
 		_type = other._type;
-		_options = other._options;
+		_displayOptions = other._displayOptions;
 		_kColorStd = other._kColorStd;
 		_kColorFolder = other._kColorFolder;
 		_kColorFile = other._kColorFile;
@@ -93,12 +93,12 @@ public:
 
 	void setDirectoryFromPath( const boost::filesystem::path& p );
 
-	EMaskOptions getMaskOptions() const
+	EDisplay getDisplayOptions() const
 	{
-		return _options;
+		return _displayOptions;
 	}
 
-	EMaskType getMaskType() const
+	EType getType() const
 	{
 		return _type;
 	}
@@ -106,20 +106,20 @@ public:
 	virtual inline void clear()
 	{
 		_directory.clear();
-		_type = eMaskTypeDefault;
-		_options = eMaskOptionsDefault;
+		_type = eTypeUndefined;
+		_displayOptions = eDisplayDefault;
 	}
 	
 	virtual FileObject* clone() const = 0;
 	
 private:
 
-	void init( const boost::filesystem::path& directory, const EMaskType& type, const EMaskOptions& options )
+	void init( const boost::filesystem::path& directory, const EType& type, const EDisplay& displayOptions )
 	{
 		_directory = directory;
 		_type = type;
-		_options = options;
-		setColorActive( _options & eMaskOptionsColor );
+		_displayOptions = displayOptions;
+		setColorActive( _displayOptions & eDisplayColor );
 	}
 
 	void setColorActive( bool activate = false )
@@ -146,26 +146,26 @@ protected:
 
 	inline bool showProperties() const
 	{
-		return _options & eMaskOptionsProperties;
+		return _displayOptions & eDisplayProperties;
 	}
 
 	inline bool showRelativePath() const
 	{
-		return _options & eMaskOptionsPath;
+		return _displayOptions & eDisplayPath;
 	}
 
 	inline bool showAbsolutePath() const
 	{
-		return _options & eMaskOptionsAbsolutePath;
+		return _displayOptions & eDisplayAbsolutePath;
 	}
 
 protected:
 	boost::filesystem::path _directory; ///< directory
-	EMaskType _type; ///< specify type of object
+	EType _type; ///< specify type of object
 	
 	///@todo Remove this from here!
 	///@{
-	EMaskOptions _options; ///< specify output options of object, common for each objects
+	EDisplay _displayOptions; ///< specify output options of object, common for each objects
 	std::string _kColorStd;
 	std::string _kColorFolder;
 	std::string _kColorFile;

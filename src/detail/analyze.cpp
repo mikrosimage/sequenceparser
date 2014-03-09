@@ -265,9 +265,9 @@ bool getVaryingNumber( std::ssize_t& index, const FileNumbers& a, const FileNumb
 	return foundOne; // we found one varying index
 }
 
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EMaskOptions& desc )
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EDisplay displayOptions )
 {
-	Sequence defaultSeq( directory, desc );
+	Sequence defaultSeq( directory, displayOptions );
 	BOOST_ASSERT( numberParts.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( numberParts.front().size() == numberParts.back().size() );
@@ -372,11 +372,11 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 	return result;
 }
 
-std::size_t decomposeFilename( const std::string& filename, FileStrings& stringParts, FileNumbers& numberParts, const EMaskOptions& options )
+std::size_t decomposeFilename( const std::string& filename, FileStrings& stringParts, FileNumbers& numberParts, const EDetection& options )
 {
 	static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
 	std::string regex;
-	if( options & eMaskOptionsNegativeIndexes )
+	if( options & eDetectionNegative )
 	{
 		regex = "[\\+\\-]?+\\d{1," + boost::lexical_cast<std::string>( max ) + "}";
 	}

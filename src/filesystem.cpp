@@ -25,9 +25,11 @@ using detail::FileStrings;
 using detail::SeqIdHash;
 namespace bfs = boost::filesystem;
 
-
 std::vector<Item> browse(
-	const std::string& dir, std::vector<std::string>& filters, const EMaskOptions desc )
+		const std::string& dir,
+		std::vector<std::string>& filters,
+		const EDetection detectOptions,
+		const EDisplay displayOptions )
 {
 	std::vector<Item> output;
 	std::string tmpDir( dir );
@@ -36,7 +38,7 @@ std::vector<Item> browse(
 	if( ! detectDirectoryInResearch( tmpDir, filters, filename ) )
 		return output;
 
-	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, desc );
+	const std::vector<boost::regex> reFilters = convertFilterToRegex( filters, detectOptions );
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
@@ -53,13 +55,13 @@ std::vector<Item> browse(
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( isNotFilter( iter->path(), reFilters, filename, desc ) )
+		if( filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
 		{
 			// it's a file or a file of a sequence
-			if( filenameIsNotFilter( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			if( filenameRespectsFilters( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
 			{
 				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, desc ) )
+				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 				{
 					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
 					if( it != sequences.end() ) // is already in map
@@ -96,7 +98,7 @@ std::vector<Item> browse(
 		}
 		else
 		{
-			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, desc );
+			const std::vector<Sequence> ss = buildSequences( directory, p.first, p.second, displayOptions );
 
 			BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 			{
@@ -113,7 +115,7 @@ std::vector<Item> browse(
 					}
 					else
 					{
-						output.push_back( Item( Sequence( directory, s, desc ), directory.string() ) );
+						output.push_back( Item( Sequence( directory, s, displayOptions ), directory.string() ) );
 					}
 				}
 			}

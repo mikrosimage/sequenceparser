@@ -28,8 +28,7 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequence )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	std::cout << "listSequence.size()" << listSequence.size() << std::endl;
-	BOOST_CHECK( listSequence.size() == 3 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 3 );
 }
 
 BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
@@ -51,14 +50,9 @@ BOOST_AUTO_TEST_CASE( SimpleMultiSequenceMultiLevel )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-//	std::cout << "AA: " << listSequence.size() << std::endl;
-	BOOST_CHECK( listSequence.size() == 2 );
-	
-	std::cout << listSequence.front().getNbFiles() << std::endl;
-	BOOST_CHECK( listSequence.front().getNbFiles() == 3 );
-	
-	std::cout << listSequence.back().getNbFiles() << std::endl;
-	BOOST_CHECK( listSequence.back().getNbFiles() == 4 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 2 );
+	BOOST_CHECK_EQUAL( listSequence.front().getNbFiles(), 3 );
+	BOOST_CHECK_EQUAL( listSequence.back().getNbFiles(), 4 );
 }
 
 BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
@@ -78,8 +72,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 			;
 
 		listSequence = sequenceParser::sequenceFromFilenameList( paths );
-		//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
-		BOOST_CHECK( listSequence.size() == 2 );
+		BOOST_CHECK_EQUAL( listSequence.size(), 2 );
 	}
 	{
 		boost::ptr_vector<sequenceParser::Sequence> listSequence;
@@ -97,8 +90,7 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPadding )
 			;
 
 		listSequence = sequenceParser::sequenceFromFilenameList( paths );
-		std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
-		BOOST_CHECK( listSequence.size() == 3 );
+		BOOST_CHECK_EQUAL( listSequence.size(), 3 );
 	}
 }
 
@@ -121,9 +113,27 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMultiLevelMultiPaddingWithNegValues )
 		( "aaa/bbb/a1b-6c-4.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eMaskOptionsDotFile | sequenceParser::eMaskOptionsNegativeIndexes) );
-	std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
-	BOOST_CHECK( listSequence.size() == 4 );
+	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles) );
+	BOOST_CHECK_EQUAL( listSequence.size(), 4 );
+}
+
+BOOST_AUTO_TEST_CASE( MultiSequenceMinusSeparatorAmbiguityWithNegValues )
+{
+	boost::ptr_vector<sequenceParser::Sequence> listSequence;
+	std::vector<boost::filesystem::path> paths;
+	boost::assign::push_back( paths )
+		( "aaa/bbb/a1b2-1.j2c" )
+		( "aaa/bbb/a1b2-3.j2c" )
+		( "aaa/bbb/a1b2+5.j2c" )
+		( "aaa/bbb/a1b2+10.j2c" )
+		( "aaa/bbb/a1b24.j2c" )
+		;
+
+	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles) );
+	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
+	BOOST_CHECK_EQUAL( listSequence[0].getFirstTime(), -3 );
+	BOOST_CHECK_EQUAL( listSequence[0].getLastTime(), 10 );
+	BOOST_CHECK_EQUAL( listSequence.front().getNbFiles(), 4 );
 }
 
 

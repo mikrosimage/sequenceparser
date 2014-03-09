@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE( Nothing )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	BOOST_CHECK( listSequence.size() == 0 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 0 );
 }
 
 BOOST_AUTO_TEST_CASE( SingleFilename )
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( SingleFilename )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths );
 
-	BOOST_CHECK( listSequence.size() == 0 );
+	BOOST_CHECK_EQUAL( listSequence.size(), 0 );
 }
 
 BOOST_AUTO_TEST_CASE( SingleSequence )
@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 			( "aaa/bbb/a1b3.j2c" )
 			;
 		listSequence2 = sequenceParser::sequenceFromFilenameList( paths );
-		BOOST_CHECK( listSequence2.size() == 1 );
+		BOOST_CHECK_EQUAL( listSequence2.size(), 1 );
 	}
 
-	BOOST_CHECK( listSequence1.front() == listSequence2.front() );
+	BOOST_CHECK_EQUAL( listSequence1.front(), listSequence2.front() );
 
 	boost::ptr_vector<sequenceParser::Sequence> listSequence3;
 	{
@@ -73,10 +73,10 @@ BOOST_AUTO_TEST_CASE( SingleSequence )
 			( "aaa/bbb/a1b3.j2c" )
 			;
 		listSequence3 = sequenceParser::sequenceFromFilenameList( paths );
-		BOOST_CHECK( listSequence2.size() == 1 );
+		BOOST_CHECK_EQUAL( listSequence2.size(), 1 );
 	}
 
-	BOOST_CHECK( listSequence1.front() != listSequence3.front() );
+	BOOST_CHECK_NE( listSequence1.front(), listSequence3.front() );
 }
 
 

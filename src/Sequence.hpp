@@ -42,20 +42,20 @@ public:
 		clear();
 	}
 
-	Sequence( const boost::filesystem::path& directory, const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const EMaskOptions options = eMaskOptionsDefault, const bool strictPadding = false )
-		: FileObject( directory, eMaskTypeSequence, options )
+	Sequence( const boost::filesystem::path& directory, const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const EDisplay displayOptions = eDisplayDefault, const bool strictPadding = false )
+		: FileObject( directory, eTypeSequence, displayOptions )
 	{
 		init( prefix, padding, suffix, firstTime, lastTime, step, strictPadding );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EMaskOptions options = eMaskOptionsDefault, const EPattern accept = ePatternDefault ) :
-	FileObject( directory, eMaskTypeSequence, options )
+	Sequence( const boost::filesystem::path& directory, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
+		: FileObject( directory, eTypeSequence, displayOptions )
 	{
 		init( pattern, firstTime, lastTime, step, accept );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const Time firstTime, const Time lastTime, const Time step, const EMaskOptions options = eMaskOptionsDefault, const EPattern accept = ePatternDefault ) :
-	FileObject( directory, eMaskTypeSequence, options )
+	Sequence( const boost::filesystem::path& directory, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
+		: FileObject( directory, eTypeSequence, displayOptions )
 	{
 		init( firstTime, lastTime, step, accept );
 	}
@@ -63,17 +63,17 @@ public:
 	/**
 	 * @todo check if we put a pattern with full path: /home/foo/images/foo.####.jpg
 	 */
-	Sequence( const boost::filesystem::path& directory, const EMaskOptions options = eMaskOptionsDefault, const EPattern accept = ePatternDefault );
+	Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault );
 
 	Sequence( const Sequence& v )
 	{
 		operator=( v );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const Sequence& v, const EMaskOptions& options )
+	Sequence( const boost::filesystem::path& directory, const Sequence& v, const EDisplay& displayOptions )
 	{
 		operator=( v );
-		_options = options;
+		_displayOptions = displayOptions;
 		setDirectory( directory );
 	}
 
@@ -123,7 +123,7 @@ public:
 	 * @warning No check on your filesystem.
 	 * @warning the directory must be set
 	 */
-	inline bool initFromPattern( const boost::filesystem::path& dir, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EMaskOptions options = eMaskOptionsDefault, const EPattern accept = ePatternDefault );
+	inline bool initFromPattern( const boost::filesystem::path& dir, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
 
 	/**
 	 * @brief Init from directory and pattern.
@@ -230,7 +230,7 @@ public:
 	 */
 	bool isIn( const std::string& filename, Time& time, std::string& timeStr );
 
-	EPattern checkPattern( const std::string& pattern );
+	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
 	bool operator<(const Sequence& other ) const
 	{

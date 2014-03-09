@@ -9,10 +9,10 @@
 
 namespace sequenceParser {
 
-boost::regex convertFilterToRegex( std::string filter, const EMaskOptions desc );
+boost::regex convertFilterToRegex( std::string filter, const EDetection detectOptions );
 
 
-std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EMaskOptions desc );
+std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EDetection detectOptions );
 
 
 /**
@@ -20,14 +20,14 @@ std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& 
  *
  * @param[in] filename filename need to be check if it filtered
  * @param[in] filters vector of filters
- * @param[in] desc enable research options (Cf. EMaskOptions in commonDefinitions.hpp )
+ * @param[in] detectOptions enable research options (Cf. EDetection in commonDefinitions.hpp )
  *
  * @return return true if the filename is filtered by filter(s)
  */
-bool filenameIsNotFilter( const std::string& filename, const std::vector<boost::regex>& filters );
+bool filenameRespectsFilters( const std::string& filename, const std::vector<boost::regex>& filters );
 
 
-bool isNotFilter( const boost::filesystem::path& inputPath, const std::vector<boost::regex>& filters, const std::string& filename, const EMaskOptions desc );
+bool filepathRespectsAllFilters( const boost::filesystem::path& inputPath, const std::vector<boost::regex>& filters, const std::string& filename, const EDetection detectOptions );
 
 }
 

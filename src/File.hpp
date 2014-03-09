@@ -11,9 +11,9 @@ public:
 	File()
 	{}
 	
-	File( const boost::filesystem::path& directory, const std::string& filename, const EMaskOptions& options ) :
-	FileObject( directory, eMaskTypeFile, options ),
-	_filename( filename )
+	File( const boost::filesystem::path& directory, const std::string& filename, const EDisplay& displayOptions )
+	: FileObject( directory, eTypeFile, displayOptions )
+	, _filename( filename )
 	{}
 
 	File( const File& other )
