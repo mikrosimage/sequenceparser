@@ -89,7 +89,8 @@ enum EType
 	eTypeUndefined = 0,
 	eTypeFolder = 1,
 	eTypeFile = 2,
-	eTypeSequence = 4
+	eTypeSequence = 4,
+	eTypeAll = (eTypeFolder | eTypeFile | eTypeSequence)
 };
 
 enum EDetection
