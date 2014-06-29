@@ -53,6 +53,252 @@ static const boost::regex regexPatternFrameNeg( "(.*?" // anything but without p
 												".*?)" // anything
 												);
 
+
+std::ostream& FrameRange::getCout( std::ostream& os ) const
+{
+	os << first;
+	if( step == 0 )
+		return os;
+	os << ":" << last;
+	
+	if( step != 1 )
+		os << "x" << step;
+	return os;
+}
+
+
+std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
+{
+	std::vector<FrameRange> res;
+	if( times.empty() )
+		return res;
+	if( times.size() == 1 )
+	{
+		res.push_back(FrameRange(times.front()));
+		return res;
+	}
+	res.push_back( FrameRange(times[0], times[1], times[1]-times[0]) );
+	if( times.size() == 2 )
+	{
+		return res;
+	}
+	
+	std::vector<Time>::const_iterator itPrev = times.begin();
+	std::vector<Time>::const_iterator itEnd = times.end();
+	std::vector<Time>::const_iterator it = itPrev;
+	++it;
+	
+	itPrev = it;
+	++it;
+	
+	for( ; it != itEnd; itPrev = it, ++it )
+	{
+		Time newStep = *it - *itPrev;
+		FrameRange& prevRange = res.back();
+		if( prevRange.step == newStep )
+		{
+			// same step as previous range, so update it.
+			prevRange.last = *it;
+		}
+		else if( prevRange.step == 0 )
+		{
+			// the previous range only contains one frame (without step)
+			// so update it with the new step
+			prevRange.last = *it;
+			prevRange.step = newStep;
+			
+			// The range has only 2 frames.
+		}
+		else
+		{
+			if( prevRange.getNbFrames() == 2 )
+			{
+				// The previous range has only 2 frames, so it's not really a range...
+				// So steal the frame of the previous range.
+				FrameRange newFrameRange(prevRange.last, *it, newStep);
+				prevRange.last = prevRange.first;
+				prevRange.step = 0;
+				
+				res.push_back( newFrameRange );
+			}
+			else
+			{
+				// The previous range is complete.
+				// Create a new one.
+				res.push_back( FrameRange(*it, *it, 0) );
+			}
+		}
+	}
+	
+	FrameRange& lastRange = res.back();
+	if( lastRange.getNbFrames() == 2 )
+	{
+		// If the last range has only 2 frames, so it's not really a range...
+		// Split in 2 ranges of 1 frame.
+		FrameRange newFrameRange(lastRange.last, lastRange.last, 0);
+		lastRange.last = lastRange.first;
+		lastRange.step = 0;
+		
+		res.push_back( newFrameRange );
+	}
+	return res;
+}
+
+/**
+ * @brief Find the biggest common step from a set of all steps.
+ */
+std::size_t greatestCommonDivisor( const std::set<std::size_t>& steps )
+{
+	if( steps.size() == 1 )
+	{
+		return *steps.begin();
+	}
+	std::set<std::size_t> allSteps;
+	for( std::set<std::size_t>::const_iterator itA = steps.begin(), itB = ++steps.begin(), itEnd = steps.end(); itB != itEnd; ++itA, ++itB )
+	{
+		allSteps.insert( greatestCommonDivisor( *itB, *itA ) );
+	}
+	return greatestCommonDivisor( allSteps );
+}
+
+/**
+ * @brief Extract step from a sorted vector of time values.
+ */
+std::size_t extractStep( const std::vector<Time>& times )
+{
+	if( times.size() <= 1 )
+	{
+		return 1;
+	}
+	std::set<std::size_t> allSteps;
+	for( std::vector<Time>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
+	{
+		allSteps.insert( *itB - *itA );
+	}
+	return greatestCommonDivisor( allSteps );
+}
+
+/**
+ * @brief Extract step from a sorted vector of time values.
+ */
+std::size_t extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
+{
+	if( std::distance( timesBegin, timesEnd ) <= 1 )
+	{
+		return 1;
+	}
+	std::set<std::size_t> allSteps;
+	for( std::vector<detail::FileNumbers>::const_iterator itA = timesBegin, itB = boost::next(timesBegin), itEnd = timesEnd; itB != itEnd; ++itA, ++itB )
+	{
+		allSteps.insert( itB->getTime( i ) - itA->getTime( i ) );
+	}
+	return greatestCommonDivisor( allSteps );
+}
+
+std::size_t getPaddingFromStringNumber( const std::string& timeStr )
+{
+	if( timeStr.size() > 1 )
+	{
+		// if the number is signed, this charater does not count as padding.
+		if( timeStr[0] == '-' || timeStr[0] == '+' )
+		{
+			return timeStr.size() - 1;
+		}
+	}
+	return timeStr.size();
+}
+
+/**
+ * @brief extract the padding from a vector of frame numbers
+ * @param[in] timesStr vector of frame numbers in string format
+ */
+std::size_t extractPadding( const std::vector<std::string>& timesStr )
+{
+	BOOST_ASSERT( timesStr.size() > 0 );
+	const std::size_t padding = getPaddingFromStringNumber( timesStr.front() );
+
+	BOOST_FOREACH( const std::string& s, timesStr )
+	{
+		if( padding != getPaddingFromStringNumber( s ) )
+		{
+			return 0;
+		}
+	}
+	return padding;
+}
+
+std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
+{
+	BOOST_ASSERT( timesBegin != timesEnd );
+
+	std::set<std::size_t> padding;
+	std::set<std::size_t> nbDigits;
+	
+	for( std::vector<detail::FileNumbers>::const_iterator s = timesBegin;
+		 s != timesEnd;
+		 ++s )
+	{
+		padding.insert( s->getPadding(i) );
+		nbDigits.insert( s->getNbDigits(i) );
+	}
+	
+	std::set<std::size_t> pad = padding;
+	pad.erase(0);
+	
+	if( pad.size() == 0 )
+	{
+		return 0;
+	}
+	else if( pad.size() == 1 )
+	{
+		return *pad.begin();
+	}
+	
+	// @todo multi-padding !
+	// need to split into multiple sequences !
+	return 0;
+}
+
+/**
+ * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
+ * @param[in] timesStr vector of frame numbers in string format
+ * @param[in] padding previously detected padding
+ */
+bool extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding )
+{
+	if( padding == 0 )
+	{
+		return false;
+	}
+
+	BOOST_FOREACH( const std::string& s, timesStr )
+	{
+		if( s[0] == '0' )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
+{
+	if( padding == 0 )
+	{
+		return false;
+	}
+
+	BOOST_FOREACH( const detail::FileNumbers& s, times )
+	{
+		if( s.getString( i )[0] == '0' )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
 Sequence::~Sequence()
 {
 }
@@ -60,10 +306,6 @@ Sequence::~Sequence()
 Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept )
 : FileObject( directory, eTypeSequence, displayOptions )
 , _padding(0)
-, _step(1)
-, _firstTime(0)
-, _lastTime(0)
-, _nbFiles(0)
 {
 }
 
@@ -165,22 +407,17 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 	_prefix = prefix;
 	_padding = padding;
 	_suffix = suffix;
-	_firstTime = firstTime;
-	_lastTime = lastTime;
-	_step = step;
+	_ranges.clear();
+	_ranges.push_back(FrameRange(firstTime, lastTime, step));
 	_strictPadding = strictPadding;
-	_nbFiles = 0;
 }
 
 bool Sequence::init( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
 {
 	if( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
 		return false; // not regognize as a pattern, maybe a still file
-	_firstTime = firstTime;
-	_lastTime = lastTime;
-	_step = step;
-	_nbFiles = 0;
-	//std::cout << "init => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+	_ranges.clear();
+	_ranges.push_back(FrameRange(firstTime, lastTime, step));
 	return true;
 }
 
@@ -202,8 +439,8 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 	{
 		// we don't make this check, which can take long time on big sequences (>1000 files)
 		// depending on your filesystem, we may need to do a stat() for each file
-		//      if( bfs::is_directory( iter->status() ) )
-		//          continue; // skip directories
+		// if( bfs::is_directory( iter->status() ) )
+		// continue; // skip directories
 		Time time;
 		std::string timeStr;
 
@@ -219,7 +456,7 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 	{
 		if( allTimes.size() == 1 )
 		{
-			_firstTime = _lastTime = allTimes.front();
+			_ranges.push_back(FrameRange(allTimes.front()));
 		}
 		//std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
 		return true; // an empty sequence
@@ -228,175 +465,8 @@ bool Sequence::initFromDetection( const std::string& pattern, const EPattern acc
 	extractStep( allTimes );
 	extractPadding( allTimesStr );
 	extractIsStrictPadding( allTimesStr, _padding );
-	_firstTime = allTimes.front();
-	_lastTime = allTimes.back();
-	_nbFiles = allTimes.size();
-	//std::cout << _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
+	_ranges = extractFrameRanges( allTimes );
 	return true; // a real file sequence
-}
-
-/**
- * @brief Find the biggest common step from a set of all steps.
- */
-void Sequence::extractStep( const std::set<std::size_t>& steps )
-{
-	if( steps.size() == 1 )
-	{
-		_step = *steps.begin();
-		return;
-	}
-	std::set<std::size_t> allSteps;
-	for( std::set<std::size_t>::const_iterator itA = steps.begin(), itB = ++steps.begin(), itEnd = steps.end(); itB != itEnd; ++itA, ++itB )
-	{
-		allSteps.insert( greatestCommonDivisor( *itB, *itA ) );
-	}
-	extractStep( allSteps );
-}
-
-/**
- * @brief Extract step from a sorted vector of time values.
- */
-void Sequence::extractStep( const std::vector<Time>& times )
-{
-	if( times.size() <= 1 )
-	{
-		_step = 1;
-		return;
-	}
-	std::set<std::size_t> allSteps;
-	for( std::vector<Time>::const_iterator itA = times.begin(), itB = ++times.begin(), itEnd = times.end(); itB != itEnd; ++itA, ++itB )
-	{
-		allSteps.insert( *itB - *itA );
-	}
-	extractStep( allSteps );
-}
-
-/**
- * @brief Extract step from a sorted vector of time values.
- */
-void Sequence::extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
-{
-	if( std::distance( timesBegin, timesEnd ) <= 1 )
-	{
-		_step = 1;
-		return;
-	}
-	std::set<std::size_t> allSteps;
-	for( std::vector<detail::FileNumbers>::const_iterator itA = timesBegin, itB = boost::next(timesBegin), itEnd = timesEnd; itB != itEnd; ++itA, ++itB )
-	{
-		allSteps.insert( itB->getTime( i ) - itA->getTime( i ) );
-	}
-	extractStep( allSteps );
-}
-
-std::size_t Sequence::getPaddingFromStringNumber( const std::string& timeStr )
-{
-	if( timeStr.size() > 1 )
-	{
-		// if the number is signed, this charater does not count as padding.
-		if( timeStr[0] == '-' || timeStr[0] == '+' )
-		{
-			return timeStr.size() - 1;
-		}
-	}
-	return timeStr.size();
-}
-
-/**
- * @brief extract the padding from a vector of frame numbers
- * @param[in] timesStr vector of frame numbers in string format
- */
-void Sequence::extractPadding( const std::vector<std::string>& timesStr )
-{
-	BOOST_ASSERT( timesStr.size() > 0 );
-	const std::size_t padding = getPaddingFromStringNumber( timesStr.front() );
-
-	BOOST_FOREACH( const std::string& s, timesStr )
-	{
-		if( padding != getPaddingFromStringNumber( s ) )
-		{
-			_padding = 0;
-			return;
-		}
-	}
-	_padding = padding;
-}
-
-void Sequence::extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
-{
-	BOOST_ASSERT( timesBegin != timesEnd );
-
-	std::set<std::size_t> padding;
-	std::set<std::size_t> nbDigits;
-	
-	for( std::vector<detail::FileNumbers>::const_iterator s = timesBegin;
-		 s != timesEnd;
-		 ++s )
-	{
-		padding.insert( s->getPadding(i) );
-		nbDigits.insert( s->getNbDigits(i) );
-	}
-	
-	std::set<std::size_t> pad = padding;
-	pad.erase(0);
-	
-	if( pad.size() == 0 )
-	{
-		_padding = 0;
-	}
-	else if( pad.size() == 1 )
-	{
-		_padding = *pad.begin();
-	}
-	else
-	{
-		// @todo multi-padding !
-		// need to split into multiple sequences !
-		_padding = 0;
-	}
-}
-
-/**
- * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
- * @param[in] timesStr vector of frame numbers in string format
- * @param[in] padding previously detected padding
- */
-void Sequence::extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding )
-{
-	if( padding == 0 )
-	{
-		_strictPadding = false;
-		return;
-	}
-
-	BOOST_FOREACH( const std::string& s, timesStr )
-	{
-		if( s[0] == '0' )
-		{
-			_strictPadding = true;
-			return;
-		}
-	}
-	_strictPadding = false;
-}
-
-void Sequence::extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
-{
-	if( padding == 0 )
-	{
-		_strictPadding = false;
-		return;
-	}
-
-	BOOST_FOREACH( const detail::FileNumbers& s, times )
-	{
-		if( s.getString( i )[0] == '0' )
-		{
-			_strictPadding = true;
-			return;
-		}
-	}
-	_strictPadding = false;
 }
 
 std::ostream& Sequence::getCout( std::ostream& os ) const
@@ -423,10 +493,17 @@ std::ostream& Sequence::getCout( std::ostream& os ) const
 		os << std::setw( NAME_WIDTH ) << _kColorSequence + ( dir / getStandardPattern() ).string() + _kColorStd;
 	}
 
-	os << " [" << getFirstTime() << ":" << getLastTime();
-	if( getStep() != 1 )
-		os << "x" << getStep();
-	os << "] " << getNbFiles() << " file" << ( ( getNbFiles() > 1 ) ? "s" : "" );
+	if( ! _ranges.empty() )
+	{
+		os << " [";
+		for(std::size_t i = 0; i < _ranges.size() - 1; ++i)
+		{
+			os << _ranges[i] << ", ";
+		}
+		os << _ranges.back();
+		Time nbFiles = getNbFiles();
+		os << "] " << nbFiles << " file" << ( ( nbFiles > 1 ) ? "s" : "" );
+	}
 	if( hasMissingFile() )
 	{
 		os << ", " << _kColorError << getNbMissingFiles() << " missing file" << ( ( getNbMissingFiles() > 1 ) ? "s" : "" ) << _kColorStd;
@@ -437,11 +514,13 @@ std::ostream& Sequence::getCout( std::ostream& os ) const
 std::vector<boost::filesystem::path> Sequence::getFiles() const
 {
 	std::vector<boost::filesystem::path> allPaths;
-	for( Time t = getFirstTime(); t <= getLastTime(); t += getStep() )
+	BOOST_FOREACH(const FrameRange& range, _ranges)
 	{
-		allPaths.push_back( getAbsoluteFilenameAt( t ) );
+		for( Time t = range.first; t <= range.last; t += range.step )
+			allPaths.push_back( getAbsoluteFilenameAt( t ) );
 	}
 	return allPaths;
 }
+
 
 }

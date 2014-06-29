@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 	BOOST_CHECK_EQUAL( seq.getLastTime(), 3 );
 	BOOST_CHECK_EQUAL( seq.getNbFiles(), 7 );
 	BOOST_CHECK_EQUAL( seq.hasMissingFile(), false );
-	BOOST_CHECK_EQUAL( seq.getStep(), 1 );
+	BOOST_CHECK_EQUAL( seq.getFrameRanges().front().step, 1 );
 }
 
 BOOST_AUTO_TEST_CASE( SignedSequence_plus )
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( SignedSequence_plus )
 	BOOST_CHECK_EQUAL( seq.getLastTime(), 3 );
 	BOOST_CHECK_EQUAL( seq.getNbFiles(), 7 );
 	BOOST_CHECK_EQUAL( seq.hasMissingFile(), false );
-	BOOST_CHECK_EQUAL( seq.getStep(), 1 );
+	BOOST_CHECK_EQUAL( seq.getFrameRanges().front().step, 1 );
 }
 
 // TODO
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE( AmbiguousSignedSequence_plus )
 	BOOST_CHECK_EQUAL( seq.getNbFiles(), 9 );
 	// TODO
 //	BOOST_CHECK_EQUAL( seq.hasMissingFile(), true );
-//	BOOST_CHECK_EQUAL( seq.getStep(), 1 );
+//	BOOST_CHECK_EQUAL( seq.getFrameRanges().front().step, 1 );
 
 	// Bad:
 	// * One hidden file (+2 and 2)

@@ -56,34 +56,30 @@ std::vector<Item> browse(
 		tmpStringParts.clear();
 		tmpNumberParts.clear(); // (clear but don't realloc the vector inside)
 
-		if( filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
+		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
+			continue;
+		
+		// if at least one number detected
+		if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 		{
-			// it's a file or a file of a sequence
-			if( filenameRespectsFilters( iter->path().filename().string(), reFilters ) ) // filtering of entries with filters strings
+			const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
+			if( it != sequences.end() ) // is already in map
 			{
-				// if at least one number detected
-				if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
-				{
-					const SeqIdMap::iterator it( sequences.find( tmpStringParts ) );
-					if( it != sequences.end() ) // is already in map
-					{
-						// append the vector of numbers
-						sequences.at( tmpStringParts ).push_back( tmpNumberParts );
-					}
-					else
-					{
-						// create an entry in the map
-						std::vector<FileNumbers> li;
-						li.push_back( tmpNumberParts );
-						sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
-					}
-				}
-				else
-				{
-					EType type = bfs::is_directory(iter->path()) ? eTypeFolder : eTypeFile;
-					output.push_back( Item( type, iter->path().filename().string(), directory.string() ) );
-				}
+				// append the vector of numbers
+				sequences.at( tmpStringParts ).push_back( tmpNumberParts );
 			}
+			else
+			{
+				// create an entry in the map
+				std::vector<FileNumbers> li;
+				li.push_back( tmpNumberParts );
+				sequences.insert( SeqIdMap::value_type( tmpStringParts, li ) );
+			}
+		}
+		else
+		{
+			EType type = bfs::is_directory(iter->path()) ? eTypeFolder : eTypeFile;
+			output.push_back( Item( type, iter->path().filename().string(), directory.string() ) );
 		}
 	}
 

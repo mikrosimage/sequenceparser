@@ -41,6 +41,7 @@ Sequence privateBuildSequence(
 		const bool strictPadding
 	);
 
+
 void privateBuildSequencesAccordingToPadding(
 	std::vector<Sequence>& result,
 	const Sequence& defaultSeq,

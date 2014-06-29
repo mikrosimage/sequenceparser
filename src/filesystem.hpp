@@ -6,8 +6,11 @@
 #include "File.hpp"
 #include "Folder.hpp"
 
+#include <boost/filesystem/path.hpp>
+
 #include <iostream>
 #include <iomanip>
+
 
 namespace sequenceParser {
 
@@ -33,17 +36,30 @@ public:
 	, _sequence(sequence)
 	{}
 	
+	EType getType() const { return _type; }
+	const std::string& getFolder() const { return _folder; }
+	const std::string& getFilename() const { return _filename; }
+	boost::filesystem::path getAbsPath() const
+	{
+		return boost::filesystem::path(_folder) / _filename;
+	}
+	std::string getAbsPathStr() const { return getAbsPath().string(); }
+	
+	bool operator<( const Item& other ) const
+	{
+		if( _folder == other._folder )
+			return _filename < other._filename;
+		return _folder < other._folder;
+	}
+
+//	ItemStat getStat( bool approximative = True )
+
+private:
 	EType _type;
 	
 	std::string _folder;
 	std::string _filename;
 	Sequence _sequence;
-
-//	std::string& getFilepath();
-//	std::string& getFirstFilepath();
-//	std::string& getFirstFilename();
-//	stat(approximative=True)
-//	operator<(item)
 };
 
 std::vector<Item> browse(

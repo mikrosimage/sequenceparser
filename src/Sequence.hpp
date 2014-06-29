@@ -3,16 +3,21 @@
 
 #include "FileObject.hpp"
 #include "commonDefinitions.hpp"
+#include "FrameRange.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
+
 #include <iomanip>
 #include <set>
+
 
 namespace sequenceParser {
 
 namespace detail {
 class FileNumbers;
 }
+
 
 /**
  * @brief A sequence of numbered files.
@@ -86,10 +91,7 @@ public:
 		_suffix = other._suffix;
 		_strictPadding = other._strictPadding;
 		_padding = other._padding;
-		_step = other._step;
-		_firstTime = other._firstTime;
-		_lastTime = other._lastTime;
-		_nbFiles = other._nbFiles;
+		_ranges = other._ranges;
 		return *this;
 	}
 	
@@ -130,41 +132,6 @@ public:
 	 */
 	inline bool initFromDetection( const EPattern& accept = ePatternDefault );
 
-	/**
-	 * @brief Find the biggest common step from a set of all steps.
-	 */
-	void extractStep( const std::set<std::size_t>& steps );
-
-	/**
-	 * @brief Extract step from a sorted vector of time values.
-	 */
-	void extractStep( const std::vector<Time>& times );
-
-// TODO: move that outside of that class!
-	/**
-	 * @brief Extract step from a sorted vector of time values.
-	 */
-	void extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
-
-	std::size_t getPaddingFromStringNumber( const std::string& timeStr );
-
-	/**
-	 * @brief extract the padding from a vector of frame numbers
-	 * @param[in] timesStr vector of frame numbers in string format
-	 */
-	void extractPadding( const std::vector<std::string>& timesStr );
-
-	void extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
-
-	/**
-	 * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
-	 * @param[in] timesStr vector of frame numbers in string format
-	 * @param[in] padding previously detected padding
-	 */
-	void extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding );
-
-	void extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
-
 public:
 	inline std::string getAbsoluteFilenameAt( const Time time ) const;
 
@@ -190,8 +157,6 @@ public:
 	inline std::string getAbsoluteCStylePattern() const;
 
 	inline std::pair<Time, Time> getRange() const;
-
-	inline std::size_t getStep() const;
 
 	inline Time getFirstTime() const;
 
@@ -236,7 +201,6 @@ public:
 		std::cout << "_prefix: " << _prefix << " -> " << other._prefix << std::endl;
 		std::cout << "_suffix: " << _suffix << " -> " << other._suffix << std::endl;
 		std::cout << "_padding: " << _padding << " -> " << other._padding << std::endl;
-		std::cout << "_step: " << _step << " -> " << other._step << std::endl;
 		std::cout << "_firstTime: " << _firstTime << " -> " << other._firstTime << std::endl;
 		std::cout << "_lastTime: " << _lastTime << " -> " << other._lastTime << std::endl;
 		std::cout << "_nbFiles: " << _nbFiles << " -> " << other._nbFiles << std::endl;
@@ -245,10 +209,7 @@ public:
 			( _prefix == other._prefix ) &&
 			( _suffix == other._suffix ) &&
 			( _padding == other._padding ) &&
-			( _step == other._step ) &&
-			( _firstTime == other._firstTime ) &&
-			( _lastTime == other._lastTime ) &&
-			( _nbFiles == other._nbFiles );
+			( _ranges == other._ranges );
 	}
 
 	bool operator!=(const Sequence& other ) const
@@ -264,11 +225,19 @@ protected:
 	 */
 	bool retrieveInfosFromPattern( const std::string& pattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding ) const;
 
-private:
+public:
 
 	std::ostream& getCout( std::ostream& os ) const;
 
 	std::vector<boost::filesystem::path> getFiles() const;
+	
+	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
+	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
+
+	const FrameRangesView getFramesIterable() const
+	{
+		return FrameRangesView(getFrameRanges());
+	}
 
 protected:
 
@@ -278,10 +247,7 @@ protected:
 		_prefix.clear();
 		_suffix.clear();
 		_padding = 0;
-		_step = 1;
-		_firstTime = 0;
-		_lastTime = 0;
-		_nbFiles = 0;
+		_ranges.clear();
 	}
 
 public:
@@ -289,16 +255,53 @@ public:
 	std::string _suffix; ///< filename suffix
 	bool _strictPadding; ///<
 	std::size_t _padding; ///< padding, no padding if 0, fixed padding otherwise
-	std::size_t _step; ///< step
-	Time _firstTime; ///< begin time
-	Time _lastTime; ///< end time
-	std::size_t _nbFiles; ///< number of frames
+	std::vector<FrameRange> _ranges;
 	static const char _fillCar = '0'; ///< Filling character
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Sequence& sequence)
+{
+	return sequence.getCout(os);
+}
+
+#ifndef SWIG
+
+std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times );
+
+/**
+ * @brief Extract step from a sorted vector of time values.
+ */
+std::size_t extractStep( const std::vector<Time>& times );
+
+/**
+ * @brief Extract step from a sorted vector of time values.
+ */
+std::size_t extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
+
+std::size_t getPaddingFromStringNumber( const std::string& timeStr );
+
+/**
+ * @brief extract the padding from a vector of frame numbers
+ * @param[in] timesStr vector of frame numbers in string format
+ */
+std::size_t extractPadding( const std::vector<std::string>& timesStr );
+
+std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
+
+/**
+ * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
+ * @param[in] timesStr vector of frame numbers in string format
+ * @param[in] padding previously detected padding
+ */
+bool extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding );
+
+bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
+
+#endif
 
 #include <Sequence.tcc>
 
 
 }
 
-#endif // _SEQUENCE_HPP_
+#endif
