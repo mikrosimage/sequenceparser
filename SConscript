@@ -19,3 +19,11 @@ pySequenceParser = project.pySwigBinding(
 			sources=['src/sequenceParser.i'],
 			libraries=[libs.sequenceParser],
 			)
+
+javaSequenceParser = project.javaSwigBinding(
+			'eu.sequence.parser',
+			'sequenceParser',
+			sources=['src/sequenceParser.i'],
+			libraries=[libs.sequenceParser],
+			)
+
