@@ -13,7 +13,7 @@ project.StaticLibrary(
 		shared = True
 	)
 
-envSwig = project.pySwigBinding(
+pySequenceParser = project.pySwigBinding(
 			'pySequenceParser',
 			'sequenceParser',
 			sources=['src/sequenceParser.i'],
