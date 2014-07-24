@@ -17,6 +17,9 @@
 
 #include <set>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 namespace sequenceParser {
 
@@ -24,6 +27,155 @@ using detail::FileNumbers;
 using detail::FileStrings;
 using detail::SeqIdHash;
 namespace bfs = boost::filesystem;
+
+
+std::string Item::getAbsFilepath() const
+{
+	return _path.string();
+}
+
+std::string Item::getFilename() const
+{
+	return _path.filename().string();
+}
+
+std::string Item::getFolder() const
+{
+	return _path.parent_path().string();
+}
+
+std::string Item::getAbsoluteFirstFilename() const
+{
+	if( getType() == eTypeSequence )
+		return getSequence().getAbsoluteFirstFilename();
+	return getAbsFilepath();
+}
+
+std::string Item::getFirstFilename() const
+{
+	if( getType() == eTypeSequence )
+		return getSequence().getFirstFilename();
+	return getFilename();
+}
+
+
+ItemStat::ItemStat( const Item& item, const bool approximative )
+{
+	switch(item.getType())
+	{
+		case eTypeFolder:
+		case eTypeFile:
+		{
+			statFile(item);
+			break;
+		}
+		case eTypeSequence:
+		{
+			statSequence( item, approximative );
+			break;
+		}
+		case eTypeUndefined:
+			BOOST_ASSERT(false);
+	}
+}
+
+void ItemStat::statFile( const Item& item )
+{
+	using namespace boost::filesystem;
+	boost::system::error_code errorCode;
+
+	_fullNbHardLinks = _nbHardLinks = hard_link_count( item.getPath(), errorCode );
+	_size = file_size(item.getPath(), errorCode);
+	_modificationTime = last_write_time(item.getPath(), errorCode);
+
+#ifdef UNIX
+	struct stat statInfos;
+	lstat( item.getAbsFilepath().c_str(), &statInfos );
+	_deviceId = statInfos.st_dev;
+	_inodeId = statInfos.st_ino;
+	_userId = statInfos.st_uid;
+	_groupId = statInfos.st_gid;
+	_accessTime = statInfos.st_atime;
+	_creationTime = statInfos.st_ctime;
+	// size on hard-drive (takes hardlinks into account)
+	_sizeOnDisk = (statInfos.st_blocks / _nbHardLinks) * 512;
+#else
+	_deviceId = 0;
+	_inodeId = 0;
+	_userId = 0;
+	_groupId = 0;
+	_accessTime = 0;
+	_creationTime = 0;
+	_sizeOnDisk = 0;
+#endif
+
+	// size (takes hardlinks into account)
+	_realSize = _size / _nbHardLinks;
+}
+
+void ItemStat::statSequence( const Item& item, const bool approximative )
+{
+	using namespace boost::filesystem;
+	using namespace sequenceParser;
+	boost::system::error_code errorCode;
+
+#ifdef UNIX
+	struct stat statInfos;
+	lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
+	_deviceId = statInfos.st_dev;
+	_inodeId = statInfos.st_ino;
+	_userId = statInfos.st_uid;
+	_groupId = statInfos.st_gid;
+	_accessTime = statInfos.st_atime;
+#else
+	_deviceId = 0;
+	_inodeId = 0;
+	_userId = 0;
+	_groupId = 0;
+	_accessTime = 0;
+#endif
+
+	_modificationTime = 0;
+	_fullNbHardLinks = 0;
+	_size = 0;
+	_realSize = 0;
+	_sizeOnDisk = 0;
+	_creationTime = 0;
+
+	const Sequence& seq = item.getSequence();
+	for( Time t = seq.getFirstTime(); t <= seq.getLastTime(); ++t )
+	{
+		boost::filesystem::path filepath = seq.getAbsoluteFilenameAt(t);
+
+		long long fileNbHardLinks = hard_link_count( filepath, errorCode );
+		long long fileSize = file_size(filepath, errorCode);
+		long long fileModificationTime = last_write_time(filepath, errorCode);
+
+		if( fileModificationTime > _modificationTime )
+			_modificationTime = fileModificationTime;
+
+		_fullNbHardLinks += fileNbHardLinks;
+		_size += fileSize;
+		// realSize takes hardlinks into account
+		long double fileRealSize = fileSize / fileNbHardLinks;
+		_realSize += fileRealSize;
+
+		#ifdef UNIX
+			struct stat statInfos;
+			lstat( filepath.c_str(), &statInfos );
+			if( _creationTime == 0 || _creationTime > statInfos.st_ctime )
+				_creationTime = statInfos.st_ctime;
+			// size on hard-drive (takes hardlinks into account)
+			_sizeOnDisk += (statInfos.st_blocks / fileNbHardLinks) * 512;
+		#else
+			_creationTime = 0;
+			_sizeOnDisk = 0;
+		#endif
+	}
+
+	_nbHardLinks = _fullNbHardLinks / (double)(seq.getLastTime() - seq.getFirstTime() + 1);
+}
+
 
 std::vector<Item> browse(
 		const std::string& dir,

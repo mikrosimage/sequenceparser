@@ -20,31 +20,67 @@ public:
 	
 	Item( const EType type, const std::string& filename, const std::string& folder )
 	: _type(type)
-	, _folder(folder)
-	, _filename(filename)
+	, _path(folder)
 	{
+		_path /= filename;
 		assert( type != eTypeSequence );
 	}
 	
 	Item( const Sequence& sequence, const std::string& folder )
 	: _type(eTypeSequence)
-	, _folder(folder)
-	, _filename(sequence.getStandardPattern())
+	, _path(folder)
 	, _sequence(sequence)
-	{}
-	
+	{
+		_path /= sequence.getStandardPattern();
+	}
+
+	EType getType() const { return _type; }
+
+	std::string getAbsFilepath() const;
+	std::string getFilename() const;
+	std::string getFolder() const;
+
+	const Sequence& getSequence() const { return _sequence; }
+
+	const boost::filesystem::path& getPath() const { return _path; }
+
+	std::string getAbsoluteFirstFilename() const;
+	std::string getFirstFilename() const;
+
+private:
 	EType _type;
 	
-	std::string _folder;
-	std::string _filename;
-	Sequence _sequence;
+	boost::filesystem::path _path;
 
-//	std::string& getFilepath();
-//	std::string& getFirstFilepath();
-//	std::string& getFirstFilename();
-//	stat(approximative=True)
-//	operator<(item)
+	Sequence _sequence;
 };
+
+
+class ItemStat
+{
+public:
+	ItemStat( const Item& item, const bool approximative=true );
+
+private:
+	void statFile( const Item& item );
+	void statSequence( const Item& item, const bool approximative );
+
+public:
+	long long _deviceId;
+	unsigned int _inodeId;
+	double _nbHardLinks;
+	long long _fullNbHardLinks;
+	long long _userId;
+	long long _groupId;
+	long long _size;
+	long long _realSize; /// size (takes hardlinks into account)
+	long long _sizeOnDisk; /// size on hard-drive (takes hardlinks into account)
+	long long _accessTime;
+	long long _modificationTime;
+	long long _creationTime;
+};
+
+
 
 std::vector<Item> browse(
 		const std::string& directory,
