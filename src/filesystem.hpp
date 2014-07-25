@@ -6,8 +6,11 @@
 #include "File.hpp"
 #include "Folder.hpp"
 
+#include <boost/filesystem/path.hpp>
+
 #include <iostream>
 #include <iomanip>
+
 
 namespace sequenceParser {
 
@@ -46,6 +49,13 @@ public:
 
 	std::string getAbsoluteFirstFilename() const;
 	std::string getFirstFilename() const;
+	
+	bool operator<( const Item& other ) const
+	{
+		if( _folder == other._folder )
+			return _filename < other._filename;
+		return _folder < other._folder;
+	}
 
 private:
 	EType _type;

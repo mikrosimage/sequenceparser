@@ -59,6 +59,7 @@ bool detectDirectoryInResearch( std::string& researchPath, std::vector<std::stri
 	return true;
 }
 
+
 Sequence privateBuildSequence(
 		const Sequence& defaultSeq,
 		const FileStrings& stringParts,
@@ -90,11 +91,14 @@ Sequence privateBuildSequence(
 	--numberPartsLast;
 
 	// standard case, one sequence detected
-	sequence._firstTime = numberPartsBegin->getTime( index );
-	sequence._lastTime = numberPartsLast->getTime( index );
-	sequence._nbFiles = std::distance( numberPartsBegin, numberPartsEnd );
+	std::vector<Time> times;
+	times.reserve(std::distance( numberPartsBegin, numberPartsEnd ));
+	for( std::vector<FileNumbers>::const_iterator it = numberPartsBegin; it != numberPartsEnd; ++it )
+	{
+		times.push_back(it->getTime(index));
+	}
+	sequence._ranges = extractFrameRanges(times);
 
-	sequence.extractStep( numberPartsBegin, numberPartsEnd, index );
 	//sequence.extractPadding( numberPartsBegin, numberPartsEnd, index );
 	sequence._padding = padding;
 	sequence._strictPadding = strictPadding;
@@ -204,18 +208,18 @@ void privateBuildSequencesAccordingToPadding(
 		// sort by padding
 		std::sort( numberPartsBegin, numberPartsEnd, FileNumbers::SortByPadding() );
 		// split when the padding changed
-		std::vector<FileNumbers>::const_iterator start = numberPartsBegin;
-		for( std::vector<FileNumbers>::const_iterator it = boost::next(start); it != numberPartsEnd; ++it )
+		std::vector<FileNumbers>::const_iterator first = numberPartsBegin;
+		for( std::vector<FileNumbers>::const_iterator it = boost::next(first); it != numberPartsEnd; ++it )
 		{
-			if( start->getPadding(index) != it->getPadding(index) )
+			if( first->getPadding(index) != it->getPadding(index) )
 			{
-				const std::size_t p = start->getPadding(index);
-				result.push_back( privateBuildSequence( defaultSeq, stringParts, start, it, index, p, (p!=0) ) );
-				start = it;
+				const std::size_t p = first->getPadding(index);
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, p, (p!=0) ) );
+				first = it;
 			}
 		}
-		const std::size_t p = start->getPadding(index);
-		result.push_back( privateBuildSequence( defaultSeq, stringParts, start, numberPartsEnd, index, p, (p!=0) ) );
+		const std::size_t p = first->getPadding(index);
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, p, (p!=0) ) );
 		return;
 	}
 	else
@@ -224,20 +228,20 @@ void privateBuildSequencesAccordingToPadding(
 		// sort by digits
 		std::sort( numberPartsBegin, numberPartsEnd, FileNumbers::SortByDigit() );
 		// split when the number of digits changed
-		std::vector<FileNumbers>::const_iterator start = numberPartsBegin;
+		std::vector<FileNumbers>::const_iterator first = numberPartsBegin;
 		for( std::vector<FileNumbers>::const_iterator it = boost::next(numberPartsBegin); it != numberPartsEnd; ++it )
 		{
-			if( start->getNbDigits(index) != it->getNbDigits(index) )
+			if( first->getNbDigits(index) != it->getNbDigits(index) )
 			{
 				const std::size_t p = boost::prior(it)->getPadding(index);
-				const std::size_t pStart = start->getPadding(index);
-				result.push_back( privateBuildSequence( defaultSeq, stringParts, start, it, index, pStart, (p!=pStart) ) );
-				start = it;
+				const std::size_t pStart = first->getPadding(index);
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, pStart, (p!=pStart) ) );
+				first = it;
 			}
 		}
 		const std::size_t p = boost::prior(numberPartsEnd)->getPadding(index);
-		const std::size_t pStart = start->getPadding(index);
-		result.push_back( privateBuildSequence( defaultSeq, stringParts, start, numberPartsEnd, index, pStart, (p!=pStart) ) );
+		const std::size_t pStart = first->getPadding(index);
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, pStart, (p!=pStart) ) );
 		return;
 	}
 }
@@ -323,8 +327,8 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 	
 	std::sort( numberParts.begin(), numberParts.end(), FileNumbers::SortByPadding() );
 
-	std::vector<FileNumbers>::iterator start = numberParts.begin();
-	std::vector<FileNumbers>::iterator it = boost::next(start);
+	std::vector<FileNumbers>::iterator first = numberParts.begin();
+	std::vector<FileNumbers>::iterator it = boost::next(first);
 	std::vector<FileNumbers>::iterator itEnd = numberParts.end();
 	std::ssize_t previousIndex = -1;
 	std::ssize_t index = -1;
@@ -333,9 +337,9 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 	for( ; it != itEnd; ++it )
 	{
 		//std::cout << "________________________________________" <<  std::endl;
-		//std::cout << "start: " << *start <<  std::endl;
+		//std::cout << "first: " << *first <<  std::endl;
 		//std::cout << "it: " << *it <<  std::endl;
-		if( getVaryingNumber( index, *start, *it ) )
+		if( getVaryingNumber( index, *first, *it ) )
 		{
 			if( previousIndex != -1 && // we previously have a sequence and
 			    index != previousIndex ) // the index is not the same than previous: split!
@@ -355,20 +359,20 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 			// if no sequence before... the file is alone...
 			// Set the number as the last number.
 			if( previousIndex == -1 )
-				previousIndex = start->size() - 1;
+				previousIndex = first->size() - 1;
 		}
 		if( split )
 		{
-			privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, start, it, previousIndex );
+			privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, first, it, previousIndex );
 			split = false;
 			index = -1;
-			start = it;
+			first = it;
 		}
 		previousIndex = index;
 	}
 	if( previousIndex == -1 )
-		previousIndex = start->size() - 1;
-	privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, start, it, previousIndex );
+		previousIndex = first->size() - 1;
+	privateBuildSequencesAccordingToPadding( result, defaultSeq, stringParts, first, it, previousIndex );
 	
 	return result;
 }

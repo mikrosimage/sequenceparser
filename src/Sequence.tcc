@@ -85,19 +85,14 @@ inline std::pair<Time, Time> Sequence::getRange() const
 	return std::pair<Time, Time > ( getFirstTime(), getLastTime() );
 }
 
-inline std::size_t Sequence::getStep() const
-{
-	return _step;
-}
-
 inline Time Sequence::getFirstTime() const
 {
-	return _firstTime;
+	return _ranges.front().first;
 }
 
 inline Time Sequence::getLastTime() const
 {
-	return _lastTime;
+	return _ranges.back().last;
 }
 
 inline std::size_t Sequence::getDuration() const
@@ -107,7 +102,12 @@ inline std::size_t Sequence::getDuration() const
 
 inline Time Sequence::getNbFiles() const
 {
-	return _nbFiles;
+	Time nbFiles = 0;
+	BOOST_FOREACH(const FrameRange& frameRange, _ranges)
+	{
+		nbFiles += frameRange.getNbFrames();
+	}
+	return nbFiles;
 }
 
 inline std::size_t Sequence::getPadding() const
@@ -122,14 +122,12 @@ inline bool Sequence::isStrictPadding() const
 
 inline bool Sequence::hasMissingFile() const
 {
-	return getNbMissingFiles() != 0;
+	return _ranges.size() != 1 || _ranges.front().step != 1;
 }
 
 inline std::size_t Sequence::getNbMissingFiles() const
 {
-	if( !getStep() )
-		return 0;
-	return (( ( getLastTime() - getFirstTime() ) / getStep() ) + 1 ) -getNbFiles();
+	return (( getLastTime() - getFirstTime() ) + 1 ) - getNbFiles();
 }
 
 /// @brief filename without frame number

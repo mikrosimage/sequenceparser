@@ -131,8 +131,9 @@ BOOST_AUTO_TEST_CASE( MultiSequenceMinusSeparatorAmbiguityWithNegValues )
 
 	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles) );
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
-	BOOST_CHECK_EQUAL( listSequence[0].getFirstTime(), -3 );
-	BOOST_CHECK_EQUAL( listSequence[0].getLastTime(), 10 );
+	BOOST_CHECK_EQUAL( listSequence.front().getFirstTime(), -3 );
+	BOOST_CHECK_EQUAL( listSequence.front().getLastTime(), 10 );
+	BOOST_CHECK_EQUAL( listSequence.front().getFrameRanges().size(), 4 );
 	BOOST_CHECK_EQUAL( listSequence.front().getNbFiles(), 4 );
 }
 

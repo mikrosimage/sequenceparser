@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 	BOOST_CHECK_EQUAL( seq.getLastTime(), 123456 );
 	BOOST_CHECK_EQUAL( seq.getNbFiles(), 5 );
 	BOOST_CHECK_EQUAL( seq.hasMissingFile(), true );
-	BOOST_CHECK_EQUAL( seq.getStep(), 1 );
+	BOOST_CHECK_EQUAL( seq.getFrameRanges().size(), 5 );
+	BOOST_CHECK_EQUAL( seq.getFrameRanges().front().step, 0 );
 }
 
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
