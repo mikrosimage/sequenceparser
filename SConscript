@@ -27,3 +27,9 @@ javaSequenceParser = project.javaSwigBinding(
 			libraries=[libs.sequenceParser],
 			)
 
+SConscript([
+	'pyTest/SConscript',
+	'test/filesDetection/SConscript',
+	'test/stringSequenceDetection/SConscript',
+	])
+

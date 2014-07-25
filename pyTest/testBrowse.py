@@ -9,7 +9,6 @@ from nose.tools import *
 
 root_path = ''
 
-print("init test !!")
 
 def setUp():
 	global root_path
@@ -60,12 +59,12 @@ def testBrowse():
 	print("items:", items)
 	for item in items:
 		print("item:", item)
-		print("item:", item._folder)
-		print("item:", item._filename)
-		print("item:", item._type)
-		if item._type == sequenceParser.eTypeSequence:
-			print("item seq:", item._sequence.getAbsoluteFirstFilename())
-			print("item seq:", item._sequence.getFirstTime(), item._sequence.getLastTime(), item._sequence.getDuration(), item._sequence.getStandardPattern())
+		print("item:", item.getFolder())
+		print("item:", item.getFilename())
+		print("item:", item.getType())
+		if item.getType() == sequenceParser.eTypeSequence:
+			print("item seq:", item.getSequence().getAbsoluteFirstFilename())
+			print("item seq:", item.getSequence().getFirstTime(), item.getSequence().getLastTime(), item.getSequence().getDuration(), item.getSequence().getStandardPattern())
 
 
 
