@@ -52,9 +52,7 @@ public:
 	
 	bool operator<( const Item& other ) const
 	{
-		if( _folder == other._folder )
-			return _filename < other._filename;
-		return _folder < other._folder;
+		return _path < other._path;
 	}
 
 private:
