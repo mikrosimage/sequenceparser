@@ -197,14 +197,6 @@ public:
 
 	bool operator==(const Sequence& other ) const
 	{
-		/*
-		std::cout << "_prefix: " << _prefix << " -> " << other._prefix << std::endl;
-		std::cout << "_suffix: " << _suffix << " -> " << other._suffix << std::endl;
-		std::cout << "_padding: " << _padding << " -> " << other._padding << std::endl;
-		std::cout << "_firstTime: " << _firstTime << " -> " << other._firstTime << std::endl;
-		std::cout << "_lastTime: " << _lastTime << " -> " << other._lastTime << std::endl;
-		std::cout << "_nbFiles: " << _nbFiles << " -> " << other._nbFiles << std::endl;
-		*/
 		return
 			( _prefix == other._prefix ) &&
 			( _suffix == other._suffix ) &&
@@ -246,6 +238,7 @@ protected:
 		FileObject::clear();
 		_prefix.clear();
 		_suffix.clear();
+		_strictPadding = false;
 		_padding = 0;
 		_ranges.clear();
 	}

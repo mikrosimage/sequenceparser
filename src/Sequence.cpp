@@ -306,6 +306,7 @@ Sequence::~Sequence()
 Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept )
 : FileObject( directory, eTypeSequence, displayOptions )
 , _padding(0)
+, _strictPadding(false)
 {
 }
 
