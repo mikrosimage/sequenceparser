@@ -230,6 +230,10 @@ public:
 	{
 		return FrameRangesView(getFrameRanges());
 	}
+	const FrameRangesSubView getFramesIterable( const Time first, const Time last ) const
+	{
+		return FrameRangesSubView( getFrameRanges(), first, last );
+	}
 
 protected:
 

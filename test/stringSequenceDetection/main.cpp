@@ -85,26 +85,27 @@ BOOST_AUTO_TEST_CASE( SingleSequence_multiRange )
 {
 	boost::ptr_vector<sequenceParser::Sequence> listSequence1;
 
-	{
-		std::vector<boost::filesystem::path> paths;
-		boost::assign::push_back( paths )
-			( "aaa/bbb/a1b2.j2c" )
-			( "aaa/bbb/a1b3.j2c" )
-			( "aaa/bbb/a1b4.j2c" )
-			( "aaa/bbb/a1b14.j2c" )
-			( "aaa/bbb/a1b15.j2c" )
-			( "aaa/bbb/a1b16.j2c" )
-			( "aaa/bbb/a1b20.j2c" )
-			( "aaa/bbb/a1b22.j2c" )
-			( "aaa/bbb/a1b24.j2c" )
-			;
+	std::vector<boost::filesystem::path> paths;
+	boost::assign::push_back( paths )
+		( "aaa/bbb/a1b2.j2c" )
+		( "aaa/bbb/a1b3.j2c" )
+		( "aaa/bbb/a1b4.j2c" )
+		( "aaa/bbb/a1b14.j2c" )
+		( "aaa/bbb/a1b15.j2c" )
+		( "aaa/bbb/a1b16.j2c" )
+		( "aaa/bbb/a1b20.j2c" )
+		( "aaa/bbb/a1b22.j2c" )
+		( "aaa/bbb/a1b24.j2c" )
+		;
 
-		listSequence1 = sequenceParser::sequenceFromFilenameList( paths );
+	listSequence1 = sequenceParser::sequenceFromFilenameList( paths );
+	
+	BOOST_CHECK_EQUAL( listSequence1.size(), 1 );
+	BOOST_CHECK_EQUAL( listSequence1.front().getFrameRanges().size(), 3 );
 		
-		BOOST_CHECK_EQUAL( listSequence1.front().getFrameRanges().size(), 3 );
-		
-		std::cout << "Iterate" << std::endl;
-		using namespace boost::assign;
+	std::cout << "Iterate" << std::endl;
+	using namespace boost::assign;
+	{
 		std::vector<sequenceParser::Time> times;
 		times += 2, 3, 4, 14, 15, 16, 20, 22, 24;
 
@@ -119,6 +120,18 @@ BOOST_AUTO_TEST_CASE( SingleSequence_multiRange )
 		{
 			BOOST_CHECK_EQUAL( t, *rit++ );
 		}
+	}
+	{
+                std::vector<sequenceParser::Time> subtimes;
+		subtimes += 14, 15, 16;
+
+		std::vector<sequenceParser::Time>::const_iterator sit = subtimes.begin();
+		BOOST_FOREACH(sequenceParser::Time t, listSequence1.front().getFramesIterable(6, 17))
+		{
+			std::cout << "t: " << t << std::endl;
+			BOOST_CHECK_EQUAL( t, *sit++ );
+		}
+		BOOST_CHECK( sit == subtimes.end() );
 	}
 }
 
