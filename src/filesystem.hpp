@@ -21,15 +21,14 @@ public:
 	: _type(eTypeFile)
 	{}
 	
-	Item( const EType type, const std::string& filename, const std::string& folder )
+	Item( const EType type, const boost::filesystem::path& filepath )
 	: _type(type)
-	, _path(folder)
+	, _path(filepath)
 	{
-		_path /= filename;
-		assert( type != eTypeSequence );
+		BOOST_ASSERT( type != eTypeSequence );
 	}
 	
-	Item( const Sequence& sequence, const std::string& folder )
+	Item( const Sequence& sequence, const boost::filesystem::path& folder )
 	: _type(eTypeSequence)
 	, _path(folder)
 	, _sequence(sequence)
@@ -70,6 +69,7 @@ public:
 	ItemStat( const Item& item, const bool approximative=true );
 
 private:
+	void statFolder( const Item& item );
 	void statFile( const Item& item );
 	void statSequence( const Item& item, const bool approximative );
 
@@ -89,20 +89,55 @@ public:
 };
 
 
-
+#ifndef SWIG
 std::vector<Item> browse(
-		const std::string& directory,
+		const boost::filesystem::path& directory,
 		const std::vector<std::string>& filters,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault );
+
+inline std::vector<Item> browse(
+		const boost::filesystem::path& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault )
+{
+	std::vector<std::string> filters;
+	return browse( directory, filters, detectOptions, displayOptions );
+}
+#endif
+
+inline std::vector<Item> browse(
+		const std::string& directory,
+		const std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault )
+{
+	return browse( boost::filesystem::path(directory), filters, detectOptions, displayOptions );
+}
 
 inline std::vector<Item> browse(
 		const std::string& directory,
 		const EDetection detectOptions = eDetectionDefault,
 		const EDisplay displayOptions = eDisplayDefault )
 {
-	std::vector<std::string> filters;
-	return browse( directory, filters, detectOptions, displayOptions );
+	return browse( boost::filesystem::path(directory), detectOptions, displayOptions );
+}
+
+inline std::vector<Item> browse(
+		const Item& directory,
+		const std::vector<std::string>& filters,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault )
+{
+	return browse( directory.getPath(), filters, detectOptions, displayOptions );
+}
+
+inline std::vector<Item> browse(
+		const Item& directory,
+		const EDetection detectOptions = eDetectionDefault,
+		const EDisplay displayOptions = eDisplayDefault )
+{
+	return browse( directory.getPath(), detectOptions, displayOptions );
 }
 
 ////#ifndef SWIG

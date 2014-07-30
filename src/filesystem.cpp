@@ -64,6 +64,10 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 	switch(item.getType())
 	{
 		case eTypeFolder:
+		{
+			statFolder(item);
+			break;
+		}
 		case eTypeFile:
 		{
 			statFile(item);
@@ -77,6 +81,41 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 		case eTypeUndefined:
 			BOOST_ASSERT(false);
 	}
+}
+
+void ItemStat::statFolder( const Item& item )
+{
+	using namespace boost::filesystem;
+	boost::system::error_code errorCode;
+
+	_fullNbHardLinks = _nbHardLinks = hard_link_count( item.getPath(), errorCode );
+	_modificationTime = last_write_time(item.getPath(), errorCode);
+
+#ifdef UNIX
+	struct stat statInfos;
+	lstat( item.getAbsFilepath().c_str(), &statInfos );
+	_deviceId = statInfos.st_dev;
+	_inodeId = statInfos.st_ino;
+	_userId = statInfos.st_uid;
+	_groupId = statInfos.st_gid;
+	_accessTime = statInfos.st_atime;
+	_creationTime = statInfos.st_ctime;
+	_size = statInfos.st_size;
+	// size on hard-drive (takes hardlinks into account)
+	_sizeOnDisk = statInfos.st_blocks * 512;
+#else
+	_deviceId = 0;
+	_inodeId = 0;
+	_userId = 0;
+	_groupId = 0;
+	_accessTime = 0;
+	_creationTime = 0;
+	_sizeOnDisk = 0;
+	_size = 0;
+#endif
+
+	// size (takes hardlinks into account)
+	_realSize = _size;
 }
 
 void ItemStat::statFile( const Item& item )
@@ -143,7 +182,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	_creationTime = 0;
 
 	const Sequence& seq = item.getSequence();
-	for( Time t = seq.getFirstTime(); t <= seq.getLastTime(); ++t )
+	BOOST_FOREACH( Time t, seq.getFramesIterable() )
 	{
 		boost::filesystem::path filepath = seq.getAbsoluteFilenameAt(t);
 
@@ -178,13 +217,13 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 
 
 std::vector<Item> browse(
-		const std::string& dir,
+		const boost::filesystem::path& dir,
 		const std::vector<std::string>& filters,
 		const EDetection detectOptions,
 		const EDisplay displayOptions )
 {
 	std::vector<Item> output;
-	std::string tmpDir( dir );
+	std::string tmpDir( dir.string() );
 	std::vector<std::string> tmpFilters( filters );
 	std::string filename;
 
@@ -195,7 +234,7 @@ std::vector<Item> browse(
 
 	// variables for sequence detection
 	typedef boost::unordered_map<FileStrings, std::vector<FileNumbers>, SeqIdHash> SeqIdMap;
-	bfs::path directory( tmpDir );
+	bfs::path directory( dir );
 	SeqIdMap sequences;
 	FileStrings tmpStringParts; // an object uniquely identify a sequence
 	FileNumbers tmpNumberParts; // the vector of numbers inside one filename
@@ -231,7 +270,7 @@ std::vector<Item> browse(
 		else
 		{
 			EType type = bfs::is_directory(iter->path()) ? eTypeFolder : eTypeFile;
-			output.push_back( Item( type, iter->path().filename().string(), directory.string() ) );
+			output.push_back( Item( type, iter->path() ) );
 		}
 	}
 
@@ -242,21 +281,24 @@ std::vector<Item> browse(
 
 		BOOST_FOREACH( const std::vector<Sequence>::value_type & s, ss )
 		{
-			// don't detect sequence of directories
 			if( bfs::is_directory( s.getAbsoluteFirstFilename() ) )
 			{
-				// TODO: declare folders individually
+				// It's a sequence of directories, so it's not a sequence.
+				BOOST_FOREACH( Time t, s.getFramesIterable() )
+				{
+					output.push_back( Item( eTypeFolder, s.getAbsoluteFilenameAt(t) ) );
+				}
 			}
 			else
 			{
 				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
 				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 				{
-					output.push_back( Item( eTypeFile, s.getFirstFilename(), directory.string() ) );
+					output.push_back( Item( eTypeFile, directory / s.getFirstFilename() ) );
 				}
 				else
 				{
-					output.push_back( Item( Sequence( directory, s, displayOptions ), directory.string() ) );
+					output.push_back( Item( Sequence( directory, s, displayOptions ), directory ) );
 				}
 			}
 		}
