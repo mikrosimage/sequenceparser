@@ -90,7 +90,8 @@ enum EType
 	eTypeFolder = 1,
 	eTypeFile = 2,
 	eTypeSequence = 4,
-	eTypeAll = (eTypeFolder | eTypeFile | eTypeSequence)
+	eTypeLink = 8,
+	eTypeAll = (eTypeFolder | eTypeFile | eTypeSequence | eTypeLink)
 };
 
 enum EDetection

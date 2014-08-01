@@ -270,6 +270,16 @@ std::vector<Item> browse(
 		else
 		{
 			EType type = bfs::is_directory(iter->path()) ? eTypeFolder : eTypeFile;
+			if (bfs::is_directory(iter->path()))
+			{
+				type = eTypeFolder;
+			} else if (bfs::is_symlink(iter->path())) {
+				type = eTypeLink;
+			} else if (bfs::is_regular_file(iter->path())){
+				type = eTypeFile;
+			} else {
+				type = eTypeUndefined;
+			}
 			output.push_back( Item( type, iter->path() ) );
 		}
 	}
