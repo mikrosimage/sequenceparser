@@ -54,6 +54,8 @@ public:
 		return _path < other._path;
 	}
 
+	static EType getTypeByPath( const boost::filesystem::path& path );
+
 private:
 	EType _type;
 	
@@ -67,11 +69,16 @@ class ItemStat
 {
 public:
 	ItemStat( const Item& item, const bool approximative=true );
+	ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative=true );
 
 private:
+	void statFolder( const boost::filesystem::path& path );
 	void statFolder( const Item& item );
+	void statFile( const boost::filesystem::path& path );
 	void statFile( const Item& item );
 	void statSequence( const Item& item, const bool approximative );
+	void statLink( const boost::filesystem::path& path );
+	void statLink( const Item& item );
 
 public:
 	long long _deviceId;

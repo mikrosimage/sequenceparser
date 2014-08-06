@@ -58,6 +58,48 @@ std::string Item::getFirstFilename() const
 	return getFilename();
 }
 
+EType Item::getTypeByPath( const boost::filesystem::path& path )
+{
+	if( bfs::is_symlink( path ) )
+        {
+                return eTypeLink;
+        }
+        if( bfs::is_regular_file( path ) )
+	{
+                return eTypeFile;
+        }
+	if( bfs::is_directory( path ) )
+        {
+                return eTypeFolder;
+        }
+        return eTypeUndefined;
+}
+
+ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative )
+{
+        switch(type)
+        {
+                case eTypeFolder:
+                {
+                        statFolder(path);
+                        break;
+                }
+                case eTypeFile:
+                {
+                        statFile(path);
+                        break;
+                }
+                case eTypeLink:
+                {
+                        statLink(path);
+                        break;
+                }
+                case eTypeUndefined:
+		case eTypeSequence:
+                        BOOST_ASSERT(false);
+        }
+
+}
 
 ItemStat::ItemStat( const Item& item, const bool approximative )
 {
@@ -73,6 +115,11 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 			statFile(item);
 			break;
 		}
+		case eTypeLink:
+		{
+			statLink(item);
+			break;
+		}
 		case eTypeSequence:
 		{
 			statSequence( item, approximative );
@@ -83,17 +130,60 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 	}
 }
 
+void ItemStat::statLink( const Item& item )
+{
+	statLink( item.getPath() );
+}
+
+void ItemStat::statLink( const boost::filesystem::path& path )
+{
+	using namespace boost::filesystem;
+        boost::system::error_code errorCode;
+        _modificationTime = last_write_time(path, errorCode);
+
+#ifdef UNIX
+	struct stat statInfos;
+	lstat(path.c_str(), &statInfos);
+	_fullNbHardLinks = _nbHardLinks = statInfos.st_nlink;
+	_deviceId = statInfos.st_dev;
+        _inodeId = statInfos.st_ino;
+        _userId = statInfos.st_uid;
+        _groupId = statInfos.st_gid;
+        _accessTime = statInfos.st_atime;
+        _creationTime = statInfos.st_ctime;
+        _size = statInfos.st_size;
+        // size on hard-drive (takes hardlinks into account)
+        _sizeOnDisk = (statInfos.st_blocks / _nbHardLinks) * 512;
+#else
+	_fullNbHardLinks = _nbHardLinks = 1;
+        _deviceId = 0;
+        _inodeId = 0;
+        _userId = 0;
+        _groupId = 0;
+        _accessTime1 = 0;
+        _creationTime = 0;
+        _sizeOnDisk = 0;
+        _size = 0;
+#endif
+	_realSize = _size / _nbHardLinks;
+}
+
 void ItemStat::statFolder( const Item& item )
+{
+	statFolder( item.getPath() );
+}
+
+void ItemStat::statFolder( const boost::filesystem::path& path )
 {
 	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
 
-	_fullNbHardLinks = _nbHardLinks = hard_link_count( item.getPath(), errorCode );
-	_modificationTime = last_write_time(item.getPath(), errorCode);
+	_fullNbHardLinks = _nbHardLinks = hard_link_count( path, errorCode );
+	_modificationTime = last_write_time( path, errorCode );
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat( item.getAbsFilepath().c_str(), &statInfos );
+	lstat( path.c_str(), &statInfos );
 	_deviceId = statInfos.st_dev;
 	_inodeId = statInfos.st_ino;
 	_userId = statInfos.st_uid;
@@ -108,7 +198,7 @@ void ItemStat::statFolder( const Item& item )
 	_inodeId = 0;
 	_userId = 0;
 	_groupId = 0;
-	_accessTime = 0;
+	_accessTime1 = 0;
 	_creationTime = 0;
 	_sizeOnDisk = 0;
 	_size = 0;
@@ -120,16 +210,20 @@ void ItemStat::statFolder( const Item& item )
 
 void ItemStat::statFile( const Item& item )
 {
+	statFile( item.getPath() );
+}
+
+void ItemStat::statFile( const boost::filesystem::path& path )
+{
 	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
-
-	_fullNbHardLinks = _nbHardLinks = hard_link_count( item.getPath(), errorCode );
-	_size = file_size(item.getPath(), errorCode);
-	_modificationTime = last_write_time(item.getPath(), errorCode);
+	_fullNbHardLinks = _nbHardLinks = hard_link_count( path, errorCode );
+	_size = file_size( path, errorCode );
+	_modificationTime = last_write_time( path, errorCode );
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat( item.getAbsFilepath().c_str(), &statInfos );
+	lstat( path.c_str(), &statInfos );
 	_deviceId = statInfos.st_dev;
 	_inodeId = statInfos.st_ino;
 	_userId = statInfos.st_uid;
@@ -186,9 +280,18 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	{
 		boost::filesystem::path filepath = seq.getAbsoluteFilenameAt(t);
 
-		long long fileNbHardLinks = hard_link_count( filepath, errorCode );
-		long long fileSize = file_size(filepath, errorCode);
-		long long fileModificationTime = last_write_time(filepath, errorCode);
+		EType type = Item::getTypeByPath(filepath);
+
+		ItemStat itemStat(type, filepath);
+		
+//                long long fileNbHardLinks = hard_link_count( filepath, errorCode );
+//                long long fileSize = file_size(filepath, errorCode);
+//                long long fileModificationTime = last_write_time(filepath, errorCode);
+
+
+		long long fileNbHardLinks = itemStat._fullNbHardLinks;
+		long long fileSize = itemStat._size;
+		long long fileModificationTime = itemStat._modificationTime;
 
 		if( fileModificationTime > _modificationTime )
 			_modificationTime = fileModificationTime;
@@ -200,12 +303,10 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 		_realSize += fileRealSize;
 
 		#ifdef UNIX
-			struct stat statInfos;
-			lstat( filepath.c_str(), &statInfos );
-			if( _creationTime == 0 || _creationTime > statInfos.st_ctime )
-				_creationTime = statInfos.st_ctime;
+			if( _creationTime == 0 || _creationTime > itemStat._creationTime )
+				_creationTime = itemStat._creationTime;
 			// size on hard-drive (takes hardlinks into account)
-			_sizeOnDisk += (statInfos.st_blocks / fileNbHardLinks) * 512;
+			_sizeOnDisk += (itemStat._sizeOnDisk / fileNbHardLinks) * 512;
 		#else
 			_creationTime = 0;
 			_sizeOnDisk = 0;
@@ -269,18 +370,7 @@ std::vector<Item> browse(
 		}
 		else
 		{
-			EType type = bfs::is_directory(iter->path()) ? eTypeFolder : eTypeFile;
-			if (bfs::is_directory(iter->path()))
-			{
-				type = eTypeFolder;
-			} else if (bfs::is_symlink(iter->path())) {
-				type = eTypeLink;
-			} else if (bfs::is_regular_file(iter->path())){
-				type = eTypeFile;
-			} else {
-				type = eTypeUndefined;
-			}
-			output.push_back( Item( type, iter->path() ) );
+			output.push_back( Item( Item::getTypeByPath( iter->path() ), iter->path() ) );
 		}
 	}
 
@@ -304,7 +394,7 @@ std::vector<Item> browse(
 				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
 				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
 				{
-					output.push_back( Item( eTypeFile, directory / s.getFirstFilename() ) );
+					output.push_back( Item( Item::getTypeByPath( directory / s.getFirstFilename() ), directory / s.getFirstFilename() ) );
 				}
 				else
 				{
