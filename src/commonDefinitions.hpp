@@ -108,6 +108,7 @@ enum EDetection
 	eDetectionIgnoreDotFile = 8,
 	/// detect from an existing filename of the sequence
 	eDetectionSequenceFromFilename = 16,
+	eDetectionDefaultWithDotFile = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionSequenceFromFilename),
 	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
 };
 
