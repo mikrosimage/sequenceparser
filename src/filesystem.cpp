@@ -244,7 +244,6 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 
 	// size (takes hardlinks into account)
 	_realSize = _size / _nbHardLinks;
-	std::cout << "Stat on file " << _sizeOnDisk << std::endl;
 }
 
 void ItemStat::statSequence( const Item& item, const bool approximative )
