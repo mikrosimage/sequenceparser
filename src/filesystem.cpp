@@ -244,6 +244,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 
 	// size (takes hardlinks into account)
 	_realSize = _size / _nbHardLinks;
+	std::cout << "Stat on file " << _sizeOnDisk << std::endl;
 }
 
 void ItemStat::statSequence( const Item& item, const bool approximative )
@@ -306,7 +307,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 			if( _creationTime == 0 || _creationTime > itemStat._creationTime )
 				_creationTime = itemStat._creationTime;
 			// size on hard-drive (takes hardlinks into account)
-			_sizeOnDisk += (itemStat._sizeOnDisk / fileNbHardLinks) * 512;
+			_sizeOnDisk += itemStat._sizeOnDisk;
 		#else
 			_creationTime = 0;
 			_sizeOnDisk = 0;
