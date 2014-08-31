@@ -18,7 +18,7 @@ before_script:
   - sudo apt-get install -qq libboost1.55-all-dev swig swig2.0 python-dev default-jdk python-nose
 
 script:
-  - scons pySequenceParser java_sequenceParser test -k
+  - scons pySequenceParser java_sequenceParser scripttest -k
 
 after_failure:
   - cat config.log

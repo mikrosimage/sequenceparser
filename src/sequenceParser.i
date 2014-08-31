@@ -1,9 +1,12 @@
 
 %module sequenceParser
 
-%include "commonDefinitions.i"
-%include "File.i"
-%include "Folder.i"
+%include "common.i"
+
+%include "FrameRange.i"
 %include "Sequence.i"
+%include "Item.i"
+%include "ItemStat.i"
+
 %include "detector.i"
 %include "filesystem.i"

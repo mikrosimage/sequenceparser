@@ -1,15 +1,9 @@
-%include "File.i"
-%include "Folder.i"
-%include "Sequence.i"
+%include "common.i"
 
-%include <global.i>
 %include <std_vector.i>
 
 %{
-#include "commonDefinitions.hpp"
-#include "FileObject.hpp"
-#include "File.hpp"
-#include "Folder.hpp"
+#include "common.hpp"
 #include "Sequence.hpp"
 #include "detector.hpp"
 %}

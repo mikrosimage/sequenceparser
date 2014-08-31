@@ -1,12 +1,10 @@
 #include "detector.hpp"
 #include "Sequence.hpp"
-#include "Folder.hpp"
-#include "File.hpp"
 
 #include "detail/analyze.hpp"
 #include "detail/FileNumbers.hpp"
 #include "detail/FileStrings.hpp"
-#include "commonDefinitions.hpp"
+#include "common.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
@@ -23,36 +21,38 @@ using detail::FileNumbers;
 using detail::FileStrings;
 namespace bfs = boost::filesystem;
 
-boost::regex convertFilterToRegex( std::string filter, const EDetection detectOptions )
+boost::regex convertFilterToRegex( const std::string& filter, const EDetection detectOptions )
 {
+	std::string filterToRegex = filter;
+	
 	boost::cmatch match;
 	boost::regex expression( "(.*[%])([0-9]{2})([d].*)" ); // match to pattern like : %04d
-	if( boost::regex_match( filter.c_str(), match, expression ) )
+	if( boost::regex_match( filterToRegex.c_str(), match, expression ) )
 	{
 		std::string matched = match[1].second;
 		matched.erase( 2 , matched.size()-2); // keep only numbers
 		const int patternWidth = boost::lexical_cast<int>( matched );
 		std::string replacing( patternWidth, '#' );
-		filter = boost::regex_replace( filter, boost::regex( "\\%\\d{1,2}d" ), replacing );
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\%\\d{1,2}d" ), replacing );
 	}
 
 	// for detect sequence based on a single file
 	if( ( detectOptions & eDetectionSequenceFromFilename ) )
-		filter = boost::regex_replace( filter, boost::regex( "\\d" ), "[0-9]" );
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\d" ), "[0-9]" );
 
-	filter = boost::regex_replace( filter, boost::regex( "\\*" ), "(.*)" );
-	filter = boost::regex_replace( filter, boost::regex( "\\?" ), "(.)" );
+	filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\*" ), "(.*)" );
+	filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\?" ), "(.)" );
 	if( detectOptions & eDetectionNegative )
 	{
-		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[\\-\\+]?[0-9]+" ); // one @ correspond to one or more digits
-		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[\\-\\+]?[0-9]" ); // each # in pattern correspond to a digit
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\@" ), "[\\-\\+]?[0-9]+" ); // one @ correspond to one or more digits
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\#" ), "[\\-\\+]?[0-9]" ); // each # in pattern correspond to a digit
 	}
 	else
 	{
-		filter = boost::regex_replace( filter, boost::regex( "\\@" ), "[0-9]+" ); // one @ correspond to one or more digits
-		filter = boost::regex_replace( filter, boost::regex( "\\#" ), "[0-9]" ); // each # in pattern correspond to a digit
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\@" ), "[0-9]+" ); // one @ correspond to one or more digits
+		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\#" ), "[0-9]" ); // each # in pattern correspond to a digit
 	}
-	return boost::regex( filter );
+	return boost::regex( filterToRegex );
 }
 
 std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EDetection detectOptions )

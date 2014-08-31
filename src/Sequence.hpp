@@ -1,12 +1,8 @@
 #ifndef _SEQUENCE_PARSER_SEQUENCE_HPP_
 #define _SEQUENCE_PARSER_SEQUENCE_HPP_
 
-#include "FileObject.hpp"
-#include "commonDefinitions.hpp"
+#include "common.hpp"
 #include "FrameRange.hpp"
-
-#include <boost/lexical_cast.hpp>
-#include <boost/foreach.hpp>
 
 #include <iomanip>
 #include <set>
@@ -18,75 +14,55 @@ namespace detail {
 class FileNumbers;
 }
 
+/**
+ * List all recognized pattern types.
+ */
+enum EPattern
+{
+	ePatternNone = 0,
+	ePatternStandard = 1,
+	ePatternCStyle = 2,
+	ePatternFrame = 4,
+	ePatternFrameNeg = 8,
+
+	ePatternDefault = ePatternCStyle + ePatternStandard,
+	ePatternAll = ePatternCStyle + ePatternStandard + ePatternFrameNeg
+};
+
 
 /**
  * @brief A sequence of numbered files.
  */
-class Sequence : public FileObject
+class Sequence
 {
-
 public:
-	/**
-	 * List all recognized pattern types.
-	 */
-	enum EPattern
-	{
-
-		ePatternNone = 0,
-		ePatternStandard = 1,
-		ePatternCStyle = ePatternStandard * 2,
-		ePatternFrame = ePatternCStyle * 2,
-		ePatternFrameNeg = ePatternFrame * 2,
-
-		ePatternDefault = ePatternCStyle + ePatternStandard,
-		ePatternAll = ePatternCStyle + ePatternStandard + ePatternFrameNeg
-	};
-
 	Sequence()
 	{
 		clear();
 	}
 
-	Sequence( const boost::filesystem::path& directory, const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const EDisplay displayOptions = eDisplayDefault, const bool strictPadding = false )
-		: FileObject( directory, eTypeSequence, displayOptions )
+	Sequence( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const bool strictPadding = false )
 	{
 		init( prefix, padding, suffix, firstTime, lastTime, step, strictPadding );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
-		: FileObject( directory, eTypeSequence, displayOptions )
+	Sequence( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault )
 	{
-		init( pattern, firstTime, lastTime, step, accept );
+		initFromPattern( pattern, firstTime, lastTime, step, accept );
 	}
-
-	Sequence( const boost::filesystem::path& filepath, const Time firstTime, const Time lastTime, const Time step, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault )
-		: FileObject( filepath.parent_path(), eTypeSequence, displayOptions )
-	{
-		init( filepath.filename().string(), firstTime, lastTime, step, accept );
-	}
-
-	/**
-	 * @todo check if we put a pattern with full path: /home/foo/images/foo.####.jpg
-	 */
-	Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions = eDisplayDefault, const EPattern accept = ePatternDefault );
 
 	Sequence( const Sequence& v )
 	{
 		operator=( v );
 	}
 
-	Sequence( const boost::filesystem::path& directory, const Sequence& v, const EDisplay& displayOptions )
+	Sequence( const boost::filesystem::path& directory, const Sequence& v )
 	{
 		operator=( v );
-		_displayOptions = displayOptions;
-		setDirectory( directory );
 	}
-
-	~Sequence();
 
 	Sequence& operator=( const Sequence& other )
 	{
-		FileObject::operator=( other );
 		_prefix = other._prefix;
 		_suffix = other._suffix;
 		_strictPadding = other._strictPadding;
@@ -96,52 +72,24 @@ public:
 	}
 	
 	Sequence* clone() const { return new Sequence(*this); }
-	
+
 private:
 	/**
 	 * @brief Construct a sequence from a pattern and given informations.
 	 * @warning No check on your filesystem.
-	 * @warning the directory must be set
 	 */
 	void init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const bool strictPadding = false );
 
 	/**
 	 * @brief Construct a sequence from a pattern and given informations.
 	 * @warning No check on your filesystem.
-	 * @warning the directory must be set
 	 */
-	bool init( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
+	bool initFromPattern( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
 
 public:
-	/**
-	 * @brief Construct a sequence from a pattern and given informations.
-	 * @warning No check on your filesystem.
-	 * @warning the directory must be set
-	 */
-	inline bool initFromPattern( const boost::filesystem::path& dir, const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
-
-	/**
-	 * @brief Init from directory and pattern.
-	 * @warning search on your filesystem, to detect the range.
-	 */
-	bool initFromDetection( const std::string& pattern, const EPattern accept = ePatternDefault );
-
-	/**
-	 * @brief Init from full pattern.
-	 * @warning search on your filesystem, to detect the range.
-	 */
-	inline bool initFromDetection( const EPattern& accept = ePatternDefault );
-
-public:
-	inline std::string getAbsoluteFilenameAt( const Time time ) const;
-
-	inline std::string getFilenameAt( const Time time ) const;
+	std::string getFilenameAt( const Time time ) const;
 
 	inline std::string getFirstFilename() const;
-
-	inline std::string getAbsoluteFirstFilename() const;
-
-	inline std::string getAbsoluteLastFilename() const;
 
 	/// @return pattern character in standard style
 	inline char getPatternCharacter() const;
@@ -149,14 +97,10 @@ public:
 	/// @return a string pattern using standard style
 	inline std::string getStandardPattern() const;
 
-	inline std::string getAbsoluteStandardPattern() const;
-
 	/// @return a string pattern using C Style
-	inline std::string getCStylePattern() const;
+	std::string getCStylePattern() const;
 
-	inline std::string getAbsoluteCStylePattern() const;
-
-	inline std::pair<Time, Time> getRange() const;
+	inline std::pair<Time, Time> getGlobalRange() const;
 
 	inline Time getFirstTime() const;
 
@@ -164,7 +108,7 @@ public:
 
 	inline std::size_t getDuration() const;
 
-	inline Time getNbFiles() const;
+	Time getNbFiles() const;
 
 	inline std::size_t getPadding() const;
 
@@ -183,7 +127,9 @@ public:
 
 	/**
 	 * @brief Check if the filename is inside the sequence and return it's time value.
-	 * @param[out] time: the time extract from the filename (only if contained in the sequence)
+	 * @param[in] filename: filename to found
+	 * @param[out] time: the time extracted from the filename (only if contained in the sequence)
+	 * @param[out] timeStr: the time in string extracted from the filename (only if contained in the sequence)
 	 * @return if the filename is contained inside the sequence
 	 */
 	bool isIn( const std::string& filename, Time& time, std::string& timeStr );
@@ -192,7 +138,7 @@ public:
 
 	bool operator<(const Sequence& other ) const
 	{
-		return getAbsoluteStandardPattern() < other.getAbsoluteStandardPattern();
+		return getStandardPattern() < other.getStandardPattern();
 	}
 
 	bool operator==(const Sequence& other ) const
@@ -209,8 +155,6 @@ public:
 		return !operator==( other );
 	}
 
-protected:
-
 	/**
 	 * @brief Partial initialization, using only pattern informations.
 	 * @warning You don't have all informations like range, directory, etc.
@@ -218,9 +162,6 @@ protected:
 	bool retrieveInfosFromPattern( const std::string& pattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding ) const;
 
 public:
-
-	std::ostream& getCout( std::ostream& os ) const;
-
 	std::vector<boost::filesystem::path> getFiles() const;
 	
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
@@ -235,17 +176,16 @@ public:
 		return FrameRangesSubView( getFrameRanges(), first, last );
 	}
 
-protected:
-
 	inline void clear()
 	{
-		FileObject::clear();
 		_prefix.clear();
 		_suffix.clear();
 		_strictPadding = false;
 		_padding = 0;
 		_ranges.clear();
 	}
+	
+	std::string string() const;
 
 public:
 	std::string _prefix; ///< filename prefix
@@ -256,14 +196,9 @@ public:
 	static const char _fillCar = '0'; ///< Filling character
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Sequence& sequence)
-{
-	return sequence.getCout(os);
-}
+std::ostream& operator<<(std::ostream& os, const Sequence& sequence);
 
 #ifndef SWIG
-
-std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times );
 
 /**
  * @brief Extract step from a sorted vector of time values.

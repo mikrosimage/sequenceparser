@@ -1,13 +1,12 @@
 %include "common.i"
 
 %{
-#include "common.hpp"
-#include "Sequence.hpp"
+#include "ItemStat.hpp"
 %}
 
-%include "Sequence.hpp"
+%include "ItemStat.hpp"
 
-//%extend sequenceParser::Sequence
+//%extend sequenceParser::ItemStat
 //{
 //	%pythoncode
 //	{
@@ -15,4 +14,3 @@
 //			return self.string()
 //	}
 //}
-

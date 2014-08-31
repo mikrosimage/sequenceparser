@@ -1,11 +1,8 @@
 #ifndef _SEQUENCE_PARSER_DETAIL_ANALYZE_HPP_
 #define _SEQUENCE_PARSER_DETAIL_ANALYZE_HPP_
 
-#include "commonDefinitions.hpp"
-#include "FileObject.hpp"
+#include "common.hpp"
 #include "Sequence.hpp"
-#include "File.hpp"
-#include "Folder.hpp"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lexical_cast.hpp>
@@ -62,7 +59,7 @@ void privateBuildSequencesAccordingToPadding(
  *          so there is no reason to create a copy.
  * @return a sequence object with all informations
  */
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EDetection detectOptions, const EDisplay displayOptions );
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const detail::FileStrings& stringParts, std::vector<detail::FileNumbers>& numberParts, const EDetection detectOptions );
 
 /**
  * @brief Extract number and string parts from a filename.
