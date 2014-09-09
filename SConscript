@@ -9,6 +9,7 @@ project.StaticLibrary(
 		libraries = [
 			libs.boost_filesystem,
 			libs.boost_regex,
+			libs.boost_locale,
 			],
 		shared = True
 	)
