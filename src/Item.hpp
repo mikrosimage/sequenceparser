@@ -66,6 +66,8 @@ public:
 	std::string getFilename() const { return _path.filename().string(); }
 	std::string getFolder() const { return getFolderPath().string(); }
 
+	std::vector<Item> explode();
+
 	const Sequence& getSequence() const { return _sequence; }
 
 	const boost::filesystem::path& getPath() const { return _path; }

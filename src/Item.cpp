@@ -23,6 +23,19 @@ std::string Item::getFirstFilename() const
 	return getFilename();
 }
 
+std::vector<Item> Item::explode()
+{
+	std::vector<Item> items;
+	if (getType() == eTypeSequence){	
+		const std::vector<boost::filesystem::path> sequencePaths = getSequence().getFiles();
+		BOOST_FOREACH(const boost::filesystem::path& path, sequencePaths)
+		{
+			items.push_back( Item( getTypeFromPath(path), path ) );
+		}
+	}
+	return items;
+}
+
 
 EType getTypeFromPath( const boost::filesystem::path& path )
 {
