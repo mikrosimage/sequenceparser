@@ -390,13 +390,8 @@ std::vector<boost::filesystem::path> Sequence::getFiles() const
 	std::vector<boost::filesystem::path> allPaths;
 	BOOST_FOREACH(const FrameRange& range, _ranges)
 	{
-		if ( range.step == 0 )
-		{
-			allPaths.push_back( getFilenameAt(range.first) );
-		} else {
-			for( Time t = range.first; t <= range.last; t += range.step ){
-				allPaths.push_back( getFilenameAt( t ) );
-			}
+		for( Time t = range.first; t <= range.last; t += range.step ){
+			allPaths.push_back( getFilenameAt( t ) );
 		}
 	}
 	return allPaths;

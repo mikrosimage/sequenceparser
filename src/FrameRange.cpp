@@ -15,7 +15,7 @@ std::string FrameRange::string() const
 std::ostream& operator<<(std::ostream& os, const FrameRange& range)
 {
 	os << range.first;
-	if( range.step == 0 )
+	if( range.first == range.last )
 		return os;
 	os << ":" << range.last;
 	
@@ -50,7 +50,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 		res.push_back(FrameRange(times.front()));
 		return res;
 	}
-	res.push_back( FrameRange(times[0], times[1], times[1]-times[0]) );
+	res.push_back( FrameRange(times[0], times[1], std::max(Time(1), times[1]-times[0])) );
 	if( times.size() == 2 )
 	{
 		return res;
@@ -73,7 +73,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 			// same step as previous range, so update it.
 			prevRange.last = *it;
 		}
-		else if( prevRange.step == 0 )
+		else if( prevRange.getNbFrames() == 1 )
 		{
 			// the previous range only contains one frame (without step)
 			// so update it with the new step
@@ -82,24 +82,23 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 			
 			// The range has only 2 frames.
 		}
+		else if( prevRange.getNbFrames() == 2 )
+		{
+			// The previous range has only 2 frames, so it's not really a range...
+			// So steal the frame of the previous range.
+			FrameRange newFrameRange(prevRange.last, *it, newStep);
+
+			// Previous range is a still frame
+			prevRange.last = prevRange.first;
+			prevRange.step = 1;
+			
+			res.push_back( newFrameRange );
+		}
 		else
 		{
-			if( prevRange.getNbFrames() == 2 )
-			{
-				// The previous range has only 2 frames, so it's not really a range...
-				// So steal the frame of the previous range.
-				FrameRange newFrameRange(prevRange.last, *it, newStep);
-				prevRange.last = prevRange.first;
-				prevRange.step = 0;
-				
-				res.push_back( newFrameRange );
-			}
-			else
-			{
-				// The previous range is complete.
-				// Create a new one.
-				res.push_back( FrameRange(*it, *it, 0) );
-			}
+			// The previous range is complete.
+			// Create a new one.
+			res.push_back( FrameRange(*it, *it) );
 		}
 	}
 	
@@ -108,9 +107,9 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 	{
 		// If the last range has only 2 frames, so it's not really a range...
 		// Split in 2 ranges of 1 frame.
-		FrameRange newFrameRange(lastRange.last, lastRange.last, 0);
+		FrameRange newFrameRange(lastRange.last, lastRange.last, 1);
 		lastRange.last = lastRange.first;
-		lastRange.step = 0;
+		lastRange.step = 1;
 		
 		res.push_back( newFrameRange );
 	}
