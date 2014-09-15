@@ -43,7 +43,7 @@ def setUp():
 		]
 	for d in dirs_to_create:
 		dd = os.path.join(root_path, d)
-		print("dd:", dd)
+		print("create dir:", dd)
 		os.mkdir(dd)
 
 
@@ -63,7 +63,7 @@ def testBrowse():
 		print("item:", item.getFilename())
 		print("item:", item.getType())
 		if item.getType() == sequenceParser.eTypeSequence:
-			print("item seq:", item.getSequence().getAbsoluteFirstFilename())
+			print("item seq:", item.getSequence().getFirstFilename())
 			print("item seq:", item.getSequence().getFirstTime(), item.getSequence().getLastTime(), item.getSequence().getDuration(), item.getSequence().getStandardPattern())
 
 

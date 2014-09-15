@@ -1,7 +1,7 @@
 #ifndef _SEQUENCE_PARSER_UTILS_HPP_
 #define _SEQUENCE_PARSER_UTILS_HPP_
 
-#include "commonDefinitions.hpp"
+#include "common.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/regex.hpp>
@@ -9,9 +9,16 @@
 
 namespace sequenceParser {
 
-boost::regex convertFilterToRegex( std::string filter, const EDetection detectOptions );
+/**
+ * @brief Convert a user filter into a regex.
+ * A user filter looks like: "foo###.jpg", "foo@.tiff" or "foo%04d.jpg".
+ */
+boost::regex convertFilterToRegex( const std::string& filter, const EDetection detectOptions );
 
-
+/**
+ * @brief Convert user filters into regexes.
+ * @see convertFilterToRegex
+ */
 std::vector<boost::regex> convertFilterToRegex( const std::vector<std::string>& filters, const EDetection detectOptions );
 
 

@@ -1,9 +1,8 @@
 #include "Sequence.hpp"
-#include "Folder.hpp"
-#include "File.hpp"
 
 #include "detail/FileNumbers.hpp"
 
+#include <boost/filesystem/path.hpp>
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -11,6 +10,7 @@
 #include <set>
 
 #include <ostream>
+
 
 namespace sequenceParser {
 
@@ -54,95 +54,20 @@ static const boost::regex regexPatternFrameNeg( "(.*?" // anything but without p
 												);
 
 
-std::ostream& FrameRange::getCout( std::ostream& os ) const
+template<typename T>
+inline T greatestCommonDivisor( T a, T b )
 {
-	os << first;
-	if( step == 0 )
-		return os;
-	os << ":" << last;
-	
-	if( step != 1 )
-		os << "x" << step;
-	return os;
+	T r;
+	if( b == 0 )
+		return 0;
+	while( ( r = a % b ) != 0 )
+	{
+		a = b;
+		b = r;
+	}
+	return b;
 }
 
-
-std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
-{
-	std::vector<FrameRange> res;
-	if( times.empty() )
-		return res;
-	if( times.size() == 1 )
-	{
-		res.push_back(FrameRange(times.front()));
-		return res;
-	}
-	res.push_back( FrameRange(times[0], times[1], times[1]-times[0]) );
-	if( times.size() == 2 )
-	{
-		return res;
-	}
-	
-	std::vector<Time>::const_iterator itPrev = times.begin();
-	std::vector<Time>::const_iterator itEnd = times.end();
-	std::vector<Time>::const_iterator it = itPrev;
-	++it;
-	
-	itPrev = it;
-	++it;
-	
-	for( ; it != itEnd; itPrev = it, ++it )
-	{
-		Time newStep = *it - *itPrev;
-		FrameRange& prevRange = res.back();
-		if( prevRange.step == newStep )
-		{
-			// same step as previous range, so update it.
-			prevRange.last = *it;
-		}
-		else if( prevRange.step == 0 )
-		{
-			// the previous range only contains one frame (without step)
-			// so update it with the new step
-			prevRange.last = *it;
-			prevRange.step = newStep;
-			
-			// The range has only 2 frames.
-		}
-		else
-		{
-			if( prevRange.getNbFrames() == 2 )
-			{
-				// The previous range has only 2 frames, so it's not really a range...
-				// So steal the frame of the previous range.
-				FrameRange newFrameRange(prevRange.last, *it, newStep);
-				prevRange.last = prevRange.first;
-				prevRange.step = 0;
-				
-				res.push_back( newFrameRange );
-			}
-			else
-			{
-				// The previous range is complete.
-				// Create a new one.
-				res.push_back( FrameRange(*it, *it, 0) );
-			}
-		}
-	}
-	
-	FrameRange& lastRange = res.back();
-	if( lastRange.getNbFrames() == 2 )
-	{
-		// If the last range has only 2 frames, so it's not really a range...
-		// Split in 2 ranges of 1 frame.
-		FrameRange newFrameRange(lastRange.last, lastRange.last, 0);
-		lastRange.last = lastRange.first;
-		lastRange.step = 0;
-		
-		res.push_back( newFrameRange );
-	}
-	return res;
-}
 
 /**
  * @brief Find the biggest common step from a set of all steps.
@@ -161,6 +86,7 @@ std::size_t greatestCommonDivisor( const std::set<std::size_t>& steps )
 	return greatestCommonDivisor( allSteps );
 }
 
+
 /**
  * @brief Extract step from a sorted vector of time values.
  */
@@ -177,6 +103,7 @@ std::size_t extractStep( const std::vector<Time>& times )
 	}
 	return greatestCommonDivisor( allSteps );
 }
+
 
 /**
  * @brief Extract step from a sorted vector of time values.
@@ -195,6 +122,7 @@ std::size_t extractStep( const std::vector<detail::FileNumbers>::const_iterator&
 	return greatestCommonDivisor( allSteps );
 }
 
+
 std::size_t getPaddingFromStringNumber( const std::string& timeStr )
 {
 	if( timeStr.size() > 1 )
@@ -207,6 +135,7 @@ std::size_t getPaddingFromStringNumber( const std::string& timeStr )
 	}
 	return timeStr.size();
 }
+
 
 /**
  * @brief extract the padding from a vector of frame numbers
@@ -226,6 +155,7 @@ std::size_t extractPadding( const std::vector<std::string>& timesStr )
 	}
 	return padding;
 }
+
 
 std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i )
 {
@@ -259,6 +189,7 @@ std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterat
 	return 0;
 }
 
+
 /**
  * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
  * @param[in] timesStr vector of frame numbers in string format
@@ -281,6 +212,7 @@ bool extractIsStrictPadding( const std::vector<std::string>& timesStr, const std
 	return false;
 }
 
+
 bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
 {
 	if( padding == 0 )
@@ -299,16 +231,42 @@ bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, cons
 }
 
 
-Sequence::~Sequence()
+std::string Sequence::getFilenameAt( const Time time ) const
 {
+	std::ostringstream o;
+	if( time >= 0 )
+	{
+		// "prefix.0001.jpg"
+		o << _prefix << std::setw( _padding ) << std::setfill( _fillCar ) << time << _suffix;
+	}
+	else
+	{
+		// "prefix.-0001.jpg" (and not "prefix.000-1.jpg")
+		o << _prefix << "-" << std::setw( _padding ) << std::setfill( _fillCar ) << std::abs( (int) time ) << _suffix;
+	}
+	return o.str();
 }
 
-Sequence::Sequence( const boost::filesystem::path& directory, const EDisplay displayOptions, const EPattern accept )
-: FileObject( directory, eTypeSequence, displayOptions )
-, _padding(0)
-, _strictPadding(false)
+
+std::string Sequence::getCStylePattern() const
 {
+	if( getPadding() )
+		return getPrefix() + "%0" + boost::lexical_cast<std::string > ( getPadding() ) + "d" + getSuffix();
+	else
+		return getPrefix() + "%d" + getSuffix();
 }
+
+
+Time Sequence::getNbFiles() const
+{
+	Time nbFiles = 0;
+	BOOST_FOREACH(const FrameRange& frameRange, _ranges)
+	{
+		nbFiles += frameRange.getNbFrames();
+	}
+	return nbFiles;
+}
+
 
 bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeStr )
 {
@@ -332,7 +290,8 @@ bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeS
 	return true;
 }
 
-Sequence::EPattern Sequence::checkPattern( const std::string& pattern, const EDetection detectionOptions )
+
+EPattern Sequence::checkPattern( const std::string& pattern, const EDetection detectionOptions )
 {
 	if( regex_match( pattern.c_str(), regexPatternStandard ) )
 	{
@@ -352,6 +311,7 @@ Sequence::EPattern Sequence::checkPattern( const std::string& pattern, const EDe
 	}
 	return ePatternNone;
 }
+
 
 /**
  * @brief This function creates a regex from the pattern,
@@ -403,6 +363,7 @@ bool Sequence::retrieveInfosFromPattern( const std::string& filePattern, const E
 	return true;
 }
 
+
 void Sequence::init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step, const bool strictPadding )
 {
 	_prefix = prefix;
@@ -413,7 +374,8 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 	_strictPadding = strictPadding;
 }
 
-bool Sequence::init( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
+
+bool Sequence::initFromPattern( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
 {
 	if( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
 		return false; // not regognize as a pattern, maybe a still file
@@ -422,105 +384,32 @@ bool Sequence::init( const std::string& pattern, const Time firstTime, const Tim
 	return true;
 }
 
-bool Sequence::initFromDetection( const std::string& pattern, const EPattern accept )
-{
-	clear();
-	setDirectoryFromPath( pattern );
-
-	if( !retrieveInfosFromPattern( boost::filesystem::path( pattern ).filename().string(), accept, _prefix, _suffix, _padding, _strictPadding ) )
-		return false; // not recognized as a pattern, maybe a still file
-	if( !boost::filesystem::exists( _directory ) )
-		return true; // an empty sequence
-
-	std::vector<std::string> allTimesStr;
-	std::vector<Time> allTimes;
-	bfs::directory_iterator itEnd;
-
-	for( bfs::directory_iterator iter( _directory ); iter != itEnd; ++iter )
-	{
-		// we don't make this check, which can take long time on big sequences (>1000 files)
-		// depending on your filesystem, we may need to do a stat() for each file
-		// if( bfs::is_directory( iter->status() ) )
-		// continue; // skip directories
-		Time time;
-		std::string timeStr;
-
-		// if the file is inside the sequence
-		if( isIn( iter->path().filename().string(), time, timeStr ) )
-		{
-			// create a big vector of all times in our sequence
-			allTimesStr.push_back( timeStr );
-			allTimes.push_back( time );
-		}
-	}
-	if( allTimes.size() < 2 )
-	{
-		if( allTimes.size() == 1 )
-		{
-			_ranges.push_back(FrameRange(allTimes.front()));
-		}
-		//std::cout << "empty => " <<  _firstTime << " > " << _lastTime << " : " << _nbFiles << std::endl;
-		return true; // an empty sequence
-	}
-	std::sort( allTimes.begin(), allTimes.end() );
-	extractStep( allTimes );
-	extractPadding( allTimesStr );
-	extractIsStrictPadding( allTimesStr, _padding );
-	_ranges = extractFrameRanges( allTimes );
-	return true; // a real file sequence
-}
-
-std::ostream& Sequence::getCout( std::ostream& os ) const
-{
-	bfs::path dir;
-	if( showAbsolutePath() )
-	{
-		dir = bfs::absolute( _directory );
-		dir = boost::regex_replace( dir.string(), boost::regex( "/\\./" ), "/" );
-	}
-	os << std::left;
-	if( showProperties() )
-	{
-		os << std::setw( PROPERTIES_WIDTH ) << "s ";
-	}
-	if( showRelativePath() )
-	{
-		dir = _directory;
-		dir = boost::regex_replace( dir.string(), boost::regex( "/\\./" ), "/" );
-		os << std::setw( NAME_WIDTH_WITH_DIR ) << _kColorSequence + ( dir / getStandardPattern() ).string() + _kColorStd;
-	}
-	else
-	{
-		os << std::setw( NAME_WIDTH ) << _kColorSequence + ( dir / getStandardPattern() ).string() + _kColorStd;
-	}
-
-	if( ! _ranges.empty() )
-	{
-		os << " [";
-		for(std::size_t i = 0; i < _ranges.size() - 1; ++i)
-		{
-			os << _ranges[i] << ", ";
-		}
-		os << _ranges.back();
-		Time nbFiles = getNbFiles();
-		os << "] " << nbFiles << " file" << ( ( nbFiles > 1 ) ? "s" : "" );
-	}
-	if( hasMissingFile() )
-	{
-		os << ", " << _kColorError << getNbMissingFiles() << " missing file" << ( ( getNbMissingFiles() > 1 ) ? "s" : "" ) << _kColorStd;
-	}
-	return os;
-}
 
 std::vector<boost::filesystem::path> Sequence::getFiles() const
 {
 	std::vector<boost::filesystem::path> allPaths;
 	BOOST_FOREACH(const FrameRange& range, _ranges)
 	{
-		for( Time t = range.first; t <= range.last; t += range.step )
-			allPaths.push_back( getAbsoluteFilenameAt( t ) );
+		for( Time t = range.first; t <= range.last; t += range.step ){
+			allPaths.push_back( getFilenameAt( t ) );
+		}
 	}
 	return allPaths;
+}
+
+
+std::string Sequence::string() const
+{
+	std::ostringstream ss;
+	ss << *this;
+	return ss.str();
+}
+
+
+std::ostream& operator<<(std::ostream& os, const Sequence& sequence)
+{
+	os << sequence.getStandardPattern() << " [" << sequence.getFrameRanges() << "]";
+	return os;
 }
 
 

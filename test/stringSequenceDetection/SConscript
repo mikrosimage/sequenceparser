@@ -1,11 +1,13 @@
 Import( 'project', 'libs' )
 
-project.UnitTest(
-	target = ['sequenceParser'] + project.getDirs(),
-	dirs = ['.'],
-	libraries = [
-		libs.sequenceParser,
-		libs.boost_unit_test_framework,
-		]
-	)
+# Temporarily disabled
+#
+#project.UnitTest(
+#	target = ['sequenceParser'] + project.getDirs(),
+#	dirs = ['.'],
+#	libraries = [
+#		libs.sequenceParser,
+#		libs.boost_unit_test_framework,
+#		]
+#	)
 

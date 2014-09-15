@@ -10,7 +10,7 @@
 #include <unistd.h>
 #endif
 
-// compatibility problems...
+// Compatibility problems
 namespace std {
 #ifdef _MSC_VER
 typedef SSIZE_T ssize_t;
@@ -19,41 +19,14 @@ typedef ::ssize_t ssize_t;
 #endif
 }
 
-
+// Forward declaration
+namespace boost {
+namespace filesystem {
+class path;
+}
+}
 
 namespace sequenceParser {
-
-#ifndef PROPERTIES_WIDTH
-#define PROPERTIES_WIDTH 3
-#endif
-
-#ifndef NAME_WIDTH
-#define NAME_WIDTH 50
-#endif
-
-#ifndef NAME_WIDTH_WITH_DIR
-#define NAME_WIDTH_WITH_DIR 80
-#endif
-
-
-#ifndef SWIG
-#ifndef SEQUENCE_PARSER_OUTPUT_COLOR_FILES
-#define SEQUENCE_PARSER_OUTPUT_COLOR_FILES
-#if (defined __UNIX__ || defined UNIX || defined __LINUX__ || defined LINUX )
-static const std::string kColorStd = "\E[0;0m";
-static const std::string kColorFolder = "\E[1;34m";
-static const std::string kColorFile = "\E[0;32m";
-static const std::string kColorSequence = "\E[0;32m";
-static const std::string kColorError = "\E[1;31m";
-#else
-static const std::string kColorStd = "";
-static const std::string kColorFolder = "";
-static const std::string kColorFile = "";
-static const std::string kColorSequence = "";
-static const std::string kColorError = "";
-#endif
-#endif
-#endif
 
 typedef ::std::ssize_t Time;
 
@@ -112,34 +85,9 @@ enum EDetection
 	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
 };
 
-/// TODO: remove that!
-enum EDisplay
-{
-	eDisplayNone = 0,
-	eDisplayProperties = 1,
-	eDisplayPath = 2,
-	eDisplayAbsolutePath = 4,
-	eDisplayColor = 8,
-	eDisplayDefault = (eDisplayPath | eDisplayColor)
-};
-
 SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EType)
 SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EDetection)
-SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EDisplay)
 
-template<typename T>
-inline T greatestCommonDivisor( T a, T b )
-{
-	T r;
-	if( b == 0 )
-		return 0;
-	while( ( r = a % b ) != 0 )
-	{
-		a = b;
-		b = r;
-	}
-	return b;
-}
 
 }
 

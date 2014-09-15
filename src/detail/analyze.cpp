@@ -2,7 +2,7 @@
 
 #include "detail/FileNumbers.hpp"
 #include "detail/FileStrings.hpp"
-#include "commonDefinitions.hpp"
+#include "common.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
@@ -269,9 +269,10 @@ bool getVaryingNumber( std::ssize_t& index, const FileNumbers& a, const FileNumb
 	return foundOne; // we found one varying index
 }
 
-std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EDetection detectOptions, const EDisplay displayOptions )
+std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, const FileStrings& stringParts, std::vector<FileNumbers>& numberParts, const EDetection detectOptions )
 {
-	Sequence defaultSeq( directory, displayOptions );
+	Sequence defaultSeq;
+
 	BOOST_ASSERT( numberParts.size() > 0 );
 	// assert all FileNumbers have the same size...
 	BOOST_ASSERT( numberParts.front().size() == numberParts.back().size() );

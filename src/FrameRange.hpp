@@ -1,9 +1,10 @@
 #ifndef _SEQUENCE_PARSER_FRAMERANGE_HPP_
 #define _SEQUENCE_PARSER_FRAMERANGE_HPP_
 
-#include "commonDefinitions.hpp"
+#include "common.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/assert.hpp>
 
 #include <vector>
 #include <iostream>
@@ -11,6 +12,7 @@
 
 
 namespace sequenceParser {
+
 
 class FrameRange
 {
@@ -24,33 +26,44 @@ public:
 	: first(first)
 	, last(last)
 	, step(step)
-	{}
-	Time atIndex(Time index) const
+	{
+		BOOST_ASSERT( step >= 1 );
+	}
+	inline Time atIndex(Time index) const
 	{
 		return first + index * step;
 	}
-	Time getNbFrames() const
+	inline Time getNbFrames() const
 	{
-		if( step == 0 )
-			return 1;
+		BOOST_ASSERT( step >= 1 );
 		return ((last - first) / step) + 1;
 	}
-	
-	bool operator==( const FrameRange& other ) const
+	inline bool operator==( const FrameRange& other ) const
 	{
 		return (first == other.first) &&
 		       (last == other.last) &&
 		       (step == other.step);
 	}
-	std::ostream& getCout( std::ostream& os ) const;
+	std::string string() const;
 
-	Time first, last, step;
+	Time first;
+	Time last;
+	Time step;  // 1 >= step > N
 };
 
-inline std::ostream& operator<<(std::ostream& os, const FrameRange& range)
-{
-	return range.getCout(os);
-}
+
+/**
+ * @brief Convert FrameRange into a string.
+ * FrameRange(1, 10, 2) => "1-10x2".
+ * FrameRange(1, 10, 1) => "1-10".
+ * FrameRange(1,  1, 1) => "1".
+ */
+std::ostream& operator<<(std::ostream& os, const FrameRange& range);
+
+
+/// @brief Convert list of FrameRange into a string, like "1-10x2, 20-35, 55, 57".
+std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& range);
+
 
 class FrameRangesConstIterator
 {
@@ -66,7 +79,7 @@ public:
 		: _rangeIterator(rangeIterator)
 		, _index(index)
 	{}
-	self_type operator++()
+	inline self_type operator++()
 	{
 		if( _index < _rangeIterator->getNbFrames() - 1 )
 		{
@@ -79,13 +92,13 @@ public:
 		}
 		return *this;
 	}
-	self_type operator++(int junk)
+	inline self_type operator++(int junk)
 	{
 		self_type i = *this;
 		++(*this);
 		return i;
 	}
-	self_type operator--()
+	inline self_type operator--()
 	{
 		if( _index > 0 )
 		{
@@ -107,30 +120,30 @@ public:
 		}
 		return *this;
 	}
-	self_type operator--(int junk)
+	inline self_type operator--(int junk)
 	{
 		self_type i = *this;
 		--(*this);
 		return i;
 	}
-	value_type operator*()
+	inline value_type operator*()
 	{
 		if( _index < 0 )
 			return _rangeIterator->atIndex(_rangeIterator->getNbFrames() + _index);
 
 		return _rangeIterator->atIndex(_index);
 	}
-	std::ssize_t getRealIndex() const 
+	inline std::ssize_t getRealIndex() const 
 	{
 		if( _index < 0 )
 			return _rangeIterator->getNbFrames() + _index;
 		return _index;
 	}
-	bool operator==(const self_type& other) const
+	inline bool operator==(const self_type& other) const
 	{
 		return _rangeIterator == other._rangeIterator && (_index == other._index || getRealIndex() == other.getRealIndex());
 	}
-	bool operator!=(const self_type& other) const
+	inline bool operator!=(const self_type& other) const
 	{
 		return ! operator==(other);
 	}
@@ -140,33 +153,27 @@ public:
 	std::ssize_t _index;
 };
 
+#ifndef SWIG
+std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times );
+#endif
+
 class FrameRangesView
 {
 public:
 	typedef FrameRangesConstIterator const_iterator;
-	
+
 	FrameRangesView( const std::vector<FrameRange>& data )
 	: _data(data)
 	{}
 
 #ifndef SWIG
-	
-	std::size_t size() const
-	{
-		std::size_t s = 0;
-		BOOST_FOREACH( const FrameRange& frameRange, _data )
-		{
-			s += frameRange.getNbFrames();
-		}
-		return s;
-	}
+	std::size_t size() const;
 
-	const_iterator begin() const
+	inline const_iterator begin() const
 	{
 		return const_iterator(_data.begin(), 0);
 	}
-
-	const_iterator end() const
+	inline const_iterator end() const
 	{
 		return const_iterator(_data.end(), 0);
 	}
@@ -176,28 +183,20 @@ private:
 	const std::vector<FrameRange>& _data;
 };
 
+
 class FrameRangesSubView
 {
 public:
 	typedef FrameRangesConstIterator const_iterator;
-	
+
 	FrameRangesSubView( const std::vector<FrameRange>& data, const Time firstTime, const Time lastTime )
 	: _data(data)
 	, _firstTime(firstTime)
 	, _lastTime(lastTime)
 	{}
 
-#ifndef SWIG
-	std::size_t size() const
-	{
-		std::size_t s = 0;
-		BOOST_FOREACH( const FrameRange& frameRange, _data )
-		{
-			s += frameRange.getNbFrames();
-		}
-		return s;
-	}
-	
+	std::size_t size() const;
+
 	enum EFrameStatus {
 		eFrameStatusInRange,
 		eFrameStatusBetweenRange,
@@ -205,67 +204,13 @@ public:
 		eFrameStatusAfterAll,
 		eFrameStatusNoFrameRange
 	};
-	
-	EFrameStatus findGreaterOrEqualFrameRange( std::vector<FrameRange>::const_iterator& outIt, const Time time ) const
-	{
-		outIt = _data.begin();
-		std::vector<FrameRange>::const_iterator itEnd = _data.end();
-		if( outIt == itEnd )
-			return eFrameStatusNoFrameRange;
-		if( time < outIt->first )
-			return eFrameStatusBeforeAll;
 
-		for(; outIt != itEnd; ++outIt)
-		{
-			if( time < outIt->first )
-				return eFrameStatusBetweenRange;
-			if( time >= outIt->first && time <= outIt->last )
-				return eFrameStatusInRange;
-		}
-		return eFrameStatusAfterAll;
-	}
-	
-	const_iterator begin() const
-	{
-		std::vector<FrameRange>::const_iterator it;
-		EFrameStatus frameStatus = findGreaterOrEqualFrameRange( it, _firstTime );
-		
-		switch( frameStatus )
-		{
-			case eFrameStatusInRange:
-			{
-				Time index = std::ceil((_firstTime - it->first) / (double)(it->step));
-				return const_iterator(it, index);
-			}
-			case eFrameStatusBetweenRange:
-			case eFrameStatusBeforeAll:
-			case eFrameStatusAfterAll:
-				return const_iterator(it, 0);
-			case eFrameStatusNoFrameRange:
-				return const_iterator(_data.begin(), 0);
-		}
-	}
-	
-	const_iterator end() const
-	{
-		std::vector<FrameRange>::const_iterator it;
-		EFrameStatus frameStatus = findGreaterOrEqualFrameRange( it, _lastTime );
-		
-		switch( frameStatus )
-		{
-			case eFrameStatusInRange:
-			{
-				Time index = std::ceil((_lastTime - it->first) / (double)(it->step));
-				return ++const_iterator(it, index);
-			}
-			case eFrameStatusBetweenRange:
-			case eFrameStatusBeforeAll:
-			case eFrameStatusAfterAll:
-				return const_iterator(it, 0);
-			case eFrameStatusNoFrameRange:
-				return const_iterator(_data.begin(), 0);
-		}
-	}
+#ifndef SWIG
+	EFrameStatus findGreaterOrEqualFrameRange( std::vector<FrameRange>::const_iterator& outIt, const Time time ) const;
+
+	const_iterator begin() const;
+
+	const_iterator end() const;
 #endif
 
 private:
