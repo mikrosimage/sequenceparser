@@ -68,10 +68,16 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 {
 	boost::system::error_code errorCode;
 	modificationTime = bfs::last_write_time(path, errorCode);
+	int stat_status = -1;
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat(path.c_str(), &statInfos);
+	stat_status = lstat(path.c_str(), &statInfos);
+	if (stat_status == -1)
+	{
+		setDefaultValues();
+		return;
+	}
 	fullNbHardLinks = nbHardLinks = statInfos.st_nlink;
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
@@ -96,6 +102,20 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	realSize = size / nbHardLinks;
 }
 
+void ItemStat::setDefaultValues(){
+	deviceId = 0;
+	inodeId = 0;
+	userId = 0;
+	groupId = 0;
+	accessTime = 0;
+	creationTime = 0;
+	sizeOnDisk = 0;
+	size = 0;
+	realSize = 0;
+	fullNbHardLinks = 0;
+	modificationTime = -1;
+}
+
 void ItemStat::statFolder( const boost::filesystem::path& path )
 {
 	using namespace boost::filesystem;
@@ -103,10 +123,16 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
+	int stat_status = -1;
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat( path.c_str(), &statInfos );
+	stat_status = lstat( path.c_str(), &statInfos );
+	if (stat_status == -1)
+	{
+		setDefaultValues();
+		return;
+	}
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
 	userId = statInfos.st_uid;
@@ -138,10 +164,17 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	size = bfs::file_size( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
+	int stat_status = -1;
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat( path.c_str(), &statInfos );
+	stat_status = lstat( path.c_str(), &statInfos );
+	if (stat_status == -1)
+	{
+		setDefaultValues();
+		return;
+	}
+
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
 	userId = statInfos.st_uid;
@@ -149,7 +182,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	accessTime = statInfos.st_atime;
 	creationTime = statInfos.st_ctime;
 	// size on hard-drive (takes hardlinks into account)
-	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
+	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512; 
+
 #else
 	deviceId = 0;
 	inodeId = 0;
@@ -169,10 +203,16 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	using namespace boost::filesystem;
 	using namespace sequenceParser;
 	boost::system::error_code errorCode;
+	int stat_status = -1;
 
 #ifdef UNIX
 	struct stat statInfos;
-	lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
+	stat_status = lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
+	if (stat_status == -1)
+	{
+		setDefaultValues();
+		return;
+	}
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
 	userId = statInfos.st_uid;

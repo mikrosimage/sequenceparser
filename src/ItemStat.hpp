@@ -18,6 +18,7 @@ private:
 	void statFile( const boost::filesystem::path& path );
 	void statSequence( const Item& item, const bool approximative );
 	void statLink( const boost::filesystem::path& path );
+	void setDefaultValues();
 
 public:
 	long long deviceId;
