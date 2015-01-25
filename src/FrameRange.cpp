@@ -25,18 +25,24 @@ std::ostream& operator<<(std::ostream& os, const FrameRange& range)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& ranges)
+std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& frameRanges)
 {
 	// to ensure that "ranges" size is > 0 as we use unsigned
-	if( ranges.empty() )
+	if( frameRanges.empty() )
 		return os;
 	
-	std::vector<FrameRange>::const_iterator it;
-	for( std::size_t i = 0; i < ranges.size() - 1; ++i, ++it )
+	std::vector<FrameRange>::const_iterator it = frameRanges.begin();
+	for( std::size_t i = 0; i < frameRanges.size() - 1; ++i, ++it )
 	{
 		os << *it << ",";
 	}
 	os << *it;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const FrameRangesView& frameRanges)
+{
+	os << frameRanges.getFrameRanges();
 	return os;
 }
 
@@ -124,6 +130,13 @@ std::size_t FrameRangesView::size() const
 		s += frameRange.getNbFrames();
 	}
 	return s;
+}
+
+std::string FrameRangesView::string() const
+{
+	std::ostringstream ss;
+	ss << *this;
+	return ss.str();
 }
 
 std::size_t FrameRangesSubView::size() const

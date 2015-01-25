@@ -375,12 +375,12 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 }
 
 
-bool Sequence::initFromPattern( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept )
+bool Sequence::initFromPattern( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept )
 {
 	if( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
 		return false; // not regognize as a pattern, maybe a still file
 	_ranges.clear();
-	_ranges.push_back(FrameRange(firstTime, lastTime, step));
+	_ranges = frameRanges;
 	return true;
 }
 

@@ -63,8 +63,9 @@ def testBrowse():
 		print("item:", item.getFilename())
 		print("item:", item.getType())
 		if item.getType() == sequenceParser.eTypeSequence:
-			print("item seq:", item.getSequence().getFirstFilename())
-			print("item seq:", item.getSequence().getFirstTime(), item.getSequence().getLastTime(), item.getSequence().getDuration(), item.getSequence().getStandardPattern())
-
-
+			seq = item.getSequence()
+			print("item seq:", seq.getFirstFilename())
+			print("item seq:", seq.getFirstTime(), seq.getLastTime(), seq.getDuration(), seq.getStandardPattern())
+			for f in seq.getFramesIterable():
+				print("file:", seq.getFilenameAt(f))
 

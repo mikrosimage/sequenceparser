@@ -46,9 +46,9 @@ public:
 		init( prefix, padding, suffix, firstTime, lastTime, step, strictPadding );
 	}
 
-	Sequence( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault )
+	Sequence( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept = ePatternDefault )
 	{
-		initFromPattern( pattern, firstTime, lastTime, step, accept );
+		initFromPattern( pattern, frameRanges, accept );
 	}
 
 	Sequence( const Sequence& v )
@@ -84,7 +84,7 @@ private:
 	 * @brief Construct a sequence from a pattern and given informations.
 	 * @warning No check on your filesystem.
 	 */
-	bool initFromPattern( const std::string& pattern, const Time firstTime, const Time lastTime, const Time step, const EPattern accept = ePatternDefault );
+	bool initFromPattern( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept = ePatternDefault );
 
 public:
 	std::string getFilenameAt( const Time time ) const;

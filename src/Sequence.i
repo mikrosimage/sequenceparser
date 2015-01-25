@@ -7,12 +7,12 @@
 
 %include "Sequence.hpp"
 
-//%extend sequenceParser::Sequence
-//{
-//	%pythoncode
-//	{
-//		def __str__(self):
-//			return self.string()
-//	}
-//}
+%extend sequenceParser::Sequence
+{
+	%pythoncode
+	{
+		def __str__(self):
+			return self.string()
+	}
+}
 

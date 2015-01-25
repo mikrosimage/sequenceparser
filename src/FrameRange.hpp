@@ -81,7 +81,7 @@ public:
 	{}
 	inline self_type operator++()
 	{
-		if( _index < _rangeIterator->getNbFrames() - 1 )
+		if( _index >= 0 && _index < _rangeIterator->getNbFrames() - 1 )
 		{
 			++_index;
 		}
@@ -91,6 +91,10 @@ public:
 			++_rangeIterator;
 		}
 		return *this;
+	}
+	inline self_type next()
+	{
+		return this->operator++();
 	}
 	inline self_type operator++(int junk)
 	{
@@ -126,12 +130,20 @@ public:
 		--(*this);
 		return i;
 	}
+	inline self_type previous()
+	{
+		return this->operator--();
+	}
 	inline value_type operator*()
 	{
 		if( _index < 0 )
 			return _rangeIterator->atIndex(_rangeIterator->getNbFrames() + _index);
 
 		return _rangeIterator->atIndex(_index);
+	}
+	inline value_type value()
+	{
+		return this->operator*();
 	}
 	inline std::ssize_t getRealIndex() const 
 	{
@@ -166,7 +178,6 @@ public:
 	: _data(data)
 	{}
 
-#ifndef SWIG
 	std::size_t size() const;
 
 	inline const_iterator begin() const
@@ -177,11 +188,17 @@ public:
 	{
 		return const_iterator(_data.end(), 0);
 	}
-#endif
+	inline const std::vector<FrameRange>& getFrameRanges() const
+	{
+		return _data;
+	}
+	std::string string() const;
 
 private:
 	const std::vector<FrameRange>& _data;
 };
+
+std::ostream& operator<<(std::ostream& os, const FrameRangesView& frameRanges);
 
 
 class FrameRangesSubView
@@ -207,11 +224,11 @@ public:
 
 #ifndef SWIG
 	EFrameStatus findGreaterOrEqualFrameRange( std::vector<FrameRange>::const_iterator& outIt, const Time time ) const;
+#endif
 
 	const_iterator begin() const;
 
 	const_iterator end() const;
-#endif
 
 private:
 	const std::vector<FrameRange>& _data;
