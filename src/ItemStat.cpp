@@ -1,4 +1,5 @@
 #include "ItemStat.hpp"
+#include "system.hpp"
 
 #include <boost/filesystem/operations.hpp>
 
@@ -69,7 +70,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	boost::system::error_code errorCode;
 	modificationTime = bfs::last_write_time(path, errorCode);
 
-#ifdef UNIX
+#ifdef __UNIX__
 	struct stat statInfos;
 	lstat(path.c_str(), &statInfos);
 	fullNbHardLinks = nbHardLinks = statInfos.st_nlink;
@@ -104,7 +105,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
 
-#ifdef UNIX
+#ifdef __UNIX__
 	struct stat statInfos;
 	lstat( path.c_str(), &statInfos );
 	deviceId = statInfos.st_dev;
@@ -139,7 +140,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	size = bfs::file_size( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
 
-#ifdef UNIX
+#ifdef __UNIX__
 	struct stat statInfos;
 	lstat( path.c_str(), &statInfos );
 	deviceId = statInfos.st_dev;
@@ -170,7 +171,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	using namespace sequenceParser;
 	boost::system::error_code errorCode;
 
-#ifdef UNIX
+#ifdef __UNIX__
 	struct stat statInfos;
 	lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
 	deviceId = statInfos.st_dev;
