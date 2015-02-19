@@ -7,6 +7,8 @@
 
 %include "Sequence.hpp"
 
+#ifdef SWIGPYTHON
+
 %extend sequenceParser::Sequence
 {
 	%pythoncode
@@ -16,3 +18,4 @@
 	}
 }
 
+#endif
