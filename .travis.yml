@@ -17,10 +17,11 @@ before_script:
   - sudo apt-get install -qq cmake swig swig2.0 libboost1.55-all-dev python-dev default-jdk python-nose
 
 script:
+  # build
   - mkdir build && cd build
   - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install
   - make install
 
-after_script:
-  - export PYTHONPATH=$PYTHONPATH:`pwd`/install/lib/python/site-packages
-  - cd pyTest && nosetests
+  # tests
+  - export PYTHONPATH=$PYTHONPATH:`pwd`/../install/lib/python/site-packages:`pwd`/../install/lib/
+  - cd ../pyTest && nosetests
