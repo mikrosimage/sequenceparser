@@ -6,10 +6,12 @@
 
 %include "FrameRange.hpp"
 
+#ifdef SWIGPYTHON
+
 %extend sequenceParser::FrameRange
 {
     %pythoncode
-	{
+    {
         def __str__(self):
             return self.string()
     }
@@ -45,3 +47,4 @@
     }
 }
 
+#endif

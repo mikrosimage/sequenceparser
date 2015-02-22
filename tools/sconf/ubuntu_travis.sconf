@@ -1,8 +1,0 @@
-import os
-
-lib_python = "python2.7"
-incdir_python = join("/usr/include",lib_python)
-
-dir_java = "/usr/lib/jvm/java-7-openjdk-amd64"
-
-SWIG = "swig2.0"
