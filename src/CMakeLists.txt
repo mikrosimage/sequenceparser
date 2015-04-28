@@ -33,11 +33,8 @@ install(
 	PATTERN "*.hpp"
 	PATTERN "*.i"
 )
-set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
-install(
-	DIRECTORY "${LIBRARY_OUTPUT_PATH}"
-	DESTINATION "${CMAKE_INSTALL_PREFIX}"
-)
+install(TARGETS sequenceparser-static DESTINATION lib/)
+install(TARGETS sequenceparser-shared DESTINATION lib/)
 
 ### SWIG
 find_package(SWIG)
@@ -51,7 +48,7 @@ if(SWIG_FOUND)
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
 	### PYTHON BINDING
-	find_package(PythonLibs)
+	find_package(PythonLibs ${SEQUENCEPARSER_PYTHON_VERSION})
 	if(PYTHONLIBS_FOUND)
 		include_directories(${PYTHON_INCLUDE_PATH})
 
@@ -66,6 +63,13 @@ if(SWIG_FOUND)
 			set_target_properties(${SWIG_MODULE_sequenceparser-py_REAL_NAME} PROPERTIES SOVERSION ${SEQUENCEPARSER_VERSION_MAJOR})
 			set_target_properties(${SWIG_MODULE_sequenceparser-py_REAL_NAME} PROPERTIES VERSION ${SEQUENCEPARSER_VERSION})
 		endif()
+		# Force the library to look in the project lib folder relatively
+		set_target_properties(${SWIG_MODULE_sequenceparser-py_REAL_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
+		if(APPLE)
+			set_target_properties(${SWIG_MODULE_sequenceparser-py_REAL_NAME} PROPERTIES INSTALL_RPATH "@loader_path/../../..")
+		else()
+			set_target_properties(${SWIG_MODULE_sequenceparser-py_REAL_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/../../..:$ORIGIN")
+		endif()
 		swig_link_libraries(sequenceparser-py sequenceparser-shared ${PYTHON_LIBRARIES})
 
 		# Install python interface
@@ -75,7 +79,8 @@ if(SWIG_FOUND)
 			FILES ${SEQUENCEPARSER_PYTHON_BINDING_FILE} ${SEQUENCEPARSER_PYTHON_INIT_FILE}
 			DESTINATION ${SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR}
 		)
-		# Install __init__.py
+		# Install python lib and __init__.py files
+		install(TARGETS ${SWIG_MODULE_sequenceparser-py_REAL_NAME} DESTINATION "lib/python${PYTHONLIBS_VERSION_STRING}/site-packages/pySequenceParser/")
 		install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/${SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR}/__init__.py)")
 	else()
 		message("PYTHON not found, will not build python binding.")
@@ -99,6 +104,13 @@ if(SWIG_FOUND)
 			set_target_properties(${SWIG_MODULE_sequenceparser-java_REAL_NAME} PROPERTIES SOVERSION ${SEQUENCEPARSER_VERSION_MAJOR})
 			set_target_properties(${SWIG_MODULE_sequenceparser-java_REAL_NAME} PROPERTIES VERSION ${SEQUENCEPARSER_VERSION})
 		endif()
+		# Force the library to look in the project lib folder relatively
+		set_target_properties(${SWIG_MODULE_sequenceparser-java_REAL_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
+		if(APPLE)
+			set_target_properties(${SWIG_MODULE_sequenceparser-java_REAL_NAME} PROPERTIES INSTALL_RPATH "@loader_path/..")
+		else()
+			set_target_properties(${SWIG_MODULE_sequenceparser-java_REAL_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/..:$ORIGIN")
+		endif()
 		swig_link_libraries(sequenceparser-java sequenceparser-shared)
 
 		# Post build of java binding : compile java files (generate class files) and create jar
@@ -115,7 +127,8 @@ if(SWIG_FOUND)
 			COMMAND ${Java_JAR_EXECUTABLE} cf ${SEQUENCEPARSER_JAR_NAME} "-C" ${SEQUENCEPARSER_JAVA_CLASS_OUTPUT_PATH} "."
 		)
 
-		# Install jar file
+		# Install java lib and jar files
+		install(TARGETS ${SWIG_MODULE_sequenceparser-java_REAL_NAME} DESTINATION "lib/java")
 		install(FILES ${SEQUENCEPARSER_JAR_PATH}/${SEQUENCEPARSER_JAR_NAME} DESTINATION "share/java/")
 	else()
 		message("JAVA not found, will not build java binding.")

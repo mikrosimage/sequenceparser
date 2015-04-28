@@ -19,9 +19,10 @@ before_script:
 script:
   # build
   - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install
-  - make install
+  - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install -DSEQUENCEPARSER_PYTHON_VERSION=2.7
+  - make $J install
 
   # tests
-  - export PYTHONPATH=$PYTHONPATH:`pwd`/../install/lib/python/site-packages:`pwd`/../install/lib/
-  - cd ../pyTest && nosetests
+  - cd ${TRAVIS_BUILD_DIR}
+  - export PYTHONPATH=$PYTHONPATH:`pwd`/install/lib/python/site-packages
+  - nosetests pyTest
