@@ -48,7 +48,7 @@ if(SWIG_FOUND)
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
 	### PYTHON BINDING
-	find_package(PythonLibs)
+	find_package(PythonLibs ${SEQUENCEPARSER_PYTHON_VERSION})
 	if(PYTHONLIBS_FOUND)
 		include_directories(${PYTHON_INCLUDE_PATH})
 
