@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE( TestSequence )
     boost::filesystem::current_path("../../../../");
 
 //    BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/img.0050.dpx"          , sequenceParser::eDetectionNone, 0, 1, 0, 1 ) );
-	// no eDetectionSequenceFromFilename, so it should not detect the sequence:
+	// no eDetectionSequenceBasedOnASingleFile, so it should not detect the sequence:
     BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*.0050.dpx"            , sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles | sequenceParser::eDetectionIgnoreDotFile, 0, 1, 0, 1 ) );
     BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/*0050.dpx"             , sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles | sequenceParser::eDetectionIgnoreDotFile, 0, 1, 0, 1 ) );
     BOOST_CHECK( testFindObjectInDiretory( "tmpTestSequence/root/film/strictPadding/???.0050.dpx"          , sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles, 0, 1, 0, 1 ) );

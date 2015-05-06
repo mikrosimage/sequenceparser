@@ -37,7 +37,7 @@ boost::regex convertFilterToRegex( const std::string& filter, const EDetection d
 	}
 
 	// for detect sequence based on a single file
-	if( ( detectOptions & eDetectionSequenceFromFilename ) )
+	if( ( detectOptions & eDetectionSequenceBasedOnASingleFile ) )
 		filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\d" ), "[0-9]" );
 
 	filterToRegex = boost::regex_replace( filterToRegex, boost::regex( "\\*" ), "(.*)" );
