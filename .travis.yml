@@ -20,7 +20,8 @@ script:
   # build
   - mkdir build && cd build
   - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install -DSEQUENCEPARSER_PYTHON_VERSION=2.7
-  - make $J install
+  - make $J
+  - make install
 
   # tests
   - cd ${TRAVIS_BUILD_DIR}
