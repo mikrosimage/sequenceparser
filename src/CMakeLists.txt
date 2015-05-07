@@ -33,8 +33,8 @@ install(
 	PATTERN "*.hpp"
 	PATTERN "*.i"
 )
-install(TARGETS sequenceparser-static DESTINATION lib/)
-install(TARGETS sequenceparser-shared DESTINATION lib/)
+install(TARGETS sequenceparser-static DESTINATION lib/ OPTIONAL)
+install(TARGETS sequenceparser-shared DESTINATION lib/ OPTIONAL)
 
 ### SWIG
 find_package(SWIG)
@@ -78,9 +78,10 @@ if(SWIG_FOUND)
 		install(
 			FILES ${SEQUENCEPARSER_PYTHON_BINDING_FILE} ${SEQUENCEPARSER_PYTHON_INIT_FILE}
 			DESTINATION ${SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR}
+			OPTIONAL
 		)
 		# Install python lib and __init__.py files
-		install(TARGETS ${SWIG_MODULE_sequenceparser-py_REAL_NAME} DESTINATION "lib/python${PYTHONLIBS_VERSION_STRING}/site-packages/pySequenceParser/")
+		install(TARGETS ${SWIG_MODULE_sequenceparser-py_REAL_NAME} DESTINATION "lib/python${PYTHONLIBS_VERSION_STRING}/site-packages/pySequenceParser/" OPTIONAL)
 		install(CODE "file(WRITE ${CMAKE_INSTALL_PREFIX}/${SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR}/__init__.py)")
 	else()
 		message("PYTHON not found, will not build python binding.")
@@ -128,8 +129,8 @@ if(SWIG_FOUND)
 		)
 
 		# Install java lib and jar files
-		install(TARGETS ${SWIG_MODULE_sequenceparser-java_REAL_NAME} DESTINATION "lib/java")
-		install(FILES ${SEQUENCEPARSER_JAR_PATH}/${SEQUENCEPARSER_JAR_NAME} DESTINATION "share/java/")
+		install(TARGETS ${SWIG_MODULE_sequenceparser-java_REAL_NAME} DESTINATION "lib/java" OPTIONAL)
+		install(FILES ${SEQUENCEPARSER_JAR_PATH}/${SEQUENCEPARSER_JAR_NAME} DESTINATION "share/java/" OPTIONAL)
 	else()
 		message("JAVA not found, will not build java binding.")
 	endif()
