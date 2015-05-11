@@ -80,9 +80,9 @@ enum EDetection
 	eDetectionSingleFileSeqUseFirstNumber = 4,
 	eDetectionIgnoreDotFile = 8,
 	/// detect from an existing filename of the sequence
-	eDetectionSequenceFromFilename = 16,
-	eDetectionDefaultWithDotFile = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionSequenceFromFilename),
-	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
+	eDetectionSequenceBasedOnASingleFile = 16,
+	eDetectionDefaultWithDotFile = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionSequenceBasedOnASingleFile),
+	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceBasedOnASingleFile)
 };
 
 SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EType)

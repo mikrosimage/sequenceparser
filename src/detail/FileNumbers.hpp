@@ -44,6 +44,7 @@ public:
 		try
 		{
 			t = boost::lexical_cast<Time > ( s );
+			_numbers.push_back( Pair( t, s ) );
 		}
 		catch( ... )
 		{
@@ -52,7 +53,6 @@ public:
 			// ouf of range for Time type.
 			t = 0;
 		}
-		_numbers.push_back( Pair( t, s ) );
 	}
 
 	void clear()
