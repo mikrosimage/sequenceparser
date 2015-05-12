@@ -47,4 +47,15 @@
     }
 }
 
+%extend sequenceParser::FrameRangesSubView
+{
+    %pythoncode
+	{
+        def __iter__(self):
+            return PyFrameRangesConstIterator(self.begin().previous(), self.end())
+        def __str__(self):
+            return self.string()
+    }
+}
+
 #endif
