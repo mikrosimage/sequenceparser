@@ -159,7 +159,7 @@ public:
 	 * @brief Partial initialization, using only pattern informations.
 	 * @warning You don't have all informations like range, directory, etc.
 	 */
-	bool retrieveInfosFromPattern( const std::string& pattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding ) const;
+	bool retrieveInfosFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
 	std::vector<boost::filesystem::path> getFiles() const;

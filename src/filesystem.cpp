@@ -42,8 +42,7 @@ bool browseSequence( Sequence& outSequence, const std::string& pattern, const EP
 	boost::filesystem::path directory = getDirectoryFromPath( pattern );
 
 	if( !outSequence.retrieveInfosFromPattern(
-			boost::filesystem::path( pattern ).filename().string(), accept,
-			outSequence._prefix, outSequence._suffix, outSequence._padding, outSequence._strictPadding ) )
+			boost::filesystem::path( pattern ).filename().string(), accept ) )
 		return false; // not recognized as a pattern, maybe a still file
 
 	if( !boost::filesystem::exists( directory ) )

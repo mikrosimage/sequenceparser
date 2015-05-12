@@ -318,48 +318,44 @@ EPattern Sequence::checkPattern( const std::string& pattern, const EDetection de
  *        and init internal values.
  * @param[in] pattern
  * @param[in] accept
- * @param[out] prefix
- * @param[out] suffix
- * @param[out] padding
- * @param[out] strictPadding
  */
-bool Sequence::retrieveInfosFromPattern( const std::string& filePattern, const EPattern& accept, std::string& prefix, std::string& suffix, std::size_t& padding, bool& strictPadding ) const
+bool Sequence::retrieveInfosFromPattern( const std::string& filePattern, const EPattern& accept )
 {
 	boost::cmatch matches;
-	//std::cout << filePattern << " / " << prefix << " + " << padding << " + " << suffix << std::endl;
+	//std::cout << filePattern << " / " << _prefix << " + " << _padding << " + " << _suffix << std::endl;
 	if( ( accept & ePatternStandard ) && regex_match( filePattern.c_str(), matches, regexPatternStandard ) )
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
-		padding = paddingStr.size();
-		strictPadding = ( paddingStr[0] == '#' );
+		_padding = paddingStr.size();
+		_strictPadding = ( paddingStr[0] == '#' );
 	}
 	else if( ( accept & ePatternCStyle ) && regex_match( filePattern.c_str(), matches, regexPatternCStyle ) )
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
-		padding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no padding value: %d -> padding = 0
-		strictPadding = false;
+		_padding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no _padding value: %d -> _padding = 0
+		_strictPadding = false;
 	}
 	else if( ( accept & ePatternFrame ) && regex_match( filePattern.c_str(), matches, regexPatternFrame ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
-		padding = frame.size();
-		strictPadding = false;
+		_padding = frame.size();
+		_strictPadding = false;
 	}
 	else if( ( accept & ePatternFrameNeg ) && regex_match( filePattern.c_str(), matches, regexPatternFrameNeg ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
-		padding = frame.size();
-		strictPadding = false;
+		_padding = frame.size();
+		_strictPadding = false;
 	}
 	else
 	{
 		// this is a file, not a sequence
 		return false;
 	}
-	prefix = std::string( matches[1].first, matches[1].second );
-	suffix = std::string( matches[3].first, matches[3].second );
+	_prefix = std::string( matches[1].first, matches[1].second );
+	_suffix = std::string( matches[3].first, matches[3].second );
 	return true;
 }
 
@@ -377,7 +373,7 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 
 bool Sequence::initFromPattern( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept )
 {
-	if( !retrieveInfosFromPattern( pattern, accept, _prefix, _suffix, _padding, _strictPadding ) )
+	if( !retrieveInfosFromPattern( pattern, accept ) )
 		return false; // not regognize as a pattern, maybe a still file
 	_ranges.clear();
 	_ranges = frameRanges;
