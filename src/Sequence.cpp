@@ -319,7 +319,7 @@ EPattern Sequence::checkPattern( const std::string& pattern, const EDetection de
  * @param[in] pattern
  * @param[in] accept
  */
-bool Sequence::retrieveInfosFromPattern( const std::string& filePattern, const EPattern& accept )
+bool Sequence::initFromPattern( const std::string& filePattern, const EPattern& accept )
 {
 	boost::cmatch matches;
 	//std::cout << filePattern << " / " << _prefix << " + " << _padding << " + " << _suffix << std::endl;
@@ -369,17 +369,6 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 	_ranges.push_back(FrameRange(firstTime, lastTime, step));
 	_strictPadding = strictPadding;
 }
-
-
-bool Sequence::initFromPattern( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept )
-{
-	if( !retrieveInfosFromPattern( pattern, accept ) )
-		return false; // not regognize as a pattern, maybe a still file
-	_ranges.clear();
-	_ranges = frameRanges;
-	return true;
-}
-
 
 std::vector<boost::filesystem::path> Sequence::getFiles() const
 {

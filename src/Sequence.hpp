@@ -48,7 +48,10 @@ public:
 
 	Sequence( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept = ePatternDefault )
 	{
-		initFromPattern( pattern, frameRanges, accept );
+		if( initFromPattern( pattern, accept ) )
+		{
+			_ranges = frameRanges;
+		}
 	}
 
 	Sequence( const Sequence& v )
@@ -79,12 +82,6 @@ private:
 	 * @warning No check on your filesystem.
 	 */
 	void init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const bool strictPadding = false );
-
-	/**
-	 * @brief Construct a sequence from a pattern and given informations.
-	 * @warning No check on your filesystem.
-	 */
-	bool initFromPattern( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept = ePatternDefault );
 
 public:
 	std::string getFilenameAt( const Time time ) const;
@@ -159,7 +156,7 @@ public:
 	 * @brief Partial initialization, using only pattern informations.
 	 * @warning You don't have all informations like range, directory, etc.
 	 */
-	bool retrieveInfosFromPattern( const std::string& pattern, const EPattern& accept );
+	bool initFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
 	std::vector<boost::filesystem::path> getFiles() const;
