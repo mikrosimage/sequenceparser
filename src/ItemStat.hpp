@@ -13,6 +13,9 @@ public:
 	ItemStat( const Item& item, const bool approximative=true );
 	ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative=true );
 
+	std::string getUserName() const;
+	std::string getGroupName() const;
+
 private:
 	void statFolder( const boost::filesystem::path& path );
 	void statFile( const boost::filesystem::path& path );

@@ -5,6 +5,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
 
 
 namespace bfs = boost::filesystem;
@@ -63,6 +65,30 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 		case eTypeUndefined:
 			BOOST_ASSERT(false);
 	}
+}
+
+std::string ItemStat::getUserName() const
+{
+#ifdef __UNIX__
+	passwd* user = getpwuid(userId);
+	if(user == NULL)
+		return std::string("unknown");
+	return std::string(user->pw_name ? user->pw_name : "unknown");
+#else
+	return std::string("not implemented");
+#endif
+}
+
+std::string ItemStat::getGroupName() const
+{
+#ifdef __UNIX__
+	group* group = getgrgid(groupId);
+	if(group == NULL)
+		return std::string("unknown");
+	return std::string(group->gr_name ? group->gr_name : "unknown");
+#else
+	return std::string("not implemented");
+#endif
 }
 
 void ItemStat::statLink( const boost::filesystem::path& path )
