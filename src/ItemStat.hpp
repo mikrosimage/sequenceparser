@@ -3,6 +3,11 @@
 
 #include "Item.hpp"
 #include "common.hpp"
+#include "system.hpp"
+
+#ifdef __UNIX__
+    #include <sys/types.h>
+#endif
 
 
 namespace sequenceParser {
@@ -22,6 +27,9 @@ private:
 	void statSequence( const Item& item, const bool approximative );
 	void statLink( const boost::filesystem::path& path );
 	void setDefaultValues();
+#ifdef __UNIX__
+	void setPermissions( const mode_t& protection );
+#endif
 
 public:
 	long long deviceId;
@@ -36,6 +44,15 @@ public:
 	long long accessTime;
 	long long modificationTime;
 	long long creationTime;
+	bool ownerCanRead;
+	bool ownerCanWrite;
+	bool ownerCanExecute;
+	bool groupCanRead;
+	bool groupCanWrite;
+	bool groupCanExecute;
+	bool otherCanRead;
+	bool otherCanWrite;
+	bool otherCanExecute;
 };
 
 }

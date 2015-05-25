@@ -1,9 +1,7 @@
 #include "ItemStat.hpp"
-#include "system.hpp"
 
 #include <boost/filesystem/operations.hpp>
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
@@ -91,6 +89,21 @@ std::string ItemStat::getGroupName() const
 #endif
 }
 
+#ifdef __UNIX__
+void ItemStat::setPermissions( const mode_t& protection )
+{
+	ownerCanRead = protection & S_IRUSR;
+	ownerCanWrite = protection & S_IWUSR;
+	ownerCanExecute = protection & S_IXUSR;
+	groupCanRead = protection & S_IRGRP;
+	groupCanWrite = protection & S_IWGRP;
+	groupCanExecute = protection & S_IXGRP;
+	otherCanRead = protection & S_IROTH;
+	otherCanWrite = protection & S_IWOTH;
+	otherCanExecute = protection & S_IXOTH;
+}
+#endif
+
 void ItemStat::statLink( const boost::filesystem::path& path )
 {
 	boost::system::error_code errorCode;
@@ -115,6 +128,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	size = statInfos.st_size;
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
+	setPermissions(statInfos.st_mode);
 #else
 	fullNbHardLinks = nbHardLinks = 1;
 	deviceId = 0;
@@ -141,6 +155,15 @@ void ItemStat::setDefaultValues(){
 	realSize = 0;
 	fullNbHardLinks = 0;
 	modificationTime = -1;
+	ownerCanRead = false;
+	ownerCanWrite = false;
+	ownerCanExecute = false;
+	groupCanRead = false;
+	groupCanWrite = false;
+	groupCanExecute = false;
+	otherCanRead = false;
+	otherCanWrite = false;
+	otherCanExecute = false;
 }
 
 void ItemStat::statFolder( const boost::filesystem::path& path )
@@ -169,6 +192,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	size = statInfos.st_size;
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = statInfos.st_blocks * 512;
+	setPermissions(statInfos.st_mode);
 #else
 	deviceId = 0;
 	inodeId = 0;
@@ -209,8 +233,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	accessTime = statInfos.st_atime;
 	creationTime = statInfos.st_ctime;
 	// size on hard-drive (takes hardlinks into account)
-	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512; 
-
+	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
+	setPermissions(statInfos.st_mode);
 #else
 	deviceId = 0;
 	inodeId = 0;
@@ -245,6 +269,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	userId = statInfos.st_uid;
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
+	setPermissions(statInfos.st_mode);
 #else
 	deviceId = 0;
 	inodeId = 0;
@@ -276,6 +301,31 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 
 		ItemStat fileStat(type, filepath);
 		
+		// use the most restrictive permissions in the sequence
+#ifdef __UNIX__
+		// user
+		if( ownerCanRead && ! fileStat.ownerCanRead)
+			ownerCanRead = false;
+		if( ownerCanWrite && ! fileStat.ownerCanWrite)
+			ownerCanWrite = false;
+		if( ownerCanExecute && ! fileStat.ownerCanExecute)
+			ownerCanExecute = false;
+		// group
+		if( groupCanRead && ! fileStat.groupCanRead)
+			groupCanRead = false;
+		if( groupCanWrite && ! fileStat.groupCanWrite)
+			groupCanWrite = false;
+		if( groupCanExecute && ! fileStat.groupCanExecute)
+			groupCanExecute = false;
+		// other
+		if( otherCanRead && ! fileStat.otherCanRead)
+			otherCanRead = false;
+		if( otherCanWrite && ! fileStat.otherCanWrite)
+			otherCanWrite = false;
+		if( otherCanExecute && ! fileStat.otherCanExecute)
+			otherCanExecute = false;
+#endif
+
 		// use the latest modification date in the sequence
 		if( fileStat.modificationTime > modificationTime )
 			modificationTime = fileStat.modificationTime;
