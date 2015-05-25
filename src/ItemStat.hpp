@@ -39,6 +39,8 @@ public:
 	long long userId;
 	long long groupId;
 	long long size;
+	long long minSize; /// size of the smallest file in the sequence (otherwise, same value as size)
+	long long maxSize; /// size of the biggest file in the sequence (otherwise, same value as size)
 	long long realSize; /// size (takes hardlinks into account)
 	long long sizeOnDisk; /// size on hard-drive (takes hardlinks into account)
 	long long accessTime;

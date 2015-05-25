@@ -126,6 +126,8 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	accessTime = statInfos.st_atime;
 	creationTime = statInfos.st_ctime;
 	size = statInfos.st_size;
+	minSize = size;
+	maxSize = size;
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
 	setPermissions(statInfos.st_mode);
@@ -152,6 +154,8 @@ void ItemStat::setDefaultValues(){
 	creationTime = 0;
 	sizeOnDisk = 0;
 	size = 0;
+	minSize = 0;
+	maxSize = 0;
 	realSize = 0;
 	fullNbHardLinks = 0;
 	modificationTime = -1;
@@ -190,6 +194,8 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	accessTime = statInfos.st_atime;
 	creationTime = statInfos.st_ctime;
 	size = statInfos.st_size;
+	minSize = size;
+	maxSize = size;
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = statInfos.st_blocks * 512;
 	setPermissions(statInfos.st_mode);
@@ -214,6 +220,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	boost::system::error_code errorCode;
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	size = bfs::file_size( path, errorCode );
+	minSize = size;
+	maxSize = size;
 	modificationTime = bfs::last_write_time( path, errorCode );
 	int stat_status = -1;
 
@@ -281,6 +289,8 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	modificationTime = 0;
 	fullNbHardLinks = 0;
 	size = 0;
+	minSize = 0;
+	maxSize = 0;
 	realSize = 0;
 	sizeOnDisk = 0;
 	creationTime = 0;
@@ -332,8 +342,13 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 		if( creationTime == 0 || creationTime > fileStat.creationTime )
 			creationTime = fileStat.creationTime;
 
+		// compute sizes
 		fullNbHardLinks += fileStat.fullNbHardLinks;
 		size += fileStat.size;
+		if( minSize == 0 || minSize > fileStat.size )
+			minSize = fileStat.size;
+		if( maxSize == 0 || maxSize < fileStat.size )
+			maxSize = fileStat.size;
 		realSize += fileStat.realSize;
 		sizeOnDisk += fileStat.sizeOnDisk;
 	}
