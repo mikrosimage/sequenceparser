@@ -60,6 +60,14 @@ public:
 		_path /= sequence.getStandardPattern();
 	}
 
+	Item( const Sequence& sequence, const std::string& folder )
+	: _type(eTypeSequence)
+	, _path(folder)
+	, _sequence(sequence)
+	{
+		_path /= sequence.getStandardPattern();
+	}
+
 	EType getType() const { return _type; }
 
 	std::string getAbsoluteFilepath() const { return _path.string(); }
