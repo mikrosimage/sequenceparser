@@ -70,6 +70,9 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
  * stringParts = ["aa", "b", "cccc"]
  * numberParts = [1, 22, 3]
  * 
+ * @note if a filename contains '-0', the number is added to the string part
+ * to prevent issues between '0' and '-0' in sequence ranges.
+ * 
  * @param[in] str the string to process (filename)
  * @param[out] stringParts vector of strings
  * @param[out] numberParts vector of integers
