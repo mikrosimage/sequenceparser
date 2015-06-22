@@ -85,6 +85,10 @@ bool browseSequence( Sequence& outSequence, const std::string& pattern, const EP
 	return true; // a real file sequence
 }
 
+bool isConsideredAsSingleFile( const Sequence& s, const EDetection detectOptions )
+{
+	return (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1);
+}
 
 std::vector<Item> browse(
 		const boost::filesystem::path& dir,
@@ -160,13 +164,32 @@ std::vector<Item> browse(
 			else
 			{
 				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
-				if( (detectOptions & eDetectionSequenceNeedAtLeastTwoFiles) && (s.getNbFiles() == 1) )
+				if( isConsideredAsSingleFile( s, detectOptions ) )
 				{
 					output.push_back( Item( getTypeFromPath( directory / s.getFirstFilename() ), directory / s.getFirstFilename() ) );
 				}
 				else
 				{
-					output.push_back( Item( Sequence( directory, s ), directory ) );
+					// if it's a sequence with holes, it could be split in several sequences depending on the detect options
+					if( (detectOptions & eDetectionSequenceWithoutHoles) && (s.getFrameRanges().size() > 1) )
+					{
+						BOOST_FOREACH( FrameRange f, s.getFrameRanges() )
+						{
+							const Sequence sequenceWithoutHoles( s.getPrefix(), s.getPadding(), s.getSuffix(), f.first, f.last, f.step, s.isStrictPadding() );
+							if( isConsideredAsSingleFile( sequenceWithoutHoles, detectOptions ) )
+							{
+								output.push_back( Item( getTypeFromPath( directory / sequenceWithoutHoles.getFirstFilename() ), directory / sequenceWithoutHoles.getFirstFilename() ) );
+							}
+							else
+							{
+								output.push_back( Item( Sequence( directory, sequenceWithoutHoles ), directory ) );
+							}
+						}
+					}
+					else
+					{
+						output.push_back( Item( Sequence( directory, s ), directory ) );
+					}
 				}
 			}
 		}
