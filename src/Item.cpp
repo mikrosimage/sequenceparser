@@ -42,18 +42,25 @@ std::vector<Item> Item::explode()
 EType getTypeFromPath( const boost::filesystem::path& path )
 {
 	if( bfs::is_symlink( path ) )
-        {
-                return eTypeLink;
-        }
-        if( bfs::is_regular_file( path ) )
 	{
-                return eTypeFile;
-        }
+		return eTypeLink;
+	}
+	if( bfs::is_regular_file( path ) )
+	{
+		return eTypeFile;
+	}
 	if( bfs::is_directory( path ) )
-        {
-                return eTypeFolder;
-        }
-        return eTypeUndefined;
+	{
+		return eTypeFolder;
+	}
+	return eTypeUndefined;
+}
+
+
+EType getTypeFromPath( const std::string& pathStr )
+{
+	const boost::filesystem::path path( pathStr );
+	return getTypeFromPath(path);
 }
 
 

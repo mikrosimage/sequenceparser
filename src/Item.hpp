@@ -100,7 +100,10 @@ private:
 };
 
 
+#ifndef SWIG
 EType getTypeFromPath( const boost::filesystem::path& path );
+#endif
+EType getTypeFromPath( const std::string& pathStr );
 
 
 std::ostream& operator<<( std::ostream& os, const Item& item );
