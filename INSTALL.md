@@ -5,6 +5,7 @@ SequenceParser uses CMake build system.
 #### To build
 ```
 cmake .
+make
 make install
 ```
 
