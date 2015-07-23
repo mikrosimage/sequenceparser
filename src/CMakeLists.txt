@@ -2,7 +2,7 @@ set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
 file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "*.cpp" "*.hpp")
 
 # Find boost
-find_package(Boost 1.55.0 
+find_package(Boost 1.53.0
     COMPONENTS regex system filesystem locale REQUIRED)
 if(NOT Boost_FOUND) 
     message(FATAL_ERROR "please set BOOST_ROOT environment variable to a proper boost install")
