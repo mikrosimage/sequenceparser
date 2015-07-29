@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "FrameRange.hpp"
+#include "Item.hpp"
 
 #include <iomanip>
 #include <set>
@@ -159,8 +160,9 @@ public:
 	bool initFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
-	std::vector<boost::filesystem::path> getFiles() const;
-	
+    std::vector<boost::filesystem::path> getFiles() const;
+    std::vector<Item> getItems() const;
+
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
 
