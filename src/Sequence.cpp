@@ -382,14 +382,6 @@ std::vector<boost::filesystem::path> Sequence::getFiles() const
 	return allPaths;
 }
 
-std::vector<Item> Sequence::getItems() const
-{
-    std::vector<Item> outItems;
-    BOOST_FOREACH(const boost::filesystem::path& path, getFiles())
-        outItems.push_back(Item(eTypeFile, path));
-    return outItems;
-}
-
 std::string Sequence::string() const
 {
 	std::ostringstream ss;

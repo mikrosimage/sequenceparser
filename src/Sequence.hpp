@@ -161,7 +161,6 @@ public:
 
 public:
     std::vector<boost::filesystem::path> getFiles() const;
-    std::vector<Item> getItems() const;
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }

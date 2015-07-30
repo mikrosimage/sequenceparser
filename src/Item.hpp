@@ -70,7 +70,8 @@ public:
 
 	EType getType() const { return _type; }
 
-	std::string getAbsoluteFilepath() const { return _path.string(); }
+    std::vector<Item> getItems() const;
+    std::string getAbsoluteFilepath() const { return _path.string(); }
 	std::string getFilename() const { return _path.filename().string(); }
 	std::string getFolder() const { return getFolderPath().string(); }
 
