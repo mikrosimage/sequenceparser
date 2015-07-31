@@ -16,6 +16,22 @@ std::string Item::getAbsoluteFirstFilename() const
 }
 
 
+std::vector<Item> Item::getItems() const{
+	std::vector<Item> outItems;
+
+	if( _type != eTypeSequence ){
+		outItems.push_back(*this);
+		return outItems;
+	}
+
+	const Sequence& seq = getSequence();
+	const std::vector<boost::filesystem::path>& seqFilesPath = seq.getAbsoluteFilesPath(_path.parent_path());
+
+	BOOST_FOREACH(const boost::filesystem::path& filePath, seqFilesPath)
+		outItems.push_back(Item(eTypeFile, filePath));
+	return outItems;
+}
+
 std::string Item::getFirstFilename() const
 {
 	if( getType() == eTypeSequence )
