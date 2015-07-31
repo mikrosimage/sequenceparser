@@ -3,7 +3,6 @@
 
 #include "common.hpp"
 #include "FrameRange.hpp"
-#include "Item.hpp"
 
 #include <iomanip>
 #include <set>
@@ -32,7 +31,7 @@ enum EPattern
 
 
 /**
- * @brief A sequence of numbered files.
+ * @brief A sequence of numbered files. Has no parent folder notion.
  */
 class Sequence
 {
@@ -161,6 +160,12 @@ public:
 
 public:
     std::vector<boost::filesystem::path> getFiles() const;
+
+    /**
+     * @brief Iterate over files name contained in Sequence and concatenates file name to parentPath
+     * @param parentFolder
+     */
+    std::vector<boost::filesystem::path> getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const;
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
