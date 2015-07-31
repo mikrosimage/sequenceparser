@@ -159,13 +159,13 @@ public:
 	bool initFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
-    std::vector<boost::filesystem::path> getFiles() const;
+	std::vector<boost::filesystem::path> getFiles() const;
 
-    /**
-     * @brief Iterate over files name contained in Sequence and concatenates file name to parentPath
-     * @param parentFolder
-     */
-    std::vector<boost::filesystem::path> getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const;
+	/**
+	 * @brief Iterate over files name contained in Sequence and concatenates file name to parentPath
+	 * @param parentFolder
+	 */
+	std::vector<boost::filesystem::path> getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const;
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }

@@ -74,8 +74,8 @@ public:
      * @brief Usefull for sequences items: get sequence as Files Item
      * @return
      */
-    std::vector<Item> getItems() const;
-    std::string getAbsoluteFilepath() const { return _path.string(); }
+	std::vector<Item> getItems() const;
+	std::string getAbsoluteFilepath() const { return _path.string(); }
 	std::string getFilename() const { return _path.filename().string(); }
 	std::string getFolder() const { return getFolderPath().string(); }
 

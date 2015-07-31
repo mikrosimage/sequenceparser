@@ -372,25 +372,25 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 
 std::vector<boost::filesystem::path> Sequence::getFiles() const
 {
-    std::vector<boost::filesystem::path> allPaths;
-    BOOST_FOREACH(const FrameRange& range, _ranges)
-    {
-        for( Time t = range.first; t <= range.last; t += range.step )
-            allPaths.push_back(getFilenameAt(t));
-    }
+	std::vector<boost::filesystem::path> allPaths;
+	BOOST_FOREACH(const FrameRange& range, _ranges)
+	{
+		for( Time t = range.first; t <= range.last; t += range.step )
+			allPaths.push_back(getFilenameAt(t));
+	}
 
 	return allPaths;
 }
 
 std::vector<boost::filesystem::path> Sequence::getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const{
-    std::vector<boost::filesystem::path> allPaths;
-    BOOST_FOREACH(const FrameRange& range, _ranges)
-    {
-        for( Time t = range.first; t <= range.last; t += range.step )
-            allPaths.push_back(parentPath / getFilenameAt(t));
-    }
+	std::vector<boost::filesystem::path> allPaths;
+	BOOST_FOREACH(const FrameRange& range, _ranges)
+	{
+		for( Time t = range.first; t <= range.last; t += range.step )
+			allPaths.push_back(parentPath / getFilenameAt(t));
+	}
 
-    return allPaths;
+	return allPaths;
 }
 
 
