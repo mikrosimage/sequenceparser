@@ -16,19 +16,17 @@ std::string Item::getAbsoluteFirstFilename() const
 }
 
 
-std::vector<Item> Item::getItems() const{
+std::vector<Item> Item::explode() const{
 	std::vector<Item> outItems;
 
-	if( _type != eTypeSequence ){
+	if(_type != eTypeSequence){
 		outItems.push_back(*this);
 		return outItems;
 	}
 
-	const Sequence& seq = getSequence();
-	const std::vector<boost::filesystem::path>& seqFilesPath = seq.getAbsoluteFilesPath(_path.parent_path());
-
+	const std::vector<boost::filesystem::path>& seqFilesPath = getSequence().getAbsoluteFilesPath(_path.parent_path());
 	BOOST_FOREACH(const boost::filesystem::path& filePath, seqFilesPath)
-		outItems.push_back(Item(eTypeFile, filePath));
+		outItems.push_back(Item(getTypeFromPath(filePath), filePath));
 	return outItems;
 }
 
@@ -38,22 +36,6 @@ std::string Item::getFirstFilename() const
 		return getSequence().getFirstFilename();
 	return getFilename();
 }
-
-std::vector<Item> Item::explode()
-{
-	std::vector<Item> items;
-	if (getType() == eTypeSequence){
-		const std::vector<boost::filesystem::path> sequencePaths = getSequence().getFiles();
-		BOOST_FOREACH(const boost::filesystem::path& path, sequencePaths)
-		{
-			boost::filesystem::path finalPath( getFolderPath() );
-			finalPath /= path;
-			items.push_back( Item( getTypeFromPath(finalPath), finalPath ) );
-		}
-	}
-	return items;
-}
-
 
 EType getTypeFromPath( const boost::filesystem::path& path )
 {
