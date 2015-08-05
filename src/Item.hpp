@@ -70,16 +70,14 @@ public:
 
 	EType getType() const { return _type; }
 
-    /**
-     * @brief Usefull for sequences items: get sequence as Files Item
-     * @return
-     */
-	std::vector<Item> getItems() const;
 	std::string getAbsoluteFilepath() const { return _path.string(); }
 	std::string getFilename() const { return _path.filename().string(); }
 	std::string getFolder() const { return getFolderPath().string(); }
-
-	std::vector<Item> explode();
+	
+	/**
+	 * @brief Usefull for sequences items: explode sequence
+	 */
+	std::vector<Item> explode() const;
 
 	const Sequence& getSequence() const { return _sequence; }
 
