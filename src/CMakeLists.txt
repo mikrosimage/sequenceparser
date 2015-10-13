@@ -47,13 +47,13 @@ if(SWIG_FOUND)
 	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser.i")
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
+	# Swig flags
+	set(CMAKE_SWIG_FLAGS -c++ -fcompact)
+
 	### PYTHON BINDING
 	find_package(PythonLibs ${SEQUENCEPARSER_PYTHON_VERSION})
 	if(PYTHONLIBS_FOUND)
 		include_directories(${PYTHON_INCLUDE_PATH})
-
-		# Swig flags
-		set(CMAKE_SWIG_FLAGS -c++ -fcompact)
 
 		# Create '_sequenceparser' shared lib (python)
 		swig_add_module(sequenceparser-py python ${SEQUENCEPARSER_BINDING_FILE})
@@ -103,7 +103,7 @@ if(SWIG_FOUND)
 		include_directories(${JNI_INCLUDE_DIRS})
 
 		# Swig flags
-		set(CMAKE_SWIG_FLAGS -c++ -fcompact -package org.sequenceparser)
+		set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -package org.sequenceparser)
 
 		# Create 'sequenceparser-java' shared lib
 		swig_add_module(sequenceparser-java java ${SEQUENCEPARSER_BINDING_FILE})
