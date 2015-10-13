@@ -55,6 +55,11 @@ if(SWIG_FOUND)
 	if(PYTHONLIBS_FOUND)
 		include_directories(${PYTHON_INCLUDE_PATH})
 
+		# Swig flags
+		if(${PYTHONLIBS_VERSION_STRING} VERSION_GREATER "3")
+			set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -py3)
+		endif()
+
 		# Create '_sequenceparser' shared lib (python)
 		swig_add_module(sequenceparser-py python ${SEQUENCEPARSER_BINDING_FILE})
 		# For Python binding, need to compile the wrapper into a lib called "_<module_name>.so"
