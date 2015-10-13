@@ -12,6 +12,12 @@ compiler:
   - gcc
   - clang
 
+env:
+  global:
+     - SEQUENCEPARSER_BUILD=${TRAVIS_BUILD_DIR}/build-sequenceparser
+     - SEQUENCEPARSER_INSTALL=${TRAVIS_BUILD_DIR}/install-sequenceparser
+     - CI_NODE_TOTAL=2
+
 # This results in a 2×2 build matrix.
 # Where the variables are: os / compiler
 
@@ -36,12 +42,12 @@ before_script:
 
 script:
   # build
-  - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install -DSEQUENCEPARSER_PYTHON_VERSION=2.7
+  - mkdir ${SEQUENCEPARSER_BUILD} && cd ${SEQUENCEPARSER_BUILD}
+  - cmake .. -DCMAKE_INSTALL_PREFIX=${SEQUENCEPARSER_INSTALL} -DSEQUENCEPARSER_PYTHON_VERSION=2.7
   - make
   - make install
 
   # tests
   - cd ${TRAVIS_BUILD_DIR}
-  - export PYTHONPATH=$PYTHONPATH:`pwd`/install/lib/python2.7/site-packages
+  - export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python2.7/site-packages
   - nosetests pyTest
