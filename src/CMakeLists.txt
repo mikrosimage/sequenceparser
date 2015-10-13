@@ -48,7 +48,7 @@ if(SWIG_FOUND)
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
 	# Swig flags
-	set(CMAKE_SWIG_FLAGS -c++ -fcompact)
+	set(CMAKE_SWIG_FLAGS -c++ -fcompact -small -O -Wall)
 
 	### PYTHON BINDING
 	find_package(PythonLibs ${SEQUENCEPARSER_PYTHON_VERSION})
