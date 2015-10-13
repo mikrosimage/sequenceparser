@@ -78,11 +78,7 @@ if(SWIG_FOUND)
 		swig_link_libraries(sequenceparser-py sequenceparser-shared ${PYTHON_LIBRARIES})
 
 		# Get path to install python binding
-		if(PYTHONLIBS_VERSION_STRING)  # CMake >=2.8.11
-			string(SUBSTRING ${PYTHONLIBS_VERSION_STRING} 0 3 PYTHON_VERSION)
-		else()
-			set(PYTHON_VERSION ${SEQUENCEPARSER_PYTHON_VERSION})
-		endif()
+		string(SUBSTRING ${PYTHONLIBS_VERSION_STRING} 0 3 PYTHON_VERSION)
 		set(SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR "lib/python${PYTHON_VERSION}/site-packages/pySequenceParser/")
 
 		# Install python interface
