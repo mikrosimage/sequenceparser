@@ -8,13 +8,11 @@ if(NOT Boost_FOUND)
     message(FATAL_ERROR "please set BOOST_ROOT environment variable to a proper boost install")
 endif(NOT Boost_FOUND)
 
-# Include sequenceParser and boost
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
-
 # Create 'sequenceparser' static lib
 add_library(sequenceparser-static STATIC ${SEQUENCEPARSER_SRC_FILES})
 set_target_properties(sequenceparser-static PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(sequenceparser-static PROPERTIES OUTPUT_NAME sequenceParser)
+target_include_directories(sequenceparser-static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(sequenceparser-static ${Boost_LIBRARIES})
 
 # Create 'sequenceparser' shared lib
@@ -23,6 +21,7 @@ set_target_properties(sequenceparser-shared PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(sequenceparser-shared PROPERTIES OUTPUT_NAME sequenceParser)
 set_target_properties(sequenceparser-shared PROPERTIES SOVERSION ${SEQUENCEPARSER_VERSION_MAJOR})
 set_target_properties(sequenceparser-shared PROPERTIES VERSION ${SEQUENCEPARSER_VERSION})
+target_include_directories(sequenceparser-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(sequenceparser-shared ${Boost_LIBRARIES})
 
 ### Install sequenceParser libs and include
