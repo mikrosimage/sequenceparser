@@ -8,13 +8,11 @@ if(NOT Boost_FOUND)
     message(FATAL_ERROR "please set BOOST_ROOT environment variable to a proper boost install")
 endif(NOT Boost_FOUND)
 
-# Include sequenceParser and boost
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
-
 # Create 'sequenceparser' static lib
 add_library(sequenceparser-static STATIC ${SEQUENCEPARSER_SRC_FILES})
 set_target_properties(sequenceparser-static PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(sequenceparser-static PROPERTIES OUTPUT_NAME sequenceParser)
+target_include_directories(sequenceparser-static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(sequenceparser-static ${Boost_LIBRARIES})
 
 # Create 'sequenceparser' shared lib
@@ -23,6 +21,7 @@ set_target_properties(sequenceparser-shared PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(sequenceparser-shared PROPERTIES OUTPUT_NAME sequenceParser)
 set_target_properties(sequenceparser-shared PROPERTIES SOVERSION ${SEQUENCEPARSER_VERSION_MAJOR})
 set_target_properties(sequenceparser-shared PROPERTIES VERSION ${SEQUENCEPARSER_VERSION})
+target_include_directories(sequenceparser-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(sequenceparser-shared ${Boost_LIBRARIES})
 
 ### Install sequenceParser libs and include
@@ -47,13 +46,18 @@ if(SWIG_FOUND)
 	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser.i")
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
+	# Swig flags
+	set(CMAKE_SWIG_FLAGS -c++ -fcompact -small -O -Wall)
+
 	### PYTHON BINDING
 	find_package(PythonLibs ${SEQUENCEPARSER_PYTHON_VERSION})
 	if(PYTHONLIBS_FOUND)
 		include_directories(${PYTHON_INCLUDE_PATH})
 
 		# Swig flags
-		set(CMAKE_SWIG_FLAGS -c++ -fcompact)
+		if(${PYTHONLIBS_VERSION_STRING} VERSION_GREATER "3")
+			set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -py3)
+		endif()
 
 		# Create '_sequenceparser' shared lib (python)
 		swig_add_module(sequenceparser-py python ${SEQUENCEPARSER_BINDING_FILE})
@@ -73,11 +77,7 @@ if(SWIG_FOUND)
 		swig_link_libraries(sequenceparser-py sequenceparser-shared ${PYTHON_LIBRARIES})
 
 		# Get path to install python binding
-		if(PYTHONLIBS_VERSION_STRING)  # CMake >=2.8.11
-			string(SUBSTRING ${PYTHONLIBS_VERSION_STRING} 0 3 PYTHON_VERSION)
-		else()
-			set(PYTHON_VERSION ${SEQUENCEPARSER_PYTHON_VERSION})
-		endif()
+		string(SUBSTRING ${PYTHONLIBS_VERSION_STRING} 0 3 PYTHON_VERSION)
 		set(SEQUENCEPARSER_PYTHON_MODULE_OUTPUT_DIR "lib/python${PYTHON_VERSION}/site-packages/pySequenceParser/")
 
 		# Install python interface
@@ -103,7 +103,7 @@ if(SWIG_FOUND)
 		include_directories(${JNI_INCLUDE_DIRS})
 
 		# Swig flags
-		set(CMAKE_SWIG_FLAGS -c++ -fcompact -package org.sequenceparser)
+		set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -package org.sequenceparser)
 
 		# Create 'sequenceparser-java' shared lib
 		swig_add_module(sequenceparser-java java ${SEQUENCEPARSER_BINDING_FILE})

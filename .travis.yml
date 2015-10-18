@@ -1,29 +1,53 @@
-os:
-  - linux
+# Use container-based infrastructure
+sudo: required
+services:
+  - docker
 
 language: cpp
+
+os:
+  - linux
 
 compiler:
   - gcc
   - clang
 
+env:
+  global:
+     - SEQUENCEPARSER_BUILD=${TRAVIS_BUILD_DIR}/build-sequenceparser
+     - SEQUENCEPARSER_INSTALL=${TRAVIS_BUILD_DIR}/install-sequenceparser
+     - CI_NODE_TOTAL=2
+
+# This results in a 2×2 build matrix.
+# Where the variables are: os / compiler
+
+addons:
+  apt:
+    sources: ['boost-latest', 'kalakris-cmake']
+    packages:
+    - cmake
+    - swig
+    - libboost1.55-all-dev
+    - python-dev
+    - python-nose
+
+cache:
+  # Caching Ubuntu packages
+  apt: true
+
 before_script:
+  - env | sort  
   - date -u
   - uname -a
-  - export J='-j3'
-
-  - sudo add-apt-repository -y ppa:boost-latest/ppa
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake swig swig2.0 libboost1.55-all-dev python-dev default-jdk python-nose
 
 script:
   # build
-  - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/../install -DSEQUENCEPARSER_PYTHON_VERSION=2.7
-  - make $J
+  - mkdir ${SEQUENCEPARSER_BUILD} && cd ${SEQUENCEPARSER_BUILD}
+  - cmake .. -DCMAKE_INSTALL_PREFIX=${SEQUENCEPARSER_INSTALL} -DSEQUENCEPARSER_PYTHON_VERSION=2.7
+  - make
   - make install
 
   # tests
   - cd ${TRAVIS_BUILD_DIR}
-  - export PYTHONPATH=$PYTHONPATH:`pwd`/install/lib/python2.7/site-packages
+  - export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python2.7/site-packages
   - nosetests pyTest
