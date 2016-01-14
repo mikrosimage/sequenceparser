@@ -78,8 +78,6 @@ bool browseSequence( Sequence& outSequence, const std::string& pattern, const EP
 		return true; // an empty sequence
 	}
 	std::sort( allTimes.begin(), allTimes.end() );
-	extractStep( allTimes );
-	extractPadding( allTimesStr );
 	outSequence._ranges = extractFrameRanges( allTimes );
 	return true; // a real file sequence
 }
