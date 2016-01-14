@@ -4,6 +4,8 @@
 #include "common.hpp"
 #include "FrameRange.hpp"
 
+#include <boost/lexical_cast.hpp>
+
 #include <iomanip>
 #include <set>
 
@@ -93,6 +95,9 @@ public:
 
 	/// @return a string pattern using standard style
 	inline std::string getStandardPattern() const;
+
+	/// @return a string pattern using printf style
+	inline std::string getPrintfPattern() const;
 
 	/// @return a string pattern using C Style
 	std::string getCStylePattern() const;

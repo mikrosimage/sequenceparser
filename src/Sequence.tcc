@@ -14,6 +14,15 @@ inline std::string Sequence::getStandardPattern() const
 	return getPrefix() + std::string( getFixedPadding() ? getFixedPadding() : 1, getPatternCharacter() ) + getSuffix();
 }
 
+inline std::string Sequence::getPrintfPattern() const
+{
+	std::string paddingStr = "%";
+	if( getFixedPadding() )
+		paddingStr += "0" + boost::lexical_cast<std::string>( getFixedPadding() );
+	paddingStr += "d";
+	return getPrefix() + paddingStr + getSuffix();
+}
+
 inline std::pair<Time, Time> Sequence::getGlobalRange() const
 {
 	return std::pair<Time, Time > ( getFirstTime(), getLastTime() );
