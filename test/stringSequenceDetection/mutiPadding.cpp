@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
 	BOOST_CHECK_EQUAL( seq.getFixedPadding(), 3 );
-	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
+	BOOST_CHECK_EQUAL( seq.getMaxPadding(), 3 );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
 	BOOST_CHECK_EQUAL( seq.getFixedPadding(), 3 );
-	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
+	BOOST_CHECK_EQUAL( seq.getMaxPadding(), 3 );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )

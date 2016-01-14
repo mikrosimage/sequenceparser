@@ -39,9 +39,9 @@ inline std::size_t Sequence::getFixedPadding() const
 	return _fixedPadding;
 }
 
-inline bool Sequence::isStrictPadding() const
+inline std::size_t Sequence::getMaxPadding() const
 {
-	return _strictPadding;
+	return _maxPadding;
 }
 
 inline bool Sequence::hasMissingFile() const

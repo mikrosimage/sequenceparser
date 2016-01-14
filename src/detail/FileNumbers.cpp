@@ -48,11 +48,11 @@ bool FileNumbers::SortByDigit::operator()( const FileNumbers& a, const FileNumbe
 	BOOST_ASSERT( a._numbers.size() == b._numbers.size() );
 	for( FileNumbers::Vec::const_iterator i = a._numbers.begin(), iEnd = a._numbers.end(), vi = b._numbers.begin(); i != iEnd; ++i, ++vi )
 	{
-		const std::size_t iDigits = extractNbDigits( i->second );
-		const std::size_t viDigits = extractNbDigits( vi->second );
-		if( iDigits < viDigits )
+		const std::size_t iMaxPadding = extractMaxPadding( i->second );
+		const std::size_t viMaxPadding = extractMaxPadding( vi->second );
+		if( iMaxPadding < viMaxPadding )
 			return true;
-		else if( iDigits > viDigits )
+		else if( iMaxPadding > viMaxPadding )
 			return false;
 
 		if( i->first < vi->first )

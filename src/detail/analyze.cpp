@@ -67,7 +67,7 @@ Sequence privateBuildSequence(
 		const std::vector<FileNumbers>::const_iterator& numberPartsEnd,
 		const std::size_t index,
 		const std::size_t padding,
-		const bool strictPadding
+		const std::size_t maxPadding
 	)
 {
 	const std::size_t len = numberPartsBegin->size();
@@ -98,11 +98,8 @@ Sequence privateBuildSequence(
 		times.push_back(it->getTime(index));
 	}
 	sequence._ranges = extractFrameRanges(times);
-
-	//sequence.extractPadding( numberPartsBegin, numberPartsEnd, index );
 	sequence._fixedPadding = padding;
-	sequence._strictPadding = strictPadding;
-	//sequence.extractIsStrictPadding( numberPartsBegin, numberPartsEnd, index, sequence._fixedPadding );
+	sequence._maxPadding = maxPadding;
 
 	return sequence;
 }
@@ -123,29 +120,30 @@ void privateBuildSequencesAccordingToPadding(
 	const int index )
 {
 	std::set<std::size_t> paddings;
-	std::set<std::size_t> ambiguousPaddindDigits;
+	std::set<std::size_t> ambiguousMaxPaddings;
 	for( std::vector<FileNumbers>::const_iterator it = numberPartsBegin;
 	     it != numberPartsEnd;
 		 ++it )
 	{
 		const std::size_t padding  = it->getFixedPadding(index);
-		const std::size_t nbDigits = it->getNbDigits(index);
+		const std::size_t maxPadding = it->getMaxPadding(index);
 
 		paddings.insert( padding );
 
 		if( padding == 0 )
 		{
-			ambiguousPaddindDigits.insert( nbDigits );
+			ambiguousMaxPaddings.insert( maxPadding );
 		}
 	}
 
 	if( paddings.size() == 1 )
 	{
 		// standard case: only one padding used in the sequence!
-		const std::size_t p = *paddings.begin();
+		const std::size_t padding = *paddings.begin();
+		const std::size_t maxPadding = ( padding == 0 ? *ambiguousMaxPaddings.begin() : padding );
 		// simple sort
 		std::sort( numberPartsBegin, numberPartsEnd, FileNumbers::SortByNumber() );
-		result.push_back( privateBuildSequence( defaultSeq, stringParts, numberPartsBegin, numberPartsEnd, index, p, (p!=0) ) );
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, numberPartsBegin, numberPartsEnd, index, padding, maxPadding ) );
 		return;
 	}
 
@@ -190,9 +188,9 @@ void privateBuildSequencesAccordingToPadding(
 		//	|          YES             |   NO : sort by digits   |  NO : sort by padding   |
 		//	--------------------------------------------------------------------------------
 		onlyConsiderPadding = false;
-		BOOST_FOREACH( const std::size_t dig, ambiguousPaddindDigits )
+		BOOST_FOREACH( const std::size_t maxPadding, ambiguousMaxPaddings )
 		{
-			if( paddings.find( dig ) == paddings.end() )
+			if( paddings.find( maxPadding ) == paddings.end() )
 			{
 				// if one digits from ambiguous digits doesn't correspond to
 				// a padding... we keep the whole sequence without padding.
@@ -214,12 +212,12 @@ void privateBuildSequencesAccordingToPadding(
 			if( first->getFixedPadding(index) != it->getFixedPadding(index) )
 			{
 				const std::size_t p = first->getFixedPadding(index);
-				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, p, (p!=0) ) );
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, p, first->getMaxPadding(index) ) );
 				first = it;
 			}
 		}
 		const std::size_t p = first->getFixedPadding(index);
-		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, p, (p!=0) ) );
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, p, first->getMaxPadding(index) ) );
 		return;
 	}
 	else
@@ -231,17 +229,17 @@ void privateBuildSequencesAccordingToPadding(
 		std::vector<FileNumbers>::const_iterator first = numberPartsBegin;
 		for( std::vector<FileNumbers>::const_iterator it = boost::next(numberPartsBegin); it != numberPartsEnd; ++it )
 		{
-			if( first->getNbDigits(index) != it->getNbDigits(index) )
+			if( first->getMaxPadding(index) != it->getMaxPadding(index) )
 			{
 				const std::size_t p = boost::prior(it)->getFixedPadding(index);
 				const std::size_t pStart = first->getFixedPadding(index);
-				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, pStart, (p!=pStart) ) );
+				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, pStart, first->getMaxPadding(index) ) );
 				first = it;
 			}
 		}
 		const std::size_t p = boost::prior(numberPartsEnd)->getFixedPadding(index);
 		const std::size_t pStart = first->getFixedPadding(index);
-		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, pStart, (p!=pStart) ) );
+		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, pStart, first->getFixedPadding(index) ) );
 		return;
 	}
 }

@@ -41,9 +41,9 @@ public:
 		clear();
 	}
 
-	Sequence( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const bool strictPadding = false )
+	Sequence( const std::string& prefix, const std::size_t padding, const size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1 )
 	{
-		init( prefix, padding, suffix, firstTime, lastTime, step, strictPadding );
+		init( prefix, padding, maxPadding, suffix, firstTime, lastTime, step );
 	}
 
 	Sequence( const std::string& pattern, const std::vector<FrameRange>& frameRanges, const EPattern accept = ePatternDefault )
@@ -68,7 +68,7 @@ public:
 	{
 		_prefix = other._prefix;
 		_suffix = other._suffix;
-		_strictPadding = other._strictPadding;
+		_maxPadding = other._maxPadding;
 		_fixedPadding = other._fixedPadding;
 		_ranges = other._ranges;
 		return *this;
@@ -81,7 +81,7 @@ private:
 	 * @brief Construct a sequence from a pattern and given informations.
 	 * @warning No check on your filesystem.
 	 */
-	void init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1, const bool strictPadding = false );
+	void init( const std::string& prefix, const std::size_t padding, const size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1 );
 
 public:
 	std::string getFilenameAt( const Time time ) const;
@@ -109,7 +109,7 @@ public:
 
 	inline std::size_t getFixedPadding() const;
 
-	inline bool isStrictPadding() const;
+	inline std::size_t getMaxPadding() const;
 
 	inline bool hasMissingFile() const;
 
@@ -143,6 +143,7 @@ public:
 		return
 			( _prefix == other._prefix ) &&
 			( _suffix == other._suffix ) &&
+			( _maxPadding == other._maxPadding ) &&
 			( _fixedPadding == other._fixedPadding ) &&
 			( _ranges == other._ranges );
 	}
@@ -183,7 +184,7 @@ public:
 	{
 		_prefix.clear();
 		_suffix.clear();
-		_strictPadding = false;
+		_maxPadding = 0;
 		_fixedPadding = 0;
 		_ranges.clear();
 	}
@@ -193,8 +194,19 @@ public:
 public:
 	std::string _prefix; ///< filename prefix
 	std::string _suffix; ///< filename suffix
-	bool _strictPadding; ///<
-	std::size_t _fixedPadding; ///< fixed padding (if 0, variable padding)
+	/**
+	 * @brief Number max of padding used to enumerate the sequence
+	 * @note For fixed sequences, it is equal to the padding
+	 * @note Useful for sequence with a variable or an unknown padding
+	 * (unknown = when no frame begins with a '0' padding character)
+	 */
+	std::size_t _maxPadding;
+	/**
+	 * @brief Fixed padding
+	 * @note if 0, variable padding
+	 * @see _maxPadding
+	 */
+	std::size_t _fixedPadding;
 	std::vector<FrameRange> _ranges;
 	static const char _fillCar = '0'; ///< Filling character
 };
@@ -222,15 +234,6 @@ std::size_t getFixedPaddingFromStringNumber( const std::string& timeStr );
 std::size_t extractPadding( const std::vector<std::string>& timesStr );
 
 std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
-
-/**
- * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
- * @param[in] timesStr vector of frame numbers in string format
- * @param[in] padding previously detected padding
- */
-bool extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding );
-
-bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding );
 
 #endif
 

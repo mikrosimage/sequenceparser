@@ -162,14 +162,14 @@ std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterat
 	BOOST_ASSERT( timesBegin != timesEnd );
 
 	std::set<std::size_t> padding;
-	std::set<std::size_t> nbDigits;
+	std::set<std::size_t> maxPadding;
 	
 	for( std::vector<detail::FileNumbers>::const_iterator s = timesBegin;
 		 s != timesEnd;
 		 ++s )
 	{
 		padding.insert( s->getFixedPadding(i) );
-		nbDigits.insert( s->getNbDigits(i) );
+		maxPadding.insert( s->getMaxPadding(i) );
 	}
 	
 	std::set<std::size_t> pad = padding;
@@ -188,48 +188,6 @@ std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterat
 	// need to split into multiple sequences !
 	return 0;
 }
-
-
-/**
- * @brief return if the padding is strict (at least one frame begins with a '0' padding character).
- * @param[in] timesStr vector of frame numbers in string format
- * @param[in] padding previously detected padding
- */
-bool extractIsStrictPadding( const std::vector<std::string>& timesStr, const std::size_t padding )
-{
-	if( padding == 0 )
-	{
-		return false;
-	}
-
-	BOOST_FOREACH( const std::string& s, timesStr )
-	{
-		if( s[0] == '0' )
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-bool extractIsStrictPadding( const std::vector<detail::FileNumbers>& times, const std::size_t i, const std::size_t padding )
-{
-	if( padding == 0 )
-	{
-		return false;
-	}
-
-	BOOST_FOREACH( const detail::FileNumbers& s, times )
-	{
-		if( s.getString( i )[0] == '0' )
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
 
 std::string Sequence::getFilenameAt( const Time time ) const
 {
@@ -327,27 +285,27 @@ bool Sequence::initFromPattern( const std::string& filePattern, const EPattern& 
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
 		_fixedPadding = paddingStr.size();
-		_strictPadding = ( paddingStr[0] == '#' );
+		_maxPadding = _fixedPadding;
 	}
 	else if( ( accept & ePatternCStyle ) && regex_match( filePattern.c_str(), matches, regexPatternCStyle ) )
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
-		_fixedPadding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no _fixedPadding value: %d -> _fixedPadding = 0
-		_strictPadding = false;
+		_fixedPadding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no padding value: %d -> _fixedPadding = 0
+		_maxPadding = _fixedPadding;
 	}
 	else if( ( accept & ePatternFrame ) && regex_match( filePattern.c_str(), matches, regexPatternFrame ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
 		_fixedPadding = frame.size();
-		_strictPadding = false;
+		_maxPadding = _fixedPadding;
 	}
 	else if( ( accept & ePatternFrameNeg ) && regex_match( filePattern.c_str(), matches, regexPatternFrameNeg ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
 		_fixedPadding = frame.size();
-		_strictPadding = false;
+		_maxPadding = _fixedPadding;
 	}
 	else
 	{
@@ -360,14 +318,14 @@ bool Sequence::initFromPattern( const std::string& filePattern, const EPattern& 
 }
 
 
-void Sequence::init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step, const bool strictPadding )
+void Sequence::init( const std::string& prefix, const std::size_t padding, const std::size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step )
 {
 	_prefix = prefix;
 	_fixedPadding = padding;
+	_maxPadding = maxPadding;
 	_suffix = suffix;
 	_ranges.clear();
 	_ranges.push_back(FrameRange(firstTime, lastTime, step));
-	_strictPadding = strictPadding;
 }
 
 std::vector<boost::filesystem::path> Sequence::getFiles() const

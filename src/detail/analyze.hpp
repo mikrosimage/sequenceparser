@@ -35,7 +35,7 @@ Sequence privateBuildSequence(
 		const std::vector<detail::FileNumbers>::const_iterator& numberPartsEnd,
 		const std::size_t index,
 		const std::size_t padding,
-		const bool strictPadding
+		const std::size_t maxPadding
 	);
 
 

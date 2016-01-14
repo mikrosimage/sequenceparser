@@ -76,14 +76,14 @@ public:
 		return str[withSign] == '0' ? str.size()-withSign : 0;
 	}
 	
-	static std::size_t extractNbDigits( const std::string& s )
+	static std::size_t extractMaxPadding( const std::string& s )
 	{
 		return s.size() - hasSign( s );
 	}
 	
-	std::size_t getNbDigits( const std::size_t& i ) const
+	std::size_t getMaxPadding( const std::size_t& i ) const
 	{
-		return extractNbDigits( _numbers[i].second );
+		return extractMaxPadding( _numbers[i].second );
 	}
 	
 	std::size_t getFixedPadding( const std::size_t& i ) const

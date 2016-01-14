@@ -80,7 +80,6 @@ bool browseSequence( Sequence& outSequence, const std::string& pattern, const EP
 	std::sort( allTimes.begin(), allTimes.end() );
 	extractStep( allTimes );
 	extractPadding( allTimesStr );
-	extractIsStrictPadding( allTimesStr, outSequence._fixedPadding );
 	outSequence._ranges = extractFrameRanges( allTimes );
 	return true; // a real file sequence
 }
@@ -175,7 +174,7 @@ std::vector<Item> browse(
 					{
 						BOOST_FOREACH( FrameRange f, s.getFrameRanges() )
 						{
-							const Sequence sequenceWithoutHoles( s.getPrefix(), s.getFixedPadding(), s.getSuffix(), f.first, f.last, f.step, s.isStrictPadding() );
+							const Sequence sequenceWithoutHoles( s.getPrefix(), s.getFixedPadding(), s.getMaxPadding(), s.getSuffix(), f.first, f.last, f.step );
 							if( isConsideredAsSingleFile( sequenceWithoutHoles, detectOptions ) )
 							{
 								output.push_back( Item( getTypeFromPath( directory / sequenceWithoutHoles.getFirstFilename() ), directory / sequenceWithoutHoles.getFirstFilename() ) );
