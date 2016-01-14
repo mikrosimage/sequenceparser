@@ -6,12 +6,12 @@ inline std::string Sequence::getFirstFilename() const
 
 inline char Sequence::getPatternCharacter() const
 {
-	return getPadding() ? '#' : '@';
+	return getFixedPadding() ? '#' : '@';
 }
 
 inline std::string Sequence::getStandardPattern() const
 {
-	return getPrefix() + std::string( getPadding() ? getPadding() : 1, getPatternCharacter() ) + getSuffix();
+	return getPrefix() + std::string( getFixedPadding() ? getFixedPadding() : 1, getPatternCharacter() ) + getSuffix();
 }
 
 inline std::pair<Time, Time> Sequence::getGlobalRange() const
@@ -34,9 +34,9 @@ inline std::size_t Sequence::getDuration() const
 	return getLastTime() - getFirstTime() + 1;
 }
 
-inline std::size_t Sequence::getPadding() const
+inline std::size_t Sequence::getFixedPadding() const
 {
-	return _padding;
+	return _fixedPadding;
 }
 
 inline bool Sequence::isStrictPadding() const

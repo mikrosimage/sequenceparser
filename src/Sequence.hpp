@@ -69,7 +69,7 @@ public:
 		_prefix = other._prefix;
 		_suffix = other._suffix;
 		_strictPadding = other._strictPadding;
-		_padding = other._padding;
+		_fixedPadding = other._fixedPadding;
 		_ranges = other._ranges;
 		return *this;
 	}
@@ -107,7 +107,7 @@ public:
 
 	Time getNbFiles() const;
 
-	inline std::size_t getPadding() const;
+	inline std::size_t getFixedPadding() const;
 
 	inline bool isStrictPadding() const;
 
@@ -143,7 +143,7 @@ public:
 		return
 			( _prefix == other._prefix ) &&
 			( _suffix == other._suffix ) &&
-			( _padding == other._padding ) &&
+			( _fixedPadding == other._fixedPadding ) &&
 			( _ranges == other._ranges );
 	}
 
@@ -184,7 +184,7 @@ public:
 		_prefix.clear();
 		_suffix.clear();
 		_strictPadding = false;
-		_padding = 0;
+		_fixedPadding = 0;
 		_ranges.clear();
 	}
 	
@@ -194,7 +194,7 @@ public:
 	std::string _prefix; ///< filename prefix
 	std::string _suffix; ///< filename suffix
 	bool _strictPadding; ///<
-	std::size_t _padding; ///< padding, no padding if 0, fixed padding otherwise
+	std::size_t _fixedPadding; ///< fixed padding (if 0, variable padding)
 	std::vector<FrameRange> _ranges;
 	static const char _fillCar = '0'; ///< Filling character
 };
@@ -213,7 +213,7 @@ std::size_t extractStep( const std::vector<Time>& times );
  */
 std::size_t extractStep( const std::vector<detail::FileNumbers>::const_iterator& timesBegin, const std::vector<detail::FileNumbers>::const_iterator& timesEnd, const std::size_t i );
 
-std::size_t getPaddingFromStringNumber( const std::string& timeStr );
+std::size_t getFixedPaddingFromStringNumber( const std::string& timeStr );
 
 /**
  * @brief extract the padding from a vector of frame numbers

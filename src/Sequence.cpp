@@ -123,7 +123,7 @@ std::size_t extractStep( const std::vector<detail::FileNumbers>::const_iterator&
 }
 
 
-std::size_t getPaddingFromStringNumber( const std::string& timeStr )
+std::size_t getFixedPaddingFromStringNumber( const std::string& timeStr )
 {
 	if( timeStr.size() > 1 )
 	{
@@ -144,11 +144,11 @@ std::size_t getPaddingFromStringNumber( const std::string& timeStr )
 std::size_t extractPadding( const std::vector<std::string>& timesStr )
 {
 	BOOST_ASSERT( timesStr.size() > 0 );
-	const std::size_t padding = getPaddingFromStringNumber( timesStr.front() );
+	const std::size_t padding = getFixedPaddingFromStringNumber( timesStr.front() );
 
 	BOOST_FOREACH( const std::string& s, timesStr )
 	{
-		if( padding != getPaddingFromStringNumber( s ) )
+		if( padding != getFixedPaddingFromStringNumber( s ) )
 		{
 			return 0;
 		}
@@ -168,7 +168,7 @@ std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterat
 		 s != timesEnd;
 		 ++s )
 	{
-		padding.insert( s->getPadding(i) );
+		padding.insert( s->getFixedPadding(i) );
 		nbDigits.insert( s->getNbDigits(i) );
 	}
 	
@@ -237,12 +237,12 @@ std::string Sequence::getFilenameAt( const Time time ) const
 	if( time >= 0 )
 	{
 		// "prefix.0001.jpg"
-		o << _prefix << std::setw( _padding ) << std::setfill( _fillCar ) << time << _suffix;
+		o << _prefix << std::setw( _fixedPadding ) << std::setfill( _fillCar ) << time << _suffix;
 	}
 	else
 	{
 		// "prefix.-0001.jpg" (and not "prefix.000-1.jpg")
-		o << _prefix << "-" << std::setw( _padding ) << std::setfill( _fillCar ) << std::abs( (int) time ) << _suffix;
+		o << _prefix << "-" << std::setw( _fixedPadding ) << std::setfill( _fillCar ) << std::abs( (int) time ) << _suffix;
 	}
 	return o.str();
 }
@@ -250,8 +250,8 @@ std::string Sequence::getFilenameAt( const Time time ) const
 
 std::string Sequence::getCStylePattern() const
 {
-	if( getPadding() )
-		return getPrefix() + "%0" + boost::lexical_cast<std::string > ( getPadding() ) + "d" + getSuffix();
+	if( getFixedPadding() )
+		return getPrefix() + "%0" + boost::lexical_cast<std::string > ( getFixedPadding() ) + "d" + getSuffix();
 	else
 		return getPrefix() + "%d" + getSuffix();
 }
@@ -322,31 +322,31 @@ EPattern Sequence::checkPattern( const std::string& pattern, const EDetection de
 bool Sequence::initFromPattern( const std::string& filePattern, const EPattern& accept )
 {
 	boost::cmatch matches;
-	//std::cout << filePattern << " / " << _prefix << " + " << _padding << " + " << _suffix << std::endl;
+	//std::cout << filePattern << " / " << _prefix << " + " << _fixedPadding << " + " << _suffix << std::endl;
 	if( ( accept & ePatternStandard ) && regex_match( filePattern.c_str(), matches, regexPatternStandard ) )
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
-		_padding = paddingStr.size();
+		_fixedPadding = paddingStr.size();
 		_strictPadding = ( paddingStr[0] == '#' );
 	}
 	else if( ( accept & ePatternCStyle ) && regex_match( filePattern.c_str(), matches, regexPatternCStyle ) )
 	{
 		std::string paddingStr( matches[2].first, matches[2].second );
-		_padding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no _padding value: %d -> _padding = 0
+		_fixedPadding = paddingStr.size() == 0 ? 0 : boost::lexical_cast<std::size_t > ( paddingStr ); // if no _fixedPadding value: %d -> _fixedPadding = 0
 		_strictPadding = false;
 	}
 	else if( ( accept & ePatternFrame ) && regex_match( filePattern.c_str(), matches, regexPatternFrame ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
-		_padding = frame.size();
+		_fixedPadding = frame.size();
 		_strictPadding = false;
 	}
 	else if( ( accept & ePatternFrameNeg ) && regex_match( filePattern.c_str(), matches, regexPatternFrameNeg ) )
 	{
 		std::string frame( matches[2].first, matches[2].second );
 		// Time t = boost::lexical_cast<Time>( frame );
-		_padding = frame.size();
+		_fixedPadding = frame.size();
 		_strictPadding = false;
 	}
 	else
@@ -363,7 +363,7 @@ bool Sequence::initFromPattern( const std::string& filePattern, const EPattern& 
 void Sequence::init( const std::string& prefix, const std::size_t padding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step, const bool strictPadding )
 {
 	_prefix = prefix;
-	_padding = padding;
+	_fixedPadding = padding;
 	_suffix = suffix;
 	_ranges.clear();
 	_ranges.push_back(FrameRange(firstTime, lastTime, step));

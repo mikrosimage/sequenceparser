@@ -100,9 +100,9 @@ Sequence privateBuildSequence(
 	sequence._ranges = extractFrameRanges(times);
 
 	//sequence.extractPadding( numberPartsBegin, numberPartsEnd, index );
-	sequence._padding = padding;
+	sequence._fixedPadding = padding;
 	sequence._strictPadding = strictPadding;
-	//sequence.extractIsStrictPadding( numberPartsBegin, numberPartsEnd, index, sequence._padding );
+	//sequence.extractIsStrictPadding( numberPartsBegin, numberPartsEnd, index, sequence._fixedPadding );
 
 	return sequence;
 }
@@ -128,7 +128,7 @@ void privateBuildSequencesAccordingToPadding(
 	     it != numberPartsEnd;
 		 ++it )
 	{
-		const std::size_t padding  = it->getPadding(index);
+		const std::size_t padding  = it->getFixedPadding(index);
 		const std::size_t nbDigits = it->getNbDigits(index);
 
 		paddings.insert( padding );
@@ -211,14 +211,14 @@ void privateBuildSequencesAccordingToPadding(
 		std::vector<FileNumbers>::const_iterator first = numberPartsBegin;
 		for( std::vector<FileNumbers>::const_iterator it = boost::next(first); it != numberPartsEnd; ++it )
 		{
-			if( first->getPadding(index) != it->getPadding(index) )
+			if( first->getFixedPadding(index) != it->getFixedPadding(index) )
 			{
-				const std::size_t p = first->getPadding(index);
+				const std::size_t p = first->getFixedPadding(index);
 				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, p, (p!=0) ) );
 				first = it;
 			}
 		}
-		const std::size_t p = first->getPadding(index);
+		const std::size_t p = first->getFixedPadding(index);
 		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, p, (p!=0) ) );
 		return;
 	}
@@ -233,14 +233,14 @@ void privateBuildSequencesAccordingToPadding(
 		{
 			if( first->getNbDigits(index) != it->getNbDigits(index) )
 			{
-				const std::size_t p = boost::prior(it)->getPadding(index);
-				const std::size_t pStart = first->getPadding(index);
+				const std::size_t p = boost::prior(it)->getFixedPadding(index);
+				const std::size_t pStart = first->getFixedPadding(index);
 				result.push_back( privateBuildSequence( defaultSeq, stringParts, first, it, index, pStart, (p!=pStart) ) );
 				first = it;
 			}
 		}
-		const std::size_t p = boost::prior(numberPartsEnd)->getPadding(index);
-		const std::size_t pStart = first->getPadding(index);
+		const std::size_t p = boost::prior(numberPartsEnd)->getFixedPadding(index);
+		const std::size_t pStart = first->getFixedPadding(index);
 		result.push_back( privateBuildSequence( defaultSeq, stringParts, first, numberPartsEnd, index, pStart, (p!=pStart) ) );
 		return;
 	}

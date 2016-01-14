@@ -86,7 +86,7 @@ public:
 		return extractNbDigits( _numbers[i].second );
 	}
 	
-	std::size_t getPadding( const std::size_t& i ) const
+	std::size_t getFixedPadding( const std::size_t& i ) const
 	{
 		return extractPadding( _numbers[i].second );
 	}
