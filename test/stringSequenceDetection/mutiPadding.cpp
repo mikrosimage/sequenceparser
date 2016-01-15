@@ -25,8 +25,8 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
-	BOOST_CHECK_EQUAL( seq.getPadding(), 3 );
-	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
+	BOOST_CHECK_EQUAL( seq.getFixedPadding(), 3 );
+	BOOST_CHECK_EQUAL( seq.getMaxPadding(), 3 );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
-	BOOST_CHECK_EQUAL( seq.getPadding(), 3 );
-	BOOST_CHECK_EQUAL( seq.isStrictPadding(), true );
+	BOOST_CHECK_EQUAL( seq.getFixedPadding(), 3 );
+	BOOST_CHECK_EQUAL( seq.getMaxPadding(), 3 );
 }
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 
 	const sequenceParser::Sequence& seq = listSequence.front();
-	BOOST_CHECK_EQUAL( seq.getPadding(), 0 );
+	BOOST_CHECK_EQUAL( seq.getFixedPadding(), 0 );
 	BOOST_CHECK_EQUAL( seq.getFirstTime(), 99 );
 	BOOST_CHECK_EQUAL( seq.getLastTime(), 123456 );
 	BOOST_CHECK_EQUAL( seq.getNbFiles(), 5 );
