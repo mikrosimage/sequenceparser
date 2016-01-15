@@ -200,10 +200,17 @@ public:
 	std::string _prefix; ///< filename prefix
 	std::string _suffix; ///< filename suffix
 	/**
-	 * @brief Number max of padding used to enumerate the sequence
+	 * @brief Number max of common padding used to enumerate the sequence
 	 * @note For fixed sequences, it is equal to the padding
 	 * @note Useful for sequence with a variable or an unknown padding
-	 * (unknown = when no frame begins with a '0' padding character)
+	 * unknown padding = when no frame begins with a '0' padding character
+	 * seq.101.jpg
+	 * seq.102.jpg
+	 * seq.102.jpg
+	 * variable padding = when not all frames have the same padding
+	 * seq.0101.jpg
+	 * seq.0100.jpg
+	 * seq.099.jpg
 	 */
 	std::size_t _maxPadding;
 	/**
