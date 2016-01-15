@@ -97,7 +97,7 @@ public:
 	inline std::string getFilenameWithStandardPattern() const;
 
 	/// @return a string pattern using printf style
-	inline std::string getPrintfPattern() const;
+	inline std::string getFilenameWithPrintfPattern() const;
 
 	/// @return a string pattern using C Style
 	std::string getCStylePattern() const;

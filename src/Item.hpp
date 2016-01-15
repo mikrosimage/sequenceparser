@@ -57,7 +57,7 @@ public:
 	, _path(folder)
 	, _sequence(sequence)
 	{
-		_path /= sequence.getPrintfPattern();
+		_path /= sequence.getFilenameWithPrintfPattern();
 	}
 
 	Item( const Sequence& sequence, const std::string& folder )
@@ -65,7 +65,7 @@ public:
 	, _path(folder)
 	, _sequence(sequence)
 	{
-		_path /= sequence.getPrintfPattern();
+		_path /= sequence.getFilenameWithPrintfPattern();
 	}
 
 	EType getType() const { return _type; }

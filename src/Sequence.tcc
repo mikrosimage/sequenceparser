@@ -14,7 +14,7 @@ inline std::string Sequence::getFilenameWithStandardPattern() const
 	return getPrefix() + std::string( getFixedPadding() ? getFixedPadding() : 1, getPatternCharacter() ) + getSuffix();
 }
 
-inline std::string Sequence::getPrintfPattern() const
+inline std::string Sequence::getFilenameWithPrintfPattern() const
 {
 	std::string paddingStr = "%";
 	if( getFixedPadding() )
