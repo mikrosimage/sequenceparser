@@ -9,7 +9,7 @@ inline char Sequence::getPatternCharacter() const
 	return getFixedPadding() ? '#' : '@';
 }
 
-inline std::string Sequence::getStandardPattern() const
+inline std::string Sequence::getFilenameWithStandardPattern() const
 {
 	return getPrefix() + std::string( getFixedPadding() ? getFixedPadding() : 1, getPatternCharacter() ) + getSuffix();
 }

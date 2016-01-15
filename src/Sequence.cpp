@@ -362,7 +362,7 @@ std::string Sequence::string() const
 
 std::ostream& operator<<(std::ostream& os, const Sequence& sequence)
 {
-	os << sequence.getStandardPattern() << " [" << sequence.getFrameRanges() << "]";
+	os << sequence.getFilenameWithStandardPattern() << " [" << sequence.getFrameRanges() << "]";
 	return os;
 }
 

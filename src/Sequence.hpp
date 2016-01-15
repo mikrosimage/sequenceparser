@@ -94,7 +94,7 @@ public:
 	inline char getPatternCharacter() const;
 
 	/// @return a string pattern using standard style
-	inline std::string getStandardPattern() const;
+	inline std::string getFilenameWithStandardPattern() const;
 
 	/// @return a string pattern using printf style
 	inline std::string getPrintfPattern() const;
@@ -140,7 +140,7 @@ public:
 
 	bool operator<(const Sequence& other ) const
 	{
-		return getStandardPattern() < other.getStandardPattern();
+		return getFilenameWithStandardPattern() < other.getFilenameWithStandardPattern();
 	}
 
 	bool operator==(const Sequence& other ) const
