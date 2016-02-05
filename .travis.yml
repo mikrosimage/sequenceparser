@@ -17,19 +17,24 @@ env:
      - SEQUENCEPARSER_BUILD=${TRAVIS_BUILD_DIR}/build-sequenceparser
      - SEQUENCEPARSER_INSTALL=${TRAVIS_BUILD_DIR}/install-sequenceparser
      - CI_NODE_TOTAL=2
+  matrix:
+    - PYTHON_VERSION=2.7
+    - PYTHON_VERSION=3.4
 
-# This results in a 2×2 build matrix.
-# Where the variables are: os / compiler
+# This results in a 2×2x2 build matrix.
+# Where the variables are: os / compiler / python version
 
 addons:
   apt:
-    sources: ['boost-latest', 'kalakris-cmake']
+    sources: ['boost-latest', 'kalakris-cmake', 'pythonxy-devel']
     packages:
     - cmake
     - swig
     - libboost1.55-all-dev
     - python-dev
     - python-nose
+    - python3-dev
+    - python3-nose
 
 cache:
   # Caching Ubuntu packages
@@ -43,11 +48,11 @@ before_script:
 script:
   # build
   - mkdir ${SEQUENCEPARSER_BUILD} && cd ${SEQUENCEPARSER_BUILD}
-  - cmake .. -DCMAKE_INSTALL_PREFIX=${SEQUENCEPARSER_INSTALL} -DSEQUENCEPARSER_PYTHON_VERSION=2.7
+  - cmake .. -DCMAKE_INSTALL_PREFIX=${SEQUENCEPARSER_INSTALL} -DSEQUENCEPARSER_PYTHON_VERSION=${PYTHON_VERSION}
   - make
   - make install
 
   # tests
   - cd ${TRAVIS_BUILD_DIR}
-  - export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python2.7/site-packages
+  - export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python${PYTHON_VERSION}/site-packages
   - nosetests pyTest
