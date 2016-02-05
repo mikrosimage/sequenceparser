@@ -25,7 +25,6 @@ else()
   message(STATUS "SequenceParser version is ${SEQUENCEPARSER_VERSION}")
 endif()
 
-
 # Diplay commands being ran by CMake
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
@@ -41,5 +40,9 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3")
 endif()
 
+set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
+
 # Build library
 add_subdirectory(src)
+# Build boost tests
+add_subdirectory(test)

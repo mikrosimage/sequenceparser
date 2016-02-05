@@ -1,4 +1,3 @@
-set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
 file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "*.cpp" "*.hpp")
 
 # Find boost
