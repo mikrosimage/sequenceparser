@@ -10,7 +10,7 @@ export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python${PYTHON_VERSI
 
 # nosetests
 if [[ ${PYTHON_VERSION} == "2.7" ]]; then
-    nosetests ${TRAVIS_BUILD_DIR}/pyTest -v
+    nosetests ${TRAVIS_BUILD_DIR}/test/pyTest -v
 elif [[ ${PYTHON_VERSION} == "3.4" ]]; then
-    nosetests3 ${TRAVIS_BUILD_DIR}/pyTest -v
+    nosetests3 ${TRAVIS_BUILD_DIR}/test/pyTest -v
 fi
