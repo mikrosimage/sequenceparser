@@ -46,13 +46,5 @@ before_script:
   - uname -a
 
 script:
-  # build
-  - mkdir ${SEQUENCEPARSER_BUILD} && cd ${SEQUENCEPARSER_BUILD}
-  - cmake .. -DCMAKE_INSTALL_PREFIX=${SEQUENCEPARSER_INSTALL} -DSEQUENCEPARSER_PYTHON_VERSION=${PYTHON_VERSION}
-  - make
-  - make install
-
-  # tests
-  - cd ${TRAVIS_BUILD_DIR}
-  - export PYTHONPATH=$PYTHONPATH:${SEQUENCEPARSER_INSTALL}/lib/python${PYTHON_VERSION}/site-packages
-  - nosetests pyTest
+  - tools/travis/build.sh
+  - tools/travis/launch_tests.sh
