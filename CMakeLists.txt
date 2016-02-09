@@ -44,5 +44,3 @@ set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
 
 # Build library
 add_subdirectory(src)
-# Build boost tests
-#add_subdirectory(test)
