@@ -1,18 +1,16 @@
-#include <detector.hpp>
+#include <test/common.hpp>
 
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/assign/std/vector.hpp>
-
 #include <boost/test/unit_test.hpp>
+
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE( MultiPaddingSequenceDetection )
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
-
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c001.j2c" )
 		( "aaa/bbb/a1b2c002.j2c" )
@@ -20,8 +18,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 		( "aaa/bbb/a1b2c023.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths );
-
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths);
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
@@ -31,10 +28,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding1 )
 
 BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
-
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c001.j2c" )
 		( "aaa/bbb/a1b2c002.j2c" )
@@ -43,8 +37,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 		( "aaa/bbb/a1b2c999.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths );
-
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths);
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 	
 	const sequenceParser::Sequence& seq = listSequence.front();
@@ -54,10 +47,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithPadding2 )
 
 BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
-
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c99.j2c" )
 		( "aaa/bbb/a1b2c102.j2c" )
@@ -66,8 +56,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 		( "aaa/bbb/a1b2c123456.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths );
-
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths);
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
 
 	const sequenceParser::Sequence& seq = listSequence.front();
@@ -82,10 +71,7 @@ BOOST_AUTO_TEST_CASE( SequenceWithoutPadding )
 
 BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
-
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c00099.j2c" )
 		( "aaa/bbb/a1b2c00102.j2c" )
@@ -95,8 +81,7 @@ BOOST_AUTO_TEST_CASE( DoublePaddingForTheSameSequence )
 		( "aaa/bbb/a1b2c123456.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths );
-
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths);
 	BOOST_CHECK_EQUAL( listSequence.size(), 2 );
 }
 

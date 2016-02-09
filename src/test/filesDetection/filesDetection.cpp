@@ -1,15 +1,14 @@
-#include <detector.hpp>
-
 #define BOOST_TEST_MODULE FileSequenceDetector
+
+#include <test/common.hpp>
+
+#include <boost/test/unit_test.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <cstdio>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 
 using boost::unit_test::test_suite;
 
@@ -127,17 +126,34 @@ void clearTmp()
 	boost::filesystem::remove_all( "tmpTestSequence" );
 }
 
-bool testFindObjectInDiretory( const char* path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
+bool testFindObjectInDiretory( const std::string path, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
-	boost::ptr_vector<sequenceParser::Folder> listFolder;
-	boost::ptr_vector<sequenceParser::File> listFile;
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
+	std::vector<sequenceParser::Item> items;
+    std::vector<sequenceParser::Item> listFileObject;
+	std::vector<sequenceParser::Item> listFolder;
+	std::vector<sequenceParser::Item> listFile;
+	std::vector<sequenceParser::Item> listSequence;
 
-	listFileObject = sequenceParser::fileObjectInDirectory( path, (sequenceParser::eTypeFolder | sequenceParser::eTypeFile | sequenceParser::eTypeSequence) );
-	listFolder = sequenceParser::folderInDirectory( path );
-	listFile = sequenceParser::fileInDirectory( path );
-	listSequence = sequenceParser::sequenceInDirectory( path );
+    items = sequenceParser::browse( path );
+    BOOST_FOREACH( const sequenceParser::Item& item, items )
+	{
+        switch(item.getType())
+        {
+            case sequenceParser::eTypeAll:
+                listSequence.push_back(item);
+            case sequenceParser::eTypeFolder:
+                listFolder.push_back(item);
+                break;
+            case sequenceParser::eTypeFile:
+                listFile.push_back(item);
+                break;
+            case sequenceParser::eTypeSequence:
+                listSequence.push_back(item);
+                break;
+            default:
+                break;
+        }
+    }
 
 	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
 	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
@@ -171,17 +187,34 @@ bool testFindObjectInDiretory( const char* path, const size_t numberOfFolders, c
 //	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 }
 
-bool testFindObjectInDiretory( const char* path, const sequenceParser::EDetection options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
+bool testFindObjectInDiretory( const std::string path, const sequenceParser::EDetection options, const size_t numberOfFolders, const size_t numberOfFiles, const size_t numberOfSequences, const size_t numberOfFileObjects )
 {
-	boost::ptr_vector<sequenceParser::FileObject> listFileObject;
-	boost::ptr_vector<sequenceParser::Folder> listFolder;
-	boost::ptr_vector<sequenceParser::File> listFile;
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
+	std::vector<sequenceParser::Item> items;
+    std::vector<sequenceParser::Item> listFileObject;
+	std::vector<sequenceParser::Item> listFolder;
+	std::vector<sequenceParser::Item> listFile;
+	std::vector<sequenceParser::Item> listSequence;
 
-	listFileObject = sequenceParser::fileObjectInDirectory( path, (sequenceParser::eTypeFolder | sequenceParser::eTypeFile | sequenceParser::eTypeSequence), options );
-	listFolder = sequenceParser::folderInDirectory( path, options );
-	listFile = sequenceParser::fileInDirectory( path, options );
-	listSequence = sequenceParser::sequenceInDirectory( path, options );
+    items = sequenceParser::browse( path, options );
+    BOOST_FOREACH( const sequenceParser::Item& item, items )
+	{
+        switch(item.getType())
+        {
+            case sequenceParser::eTypeAll:
+                listSequence.push_back(item);
+            case sequenceParser::eTypeFolder:
+                listFolder.push_back(item);
+                break;
+            case sequenceParser::eTypeFile:
+                listFile.push_back(item);
+                break;
+            case sequenceParser::eTypeSequence:
+                listSequence.push_back(item);
+                break;
+            default:
+                break;
+        }
+    }
 
 	BOOST_CHECK_EQUAL( listFileObject.size(), numberOfFileObjects );
 	BOOST_CHECK_EQUAL( listFolder.size(), numberOfFolders );
@@ -217,17 +250,29 @@ bool testFindObjectInDiretory( const char* path, const sequenceParser::EDetectio
 //	std::cout << (*it)->getAbsoluteStandardPattern() << std::endl;
 }
 
-bool testFirstSequenceLimits( const char* path, const int minValue, const int maxValue )
+bool testFirstSequenceLimits( const std::string path, const int minValue, const int maxValue )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
+	std::vector<sequenceParser::Item> items;
+	std::vector<sequenceParser::Item> listSequence;
 
-	listSequence = sequenceParser::sequenceInDirectory( path );
+    items = sequenceParser::browse( path );
+    BOOST_FOREACH( const sequenceParser::Item& item, items )
+	{
+        switch(item.getType())
+        {
+            case sequenceParser::eTypeSequence:
+                listSequence.push_back(item);
+                break;
+            default:
+                break;
+        }
+    }
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )
 		return false; // There is no sequence... so nothing to check
 
-	sequenceParser::Sequence& seq = listSequence.front();
+	const sequenceParser::Sequence& seq = listSequence.front().getSequence();
 
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
 	{
@@ -242,17 +287,29 @@ bool testFirstSequenceLimits( const char* path, const int minValue, const int ma
 	return true;
 }
 
-bool testFirstSequenceLimits( const char* path, const sequenceParser::EDetection options, const int minValue, const int maxValue )
+bool testFirstSequenceLimits( const std::string path, const sequenceParser::EDetection options, const int minValue, const int maxValue )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
+	std::vector<sequenceParser::Item> items;
+	std::vector<sequenceParser::Item> listSequence;
 
-	listSequence = sequenceParser::sequenceInDirectory( path, options );
+    items = sequenceParser::browse( path, options );
+    BOOST_FOREACH( const sequenceParser::Item& item, items )
+	{
+        switch(item.getType())
+        {
+            case sequenceParser::eTypeSequence:
+                listSequence.push_back(item);
+                break;
+            default:
+                break;
+        }
+    }
 
 	BOOST_CHECK( !listSequence.empty() );
 	if( listSequence.empty() )
 		return false; // There is no sequence... so nothing to check
 
-	sequenceParser::Sequence& seq = listSequence.front();
+	const sequenceParser::Sequence& seq = listSequence.front().getSequence();
 	if( seq.getFirstTime() != minValue || seq.getLastTime() != maxValue )
 	{
 		std::cout << "test sequence: " << path << " : set = " << minValue << " -> " << maxValue << " found "

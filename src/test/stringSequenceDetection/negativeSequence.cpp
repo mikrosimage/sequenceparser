@@ -1,8 +1,9 @@
-#include <detector.hpp>
+#include <test/common.hpp>
 
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/assign/std/vector.hpp>
-
 #include <boost/test/unit_test.hpp>
+
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE( NegativeSequenceDetection )
@@ -12,10 +13,7 @@ bool compareSequencesByNbFiles( const sequenceParser::Sequence& a, const sequenc
 
 BOOST_AUTO_TEST_CASE( NoNegativeValues )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
-
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b-2c1.j2c" )
 		( "aaa/bbb/a1b-2c2.j2c" )
@@ -31,8 +29,7 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 		( "aaa/bbb/a1b9c2.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths );
-
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths);
 	BOOST_CHECK_EQUAL( listSequence.size(), 3 );
 	
 	std::sort( listSequence.begin(), listSequence.end(), compareSequencesByNbFiles );
@@ -51,11 +48,8 @@ BOOST_AUTO_TEST_CASE( NoNegativeValues )
 }
 
 BOOST_AUTO_TEST_CASE( NegativeSequence )
-{
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
- 
+{ 
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c-3.j2c" )
 		( "aaa/bbb/a1b2c-2.j2c" )
@@ -66,7 +60,7 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 		( "aaa/bbb/a1b2c3.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths, sequenceParser::eDetectionNegative );
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths, sequenceParser::eDetectionNegative );
 
 	//std::cout << "listSequence.size(): " << listSequence.size() << std::endl;
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
@@ -81,7 +75,6 @@ BOOST_AUTO_TEST_CASE( NegativeSequence )
 
 BOOST_AUTO_TEST_CASE( SignedSequence_plus )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 	std::vector<boost::filesystem::path> paths;
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c-3.j2c" )
@@ -92,8 +85,8 @@ BOOST_AUTO_TEST_CASE( SignedSequence_plus )
 		( "aaa/bbb/a1b2c+2.j2c" )
 		( "aaa/bbb/a1b2c+3.j2c" )
 		;
-
-	listSequence = sequenceParser::sequenceFromFilenameList( paths, sequenceParser::eDetectionNegative );
+ 
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths, sequenceParser::eDetectionNegative );
 
 	// "+" character is recognized as inside the sequence.
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
@@ -109,7 +102,6 @@ BOOST_AUTO_TEST_CASE( SignedSequence_plus )
 // TODO
 BOOST_AUTO_TEST_CASE( AmbiguousSignedSequence_plus )
 {
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
 	std::vector<boost::filesystem::path> paths;
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c-3.j2c" )
@@ -123,7 +115,7 @@ BOOST_AUTO_TEST_CASE( AmbiguousSignedSequence_plus )
 		( "aaa/bbb/a1b2c8.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths, sequenceParser::eDetectionNegative );
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths, sequenceParser::eDetectionNegative );
 
 	// "+" character is recognized as inside the sequence.
 	BOOST_CHECK_EQUAL( listSequence.size(), 1 );
@@ -142,11 +134,8 @@ BOOST_AUTO_TEST_CASE( AmbiguousSignedSequence_plus )
 }
 
 BOOST_AUTO_TEST_CASE( AmbiguousNegativeZero_minus )
-{
-	boost::ptr_vector<sequenceParser::Sequence> listSequence;
- 
+{ 
 	std::vector<boost::filesystem::path> paths;
-
 	boost::assign::push_back( paths )
 		( "aaa/bbb/a1b2c-3.j2c" )
 		( "aaa/bbb/a1b2c-2.j2c" )
@@ -154,7 +143,7 @@ BOOST_AUTO_TEST_CASE( AmbiguousNegativeZero_minus )
 		( "aaa/bbb/a1b2c-0.j2c" )
 		;
 
-	listSequence = sequenceParser::sequenceFromFilenameList( paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles) );
+    std::vector<sequenceParser::Sequence> listSequence = sequenceFromFilenameList(paths, (sequenceParser::eDetectionNegative | sequenceParser::eDetectionSequenceNeedAtLeastTwoFiles) );
 
 	// there is no sense to put "-" on 0,
 	// so it's detected as 2 sequences (without eDetectionSequenceNeedAtLeastTwoFiles option).
