@@ -25,7 +25,7 @@ target_link_libraries(sequenceparser-shared ${Boost_LIBRARIES})
 
 ### Install sequenceParser libs and include
 install(
-	DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+	DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/sequenceParser"
 	DESTINATION "include"
 	FILES_MATCHING
 	PATTERN "*.hpp"
