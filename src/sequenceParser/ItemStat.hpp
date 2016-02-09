@@ -1,8 +1,8 @@
 #ifndef _SEQUENCE_PARSER_ITEMSTAT_HPP_
 #define _SEQUENCE_PARSER_ITEMSTAT_HPP_
 
-#include "Item.hpp"
 #include "common.hpp"
+#include "Item.hpp"
 #include "system.hpp"
 
 #ifdef __UNIX__

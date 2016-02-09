@@ -7,7 +7,7 @@ project(sequenceParser)
 # SEQUENCEPARSER_VERSION_MINOR
 # SEQUENCEPARSER_VERSION_MICRO
 # SEQUENCEPARSER_VERSION
-file(STRINGS "src/common.hpp" _avtranscoder_VERSION_HPP_CONTENTS REGEX "#define SEQUENCEPARSER_VERSION_")
+file(STRINGS "src/sequenceParser/common.hpp" _avtranscoder_VERSION_HPP_CONTENTS REGEX "#define SEQUENCEPARSER_VERSION_")
 foreach(v MAJOR MINOR MICRO)
   if("${_avtranscoder_VERSION_HPP_CONTENTS}" MATCHES "#define SEQUENCEPARSER_VERSION_${v} ([0-9]+)")
     set(SEQUENCEPARSER_VERSION_${v} "${CMAKE_MATCH_1}")
@@ -45,4 +45,4 @@ set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
 # Build library
 add_subdirectory(src)
 # Build boost tests
-add_subdirectory(test)
+#add_subdirectory(test)

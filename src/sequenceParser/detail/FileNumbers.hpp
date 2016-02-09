@@ -1,7 +1,7 @@
 #ifndef _SEQUENCE_PARSER_FILE_NUMBERS_HPP_
 #define _SEQUENCE_PARSER_FILE_NUMBERS_HPP_
 
-#include <common.hpp>
+#include <sequenceParser/common.hpp>
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>

@@ -5,8 +5,8 @@
 %include <exception.i>
 
 %{
-#include "Item.hpp"
-#include "filesystem.hpp"
+#include "sequenceParser/Item.hpp"
+#include "sequenceParser/filesystem.hpp"
 #include <boost/exception/diagnostic_information.hpp>
 %}
 

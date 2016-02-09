@@ -1,7 +1,7 @@
 %include "common.i"
 
 %{
-#include "FrameRange.hpp"
+#include "sequenceParser/FrameRange.hpp"
 %}
 
 %include "FrameRange.hpp"

@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "*.cpp" "*.hpp")
+file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "sequenceParser/*.cpp" "sequenceParser/*.hpp")
 
 # Find boost
 find_package(Boost 1.53.0
@@ -42,7 +42,7 @@ if(SWIG_FOUND)
 
 	# Configure Swig
 	set(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/sequenceParser")
-	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser.i")
+	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser/sequenceParser.i")
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
 	# Swig flags

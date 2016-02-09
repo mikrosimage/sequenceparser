@@ -4,7 +4,6 @@
 #include "detail/analyze.hpp"
 #include "detail/FileNumbers.hpp"
 #include "detail/FileStrings.hpp"
-#include "common.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
