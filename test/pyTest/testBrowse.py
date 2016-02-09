@@ -1,6 +1,5 @@
-# scons: pySequenceParser
-
 from pySequenceParser import sequenceParser
+
 import tempfile
 import os
 import shutil
