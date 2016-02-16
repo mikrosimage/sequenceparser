@@ -24,7 +24,6 @@ version 2.6 or upper
 
 #### Tests
 * pyTest using nosetests
-* c++ test using Boost Unit Tests (outdated and not compiled)
 
 #### Definitions
 * Sequence
