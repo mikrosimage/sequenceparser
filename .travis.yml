@@ -52,3 +52,6 @@ script:
 
 after_success:
   - if [ ${CC} = "gcc" ]; then ./tools/travis/gcc.generate.coverage.sh; fi
+
+after_failure:
+  - cat ${SEQUENCEPARSER_BUILD}/CMakeFiles/CMakeOutput.log
