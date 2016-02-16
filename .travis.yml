@@ -44,7 +44,11 @@ before_script:
   - env | sort  
   - date -u
   - uname -a
+  - if [ ${CC} = "gcc" ]; then ./tools/travis/gcc.install.coverage.sh; fi
 
 script:
   - tools/travis/build.sh
   - tools/travis/launch_tests.sh
+
+after_success:
+  - if [ ${CC} = "gcc" ]; then ./tools/travis/gcc.generate.coverage.sh; fi
