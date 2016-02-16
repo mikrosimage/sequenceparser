@@ -40,7 +40,11 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3")
 endif()
 
-set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
+# CPP flag to create code coverage report
+if(SEQUENCEPARSER_COVERAGE)
+	message("Add coverage build option.")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+endif()
 
 # Build library
 add_subdirectory(src)
