@@ -145,6 +145,3 @@ else(SWIG_FOUND)
 	message("SWIG not found, will not build python and java bindings.")
 
 endif(SWIG_FOUND)
-
-# Build boost tests
-add_subdirectory(test)
