@@ -3,9 +3,9 @@
 %include <std_vector.i>
 
 %{
-#include "common.hpp"
-#include "Sequence.hpp"
-#include "detector.hpp"
+#include "sequenceParser/common.hpp"
+#include "sequenceParser/Sequence.hpp"
+#include "sequenceParser/detector.hpp"
 %}
 
 /*

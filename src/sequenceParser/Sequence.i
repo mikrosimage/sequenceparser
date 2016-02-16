@@ -1,8 +1,8 @@
 %include "common.i"
 
 %{
-#include "common.hpp"
-#include "Sequence.hpp"
+#include "sequenceParser/common.hpp"
+#include "sequenceParser/Sequence.hpp"
 %}
 
 namespace std {

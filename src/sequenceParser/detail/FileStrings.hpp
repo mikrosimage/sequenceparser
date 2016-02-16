@@ -4,6 +4,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+
 #include <vector>
 
 namespace sequenceParser {

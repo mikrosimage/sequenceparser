@@ -1,13 +1,13 @@
 #include "analyze.hpp"
 
-#include "detail/FileNumbers.hpp"
-#include "detail/FileStrings.hpp"
-#include "common.hpp"
+#include "FileNumbers.hpp"
+#include "FileStrings.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/foreach.hpp>
+
 #include <set>
 
 

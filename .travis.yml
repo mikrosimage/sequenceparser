@@ -44,7 +44,14 @@ before_script:
   - env | sort  
   - date -u
   - uname -a
+  - if [ ${CC} = "gcc" ]; then ./tools/travis/gcc.install.coverage.sh; fi
 
 script:
   - tools/travis/build.sh
-  - tools/travis/launch_tests.sh
+  - tools/travis/python.nosetests.sh
+
+after_success:
+  - if [ ${CC} = "gcc" ]; then ./tools/travis/gcc.generate.coverage.sh; fi
+
+after_failure:
+  - cat ${SEQUENCEPARSER_BUILD}/CMakeFiles/CMakeOutput.log

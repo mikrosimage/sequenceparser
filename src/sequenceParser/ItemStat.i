@@ -1,7 +1,7 @@
 %include "common.i"
 
 %{
-#include "ItemStat.hpp"
+#include "sequenceParser/ItemStat.hpp"
 %}
 
 %include "ItemStat.hpp"

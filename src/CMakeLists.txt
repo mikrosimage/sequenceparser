@@ -1,5 +1,4 @@
-set(SEQUENCEPARSER_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
-file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "*.cpp" "*.hpp")
+file(GLOB_RECURSE SEQUENCEPARSER_SRC_FILES "sequenceParser/*.cpp" "sequenceParser/*.hpp")
 
 # Find boost
 find_package(Boost 1.53.0
@@ -26,7 +25,7 @@ target_link_libraries(sequenceparser-shared ${Boost_LIBRARIES})
 
 ### Install sequenceParser libs and include
 install(
-	DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+	DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/sequenceParser"
 	DESTINATION "include"
 	FILES_MATCHING
 	PATTERN "*.hpp"
@@ -43,7 +42,7 @@ if(SWIG_FOUND)
 
 	# Configure Swig
 	set(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/sequenceParser")
-	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser.i")
+	set(SEQUENCEPARSER_BINDING_FILE "sequenceParser/sequenceParser.i")
 	set_source_files_properties(${SEQUENCEPARSER_BINDING_FILE} PROPERTIES CPLUSPLUS ON)
 
 	# Swig flags

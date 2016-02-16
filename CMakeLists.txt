@@ -7,7 +7,7 @@ project(sequenceParser)
 # SEQUENCEPARSER_VERSION_MINOR
 # SEQUENCEPARSER_VERSION_MICRO
 # SEQUENCEPARSER_VERSION
-file(STRINGS "src/common.hpp" _avtranscoder_VERSION_HPP_CONTENTS REGEX "#define SEQUENCEPARSER_VERSION_")
+file(STRINGS "src/sequenceParser/common.hpp" _avtranscoder_VERSION_HPP_CONTENTS REGEX "#define SEQUENCEPARSER_VERSION_")
 foreach(v MAJOR MINOR MICRO)
   if("${_avtranscoder_VERSION_HPP_CONTENTS}" MATCHES "#define SEQUENCEPARSER_VERSION_${v} ([0-9]+)")
     set(SEQUENCEPARSER_VERSION_${v} "${CMAKE_MATCH_1}")
@@ -25,7 +25,6 @@ else()
   message(STATUS "SequenceParser version is ${SEQUENCEPARSER_VERSION}")
 endif()
 
-
 # Diplay commands being ran by CMake
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
@@ -39,6 +38,12 @@ if(MSVC)
 else()
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fPIC -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3")
+endif()
+
+# CPP flag to create code coverage report
+if(SEQUENCEPARSER_COVERAGE)
+	message("Add coverage build option.")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif()
 
 # Build library

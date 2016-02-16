@@ -8,7 +8,7 @@ namespace std {
 }
 
 %{
-#include "common.hpp"
+#include "sequenceParser/common.hpp"
 #include <boost/filesystem/operations.hpp>
 %}
 

@@ -1,8 +1,8 @@
 #ifndef _SEQUENCE_PARSER_DETAIL_ANALYZE_HPP_
 #define _SEQUENCE_PARSER_DETAIL_ANALYZE_HPP_
 
-#include "common.hpp"
-#include "Sequence.hpp"
+#include <sequenceParser/common.hpp>
+#include <sequenceParser/Sequence.hpp>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/lexical_cast.hpp>

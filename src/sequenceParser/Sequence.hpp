@@ -249,7 +249,7 @@ std::size_t extractPadding( const std::vector<detail::FileNumbers>::const_iterat
 
 #endif
 
-#include <Sequence.tcc>
+#include "Sequence.tcc"
 
 
 }
