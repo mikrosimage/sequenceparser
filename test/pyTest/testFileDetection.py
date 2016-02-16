@@ -39,19 +39,19 @@ def setUp():
     path_film = tempfile.mkdtemp('film', dir=path_root)
     path_strictPadding = tempfile.mkdtemp('strictPadding', dir=path_film)
     # create sequence img.%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_strictPadding, 'img.' + str(padding) + '.dpx')
     # create sequence .img.%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_strictPadding, '.img.' + str(padding) + '.dpx')
     # create sequence img.%04d.jpg
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_strictPadding, 'img.' + str(padding) + '.jpg')
     # create sequence imgBroken.%04d.jpg with holes
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_strictPadding, 'imgBroken.' + str(padding) + '.jpg')
         if i == 2: i = 9
@@ -59,19 +59,19 @@ def setUp():
 
     path_noStrictPadding = tempfile.mkdtemp('noStrictPadding', dir=path_film)
     # create sequence img.%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_noStrictPadding, 'img.' + str(padding) + '.dpx')
     # create sequence .img.%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_noStrictPadding, '.img.' + str(padding) + '.dpx')
     # create sequence img.%04d.jpg
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_noStrictPadding, 'img.' + str(padding) + '.jpg')
     # create sequence imgBroken.%04d.jpg with holes
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_noStrictPadding, 'imgBroken.' + str(padding) + '.jpg')
         if i == 2: i = 9
@@ -87,11 +87,11 @@ def setUp():
 
     path_negative = tempfile.mkdtemp('negative', dir=path_dpx)
     # create sequence img.-%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_negative, 'img.-' + str(padding) + '.dpx')
     # create sequence seqTest.-%04d.dpx
-    for i in xrange(0, 100):
+    for i in range(0, 100):
         padding = '%04d' % i
         createFile(path_negative, 'seqTest.-' + str(padding) + '.dpx')
 
