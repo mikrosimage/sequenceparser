@@ -2,9 +2,11 @@
 
 #include <boost/filesystem/operations.hpp>
 
+#ifdef __UNIX__
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
+#endif
 
 
 namespace bfs = boost::filesystem;
@@ -137,7 +139,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	inodeId = 0;
 	userId = 0;
 	groupId = 0;
-	accessTime1 = 0;
+	accessTime = 0;
 	creationTime = 0;
 	sizeOnDisk = 0;
 	size = 0;
@@ -204,7 +206,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	inodeId = 0;
 	userId = 0;
 	groupId = 0;
-	accessTime1 = 0;
+	accessTime = 0;
 	creationTime = 0;
 	sizeOnDisk = 0;
 	size = 0;
@@ -302,7 +304,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	//   TODO: stat on a subset of files
 
 	bfs::path folder = item.getFolderPath();
-	
+
 	BOOST_FOREACH( Time t, seq.getFramesIterable() )
 	{
 		boost::filesystem::path filepath = folder / seq.getFilenameAt(t);
@@ -310,7 +312,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 		EType type = getTypeFromPath(filepath);
 
 		ItemStat fileStat(type, filepath);
-		
+
 		// use the most restrictive permissions in the sequence
 #ifdef __UNIX__
 		// user

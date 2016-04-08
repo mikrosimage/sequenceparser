@@ -1,5 +1,6 @@
 #include "FrameRange.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 
@@ -18,10 +19,10 @@ std::ostream& operator<<(std::ostream& os, const FrameRange& range)
 	if( range.first == range.last )
 		return os;
 	os << ":" << range.last;
-	
+
 	if( range.step != 1 )
 		os << "x" << range.step;
-	
+
 	return os;
 }
 
@@ -30,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& frameR
 	// to ensure that "ranges" size is > 0 as we use unsigned
 	if( frameRanges.empty() )
 		return os;
-	
+
 	std::vector<FrameRange>::const_iterator it = frameRanges.begin();
 	for( std::size_t i = 0; i < frameRanges.size() - 1; ++i, ++it )
 	{
@@ -61,15 +62,15 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 	{
 		return res;
 	}
-	
+
 	std::vector<Time>::const_iterator itPrev = times.begin();
 	std::vector<Time>::const_iterator itEnd = times.end();
 	std::vector<Time>::const_iterator it = itPrev;
 	++it;
-	
+
 	itPrev = it;
 	++it;
-	
+
 	for( ; it != itEnd; itPrev = it, ++it )
 	{
 		Time newStep = *it - *itPrev;
@@ -85,7 +86,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 			// so update it with the new step
 			prevRange.last = *it;
 			prevRange.step = newStep;
-			
+
 			// The range has only 2 frames.
 		}
 		else if( prevRange.getNbFrames() == 2 )
@@ -97,7 +98,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 			// Previous range is a still frame
 			prevRange.last = prevRange.first;
 			prevRange.step = 1;
-			
+
 			res.push_back( newFrameRange );
 		}
 		else
@@ -107,7 +108,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 			res.push_back( FrameRange(*it, *it) );
 		}
 	}
-	
+
 	FrameRange& lastRange = res.back();
 	if( lastRange.getNbFrames() == 2 )
 	{
@@ -116,7 +117,7 @@ std::vector<FrameRange> extractFrameRanges( const std::vector<Time>& times )
 		FrameRange newFrameRange(lastRange.last, lastRange.last, 1);
 		lastRange.last = lastRange.first;
 		lastRange.step = 1;
-		
+
 		res.push_back( newFrameRange );
 	}
 	return res;
