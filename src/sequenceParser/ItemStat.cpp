@@ -195,17 +195,6 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
 	lastChangeTime = statInfos.st_ctime;
-	bfs::directory_iterator end_iter;
-	for (bfs::directory_iterator dir_itr(path); dir_itr != end_iter; ++dir_iter)
-	{
-		bfs::path filepath = dir_itr->path();
-		EType type = getTypeFromPath(filepath);
-		ItemStat fileStat(type, filepath);
-		if( lastChangeTime < fileStat.lastChangeTime )
-		{
-			lastChangeTime = fileStat.lastChangeTime;
-		}
-	} 
 	size = statInfos.st_size;
 	minSize = size;
 	maxSize = size;
