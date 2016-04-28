@@ -126,7 +126,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	userId = statInfos.st_uid;
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
-	creationTime = statInfos.st_ctime;
+	lastChangeTime = statInfos.st_ctime;
 	size = statInfos.st_size;
 	minSize = size;
 	maxSize = size;
@@ -140,7 +140,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	userId = 0;
 	groupId = 0;
 	accessTime = 0;
-	creationTime = 0;
+	lastChangeTime = 0;
 	sizeOnDisk = 0;
 	size = 0;
 #endif
@@ -153,7 +153,7 @@ void ItemStat::setDefaultValues(){
 	userId = 0;
 	groupId = 0;
 	accessTime = 0;
-	creationTime = 0;
+	lastChangeTime = -1;
 	sizeOnDisk = 0;
 	size = 0;
 	minSize = 0;
@@ -194,7 +194,18 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	userId = statInfos.st_uid;
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
-	creationTime = statInfos.st_ctime;
+	lastChangeTime = statInfos.st_ctime;
+	bfs::directory_iterator end_iter;
+	for (bfs::directory_iterator dir_itr(path); dir_itr != end_iter; ++dir_iter)
+	{
+		bfs::path filepath = dir_itr->path();
+		EType type = getTypeFromPath(filepath);
+		ItemStat fileStat(type, filepath);
+		if( lastChangeTime < fileStat.lastChangeTime )
+		{
+			lastChangeTime = fileStat.lastChangeTime;
+		}
+	} 
 	size = statInfos.st_size;
 	minSize = size;
 	maxSize = size;
@@ -207,7 +218,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	userId = 0;
 	groupId = 0;
 	accessTime = 0;
-	creationTime = 0;
+	lastChangeTime = 0;
 	sizeOnDisk = 0;
 	size = 0;
 #endif
@@ -241,7 +252,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	userId = statInfos.st_uid;
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
-	creationTime = statInfos.st_ctime;
+	lastChangeTime = statInfos.st_ctime;
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
 	setPermissions(statInfos.st_mode);
@@ -251,7 +262,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	userId = 0;
 	groupId = 0;
 	accessTime = 0;
-	creationTime = 0;
+	lastChangeTime = 0;
 	sizeOnDisk = 0;
 #endif
 
@@ -295,7 +306,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	maxSize = 0;
 	realSize = 0;
 	sizeOnDisk = 0;
-	creationTime = 0;
+	lastChangeTime = 0;
 
 	const Sequence& seq = item.getSequence();
 
@@ -341,8 +352,8 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 		// use the latest modification date in the sequence
 		if( fileStat.modificationTime > modificationTime )
 			modificationTime = fileStat.modificationTime;
-		if( creationTime == 0 || creationTime > fileStat.creationTime )
-			creationTime = fileStat.creationTime;
+		if( lastChangeTime == 0 || lastChangeTime < fileStat.lastChangeTime )
+			lastChangeTime = fileStat.lastChangeTime;
 
 		// compute sizes
 		fullNbHardLinks += fileStat.fullNbHardLinks;

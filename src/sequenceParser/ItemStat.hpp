@@ -45,7 +45,7 @@ public:
 	long long sizeOnDisk; /// size on hard-drive (takes hardlinks into account)
 	long long accessTime;
 	long long modificationTime;
-	long long creationTime;
+	long long lastChangeTime;
 	bool ownerCanRead;
 	bool ownerCanWrite;
 	bool ownerCanExecute;
