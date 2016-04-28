@@ -45,7 +45,7 @@ public:
 	long long sizeOnDisk; /// size on hard-drive (takes hardlinks into account)
 	long long accessTime;
 	long long modificationTime;
-	long long lastChangeTime;
+	long long lastChangeTime; /// last modification time. In case of rsync command with preserve times, the modification time is the same as remote file and the lastChangeTime is the local time 
 	bool ownerCanRead;
 	bool ownerCanWrite;
 	bool ownerCanExecute;
