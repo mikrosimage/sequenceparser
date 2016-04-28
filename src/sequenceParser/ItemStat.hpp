@@ -32,20 +32,31 @@ private:
 #endif
 
 public:
-	long long deviceId;
-	unsigned int inodeId;
-	double nbHardLinks;
-	long long fullNbHardLinks;
-	long long userId;
-	long long groupId;
-	long long size;
+	// See the following doc to get file status on UNIX system
+	// See http://linux.die.net/man/2/stat
+	long long deviceId; /// ID of device containing file
+	unsigned int inodeId; /// inode number
+	double nbHardLinks; /// number of hard links
+	long long fullNbHardLinks; /// total number of hard links in a sequence (otherwise, same value as nbHardLinks)
+	long long userId; /// user ID of owner
+	long long groupId; /// group ID of owner
+
+	long long size; /// total size, in bytes
 	long long minSize; /// size of the smallest file in the sequence (otherwise, same value as size)
 	long long maxSize; /// size of the biggest file in the sequence (otherwise, same value as size)
 	long long realSize; /// size (takes hardlinks into account)
 	long long sizeOnDisk; /// size on hard-drive (takes hardlinks into account)
-	long long accessTime;
-	long long modificationTime;
-	long long lastChangeTime; /// last modification time. In case of rsync command with preserve times, the modification time is the same as remote file and the lastChangeTime is the local time 
+
+	long long accessTime; /// time of last access
+	long long modificationTime; /// time of last modification
+	/**
+	 * @brief Time of last status change
+	 * @note In case of rsync command with preserve times, 
+	 * the modification time is the same as remote file and the lastChangeTime is the local time 
+	 */
+	long long lastChangeTime;
+
+	// permissions
 	bool ownerCanRead;
 	bool ownerCanWrite;
 	bool ownerCanExecute;
