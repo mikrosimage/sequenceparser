@@ -41,7 +41,11 @@ public:
 	long long userId; /// user ID of owner
 	long long groupId; /// group ID of owner
 
-	long long size; /// total size, in bytes
+	/**
+	 * @brief total size, in bytes
+	 * @note The size of a symbolic link is the length of the pathname it contains, without a terminating null byte
+	 */
+	long long size;
 	long long minSize; /// size of the smallest file in the sequence (otherwise, same value as size)
 	long long maxSize; /// size of the biggest file in the sequence (otherwise, same value as size)
 	long long realSize; /// size (takes hardlinks into account)
