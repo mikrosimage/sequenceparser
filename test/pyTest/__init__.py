@@ -11,6 +11,14 @@ def createFile(path, filename):
     open(ff, 'w').close()
 
 
+def createFolder(path, folderName):
+    """
+    Create an empty folder.
+    """
+    dd = os.path.join(path, folderName)
+    os.mkdir(dd)
+
+
 def getSequencesFromPath(path, detectionOptions, filters=[]):
     """
     Get a list of sequences found thanks to a browse with the given parameters.
