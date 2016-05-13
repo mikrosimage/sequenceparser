@@ -1,6 +1,12 @@
 # SequenceParser
 
-SequenceParser library is a C++ library to detect sequences, files and folders.
+SequenceParser library is a library to detect sequences, files and folders.
+
+#### Basics
+* C++ library
+* Java and Python bindings generated with SWIG
+* multiplateform (Linux, MAC, Windows)
+* the main idea is to handle ambiguous cases of sequence detection with options when browse disk
 
 #### Licence
 See [**COPYING.md**](COPYING.md)
