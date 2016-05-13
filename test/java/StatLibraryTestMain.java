@@ -1,8 +1,8 @@
 import java.io.IOException;
 
-import eu.sequence.parser.EType;
-import eu.sequence.parser.Item;
-import eu.sequence.parser.ItemStat;
+import org.sequenceparser.EType;
+import org.sequenceparser.Item;
+import org.sequenceparser.ItemStat;
 
 public class StatLibraryTestMain {
     public static void main(String[] args) throws IOException {
@@ -11,7 +11,7 @@ public class StatLibraryTestMain {
             return;
         }
         try {
-            System.loadLibrary("java_sequenceParser");
+            System.loadLibrary("sequenceParser-java");
             final String path = args[0];
             final Item item = new Item(EType.eTypeFolder, path);
             final ItemStat itemStat = new ItemStat(item);
@@ -32,3 +32,11 @@ public class StatLibraryTestMain {
         System.out.println("Device : " + itemStat.getDeviceId());
     }
 }
+
+// How to use
+
+// Compile on UNIX: javac -cp "/path/to/jar/sequenceParser-<version>.jar:." StatLibraryTestMain.java
+// Run on UNIX: java -Djava.library.path=/path/to/lib/ -cp "/path/to/jar/sequenceParser-<version>.jar:." StatLibraryTestMain <input_path>
+
+// Compile on Windows: javac -cp "/path/to/jar/sequenceParser-<version>.jar;." StatLibraryTestMain.java
+// Run on Windows: java -Djava.library.path=/path/to/lib/ -cp "/path/to/jar/sequenceParser-<version>.jar;." StatLibraryTestMain <input_path>
