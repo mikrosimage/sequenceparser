@@ -18,15 +18,6 @@ See [**COPYING.md**](COPYING.md)
 #### Compilation
 See [**INSTALL.md**](INSTALL.md)
 
-#### External Libraries
-* Boost
-version 1.48.0 or upper
-components regex, system, filesystem, locale
-* Swig ( for Python/Java Binding )
-1.3.36 or upper
-* Python
-version 2.6 or upper
-
 #### Tests
 * pyTest using nosetests
 
