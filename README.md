@@ -2,6 +2,10 @@
 
 SequenceParser library is a library to detect sequences, files and folders.
 
+[![Build Status](https://travis-ci.org/mikrosimage/sequenceparser.svg?branch=master)](https://travis-ci.org/mikrosimage/sequenceparser)
+[![Coverage Status](https://coveralls.io/repos/github/mikrosimage/sequenceparser/badge.svg?branch=develop)](https://coveralls.io/github/mikrosimage/sequenceparser?branch=develop)  
+
+
 #### Basics
 * C++ library
 * Java and Python bindings generated with SWIG
@@ -13,11 +17,6 @@ See [**COPYING.md**](COPYING.md)
 
 #### Compilation
 See [**INSTALL.md**](INSTALL.md)
-
-#### Continuous Integration
-###### Travis
-[![Build Status](https://travis-ci.org/mikrosimage/sequenceparser.svg?branch=master)](https://travis-ci.org/mikrosimage/sequenceparser)  
-[![Coverage Status](https://coveralls.io/repos/github/mikrosimage/sequenceparser/badge.svg?branch=develop)](https://coveralls.io/github/mikrosimage/sequenceparser?branch=develop)  
 
 #### External Libraries
 * Boost
