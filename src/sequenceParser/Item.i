@@ -6,11 +6,15 @@
 
 %include "Item.hpp"
 
-//%extend sequenceParser::Item
-//{
-//	%pythoncode
-//	{
-//		def __str__(self):
-//			return self.string()
-//	}
-//}
+#ifdef SWIGPYTHON
+
+%extend sequenceParser::Item
+{
+    %pythoncode
+    {
+        def __str__(self):
+            return self.string()
+    }
+}
+
+#endif
