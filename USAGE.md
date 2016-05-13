@@ -1,21 +1,21 @@
 # How to use sequenceParser
 
-#### Definitions
-* Sequence  
+## Definitions
+#### Sequence  
 It's many files with a common pattern of numbers.
-* File  
+#### File  
 It's all file without numbers in the filname and sequences with only one file.
-* Folders  
+#### Folders  
 Just folders.
 
 
-#### API
+## API
 The original code is in C++, but almost all the methods are translated into python/java without any changes.  
 So a good way to start is to have a look at the [C++ code](src/sequenceParser) (since the generated python/java code is ugly).  
 
 In the sake of brevity, the example code of the following section is written in python.
 
-###### Interact with the filesystem
+#### Interact with the filesystem
 The entry points to interact with the filesystem are the [__browse__](src/sequenceParser/filesystem.hpp) methods.
 ```python
 items = sequenceParser.browse("/path/to/browse")
@@ -23,7 +23,7 @@ items = sequenceParser.browse("/path/to/browse")
 These methods return a list of __Item__.  
 All the rest of your code will consist of manipulating those __Item__ objects, without any other interaction with the filesystem.
 
-###### Item
+#### Item
 All elements in the filesystem (folder, file, link...) are consider as [__Item__](src/sequenceParser/Item.hpp) in the library.  
 The __Item__ handles general attributes such as the path, the name, and the type of the element.  
 To get the type of an __Item__:
@@ -40,13 +40,13 @@ else
     raise ValueError("Unknown type of item!")
 ```
 
-###### ItemStat
+#### ItemStat
 From an __Item__, you can create an [__ItemStat__](src/sequenceParser/ItemStat.hpp) to have access to system information of the element (such as size on disk, rights, access time...).
 ```python
 itemStat = sequenceParser.ItemStat(item)
 ```
 
-###### Sequence
+#### Sequence
 If an __Item__ represents several files with a common pattern, it holds a [__Sequence__](src/sequenceParser/Sequence.hpp).
 ```python
 if item.getType() == sequenceParser.eTypeSequence:
@@ -65,7 +65,7 @@ nbFiles = sequence.getNbFiles()
 nbMissingFiles = sequence.getNbMissingFiles() # in case of holes
 ```
 
-###### Tell me a story about padding...
+#### Tell me a story about padding...
 To manage ambiguous cases of sequence detection, the sequenceParser library makes the difference between a fixed, variable and an unknown padding.
 
 * Fixed padding  
@@ -79,7 +79,7 @@ maxPadding = sequence.getMaxPadding()      # 3
 print sequence                             # seq.###.jpg [1:3]
 ```
 
-* Variable padding
+* Variable padding  
 When not all frames have the same padding:
     * seq.101.jpg
     * seq.100.jpg
@@ -101,11 +101,11 @@ maxPadding = sequence.getMaxPadding()      # 3
 print sequence                             # seq.@.jpg [101:103]
 ```
 
-###### Browse more!
+#### Browse more!
 When you browse the disks, you have access to several arguments to specify what you are looking for.
-* detection options  
+* Detection options  
 [__eDetectionXXX__](src/sequenceParser/common.hpp) is an enum used to choose how to consider sequences.  
-* filters  
+* Filters  
 A list of strings used to limit the search.
 
 ```python
@@ -118,15 +118,15 @@ items = sequenceParser.browse("/path/to/browse", sequenceParser.eDetectionDefaul
 
 For more information, see the [__python examples__](examples).
 
-#### Environment
-###### In C++
+## Environment
+#### In C++
 Set environment:
 ```bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/boost/lib:/path/to/sequenceParser/lib
 export PATH=$PATH:/path/to/sequenceParser/bin
 ```
 
-###### In Java
+#### In Java
 Add argument to the JVM:
 ```bash
 -Djava.library.path=/path/to/sequenceParser/lib/java
@@ -136,21 +136,21 @@ Set environment:
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/boost/lib
 ```
 
-###### In Python
+#### In Python
 Set environment:
 ```bash
 export PYTHONPATH=$PYTHONPATH:/path/to/sequenceParser/lib/python<version>/site-packages/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/boost/lib
 ```
 
-#### Projects which uses sequenceParser
-###### TuttleOFX
+## Projects which uses sequenceParser
+#### TuttleOFX
 TuttleOFX is a library to connect and batch operations with OpenFx plugins. It comes with a set of plugins that allows you to batch process on movies and file sequences.  
 TuttOFX uses sequenceParser in:
 * [tuttleIOPluginLib](https://github.com/tuttleofx/TuttleOFX/tree/develop/libraries/tuttle/src/tuttle/ioplugin/context), its common library for io plugins.
 * [sam](https://github.com/tuttleofx/TuttleOFX/tree/develop/applications/sam), its command line to process sequences.
 
-###### Dude2
-Dude2 is a disk usage monitoring tool.
+#### Dude2
+Dude2 is a disk usage monitoring tool.  
 Dude2 uses sequenceParser in:
 * its [incremental scan](https://github.com/mikrosimage/Dude2/tree/develop/FileSystemScanner/src/eu/mikrosimage/filesystem/scanner).
