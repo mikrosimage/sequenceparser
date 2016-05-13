@@ -18,9 +18,6 @@ See [**COPYING.md**](COPYING.md)
 #### Compilation
 See [**INSTALL.md**](INSTALL.md)
 
-#### Tests
-* pyTest using nosetests
-
 #### Definitions
 * Sequence
 it's many files with a common pattern of numbers

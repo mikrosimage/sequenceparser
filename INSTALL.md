@@ -32,3 +32,11 @@ cmake . -DBOOST_ROOT=/path/to/your/boost/install
 ###### MacOS
 
 ###### Windows
+
+
+#### Launch tests
+###### Python tests
+Using nosetests:
+```
+nosetests test/pyTest
+```
