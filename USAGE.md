@@ -11,9 +11,9 @@ Just folders.
 
 #### API
 The original code is in C++, but almost all the methods are translated into python/java without any changes.  
-So a good way to start is to have a look at the [C++ code](src/sequenceParser) (since the generated code is ugly).  
+So a good way to start is to have a look at the [C++ code](src/sequenceParser) (since the generated python/java code is ugly).  
 
-To simplify the following help, the code is written in python.
+In the sake of brevity, the example code of the following section is written in python.
 
 ###### Interact with the filesystem
 The entry points to interact with the filesystem are the [__browse__](src/sequenceParser/filesystem.hpp) methods.
@@ -21,7 +21,7 @@ The entry points to interact with the filesystem are the [__browse__](src/sequen
 items = sequenceParser.browse("/path/to/browse")
 ```
 These methods return a list of __Item__.  
-All the rest of your code will consist in manipulate these __Item__ objects, without any other interaction with the filesystem.
+All the rest of your code will consist of manipulating those __Item__ objects, without any other interaction with the filesystem.
 
 ###### Item
 All elements in the filesystem (folder, file, link...) are consider as [__Item__](src/sequenceParser/Item.hpp) in the library.  
@@ -37,11 +37,11 @@ elif item.getType() == sequenceParser.eTypeSequence:
 elif item.getType() == sequenceParser.eTypeLink:
     print "This is a link!"
 else
-    raise ValueError
+    raise ValueError("Unknown type of item!")
 ```
 
 ###### ItemStat
-From an __Item__, you can create an [__ItemStat__](src/sequenceParser/ItemStat.hpp) to have access to system info of the element.
+From an __Item__, you can create an [__ItemStat__](src/sequenceParser/ItemStat.hpp) to have access to system information of the element (such as size on disk, rights, access time...).
 ```python
 itemStat = sequenceParser.ItemStat(item)
 ```
@@ -55,7 +55,7 @@ else:
     pass
 ```
 
-With this object, we have access to all the information we expect about a sequence:
+With this object, you have access to all the information you expect about a sequence:
 ```python
 firstTime = sequence.getFirstTime()
 lastTime = sequence.getLastTime()
@@ -106,7 +106,7 @@ When you browse the disks, you have access to several arguments to specify what 
 * detection options  
 [__eDetectionXXX__](src/sequenceParser/common.hpp) is an enum used to choose how to consider sequences.  
 * filters  
-A list of strings used to limit the search (for example to limit to jpg files, use "*.jpg").
+A list of strings used to limit the search.
 
 ```python
 # Get all dpx files inside "/path/to/browse", and detect sequence with the following rules:
@@ -116,7 +116,7 @@ A list of strings used to limit the search (for example to limit to jpg files, u
 items = sequenceParser.browse("/path/to/browse", sequenceParser.eDetectionDefault | sequenceParser.eDetectionNegative, "*.dpx")
 ```
 
-For more information, see the [__python examples__](examples/README.md).
+For more information, see the [__python examples__](examples).
 
 #### Environment
 ###### In C++
