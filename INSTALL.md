@@ -25,5 +25,6 @@ Add ```-DBOOST_ROOT=/path/to/your/boost/install``` to the cmake command.
 #### Tested compilers
 ###### Linux
 GCC 4.4.1 on OpenSUSE 11.2 64bits
+GCC 4.6.2 on Fedora 20 64bits
 ###### MacOS
 ###### Windows
