@@ -15,13 +15,8 @@ SequenceParser library is a library to detect sequences, files and folders.
 #### Licence
 See [**COPYING.md**](COPYING.md)
 
+#### How to use
+See [**USAGE.md**](USAGE.md)
+
 #### Compilation
 See [**INSTALL.md**](INSTALL.md)
-
-#### Definitions
-* Sequence
-it's many files with a common pattern of numbers
-* File
-it's all file without numbers in the filname and sequences with only one file
-* Folders
-Just folders
