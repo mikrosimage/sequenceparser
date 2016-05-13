@@ -10,21 +10,25 @@ make install
 ```
 
 #### External Libraries
-* Boost
-version 1.48.0 or upper
-components regex, system, filesystem, locale
-* Swig ( for Python/Java Binding )
-1.3.36 or upper
-* Python
-version 2.6 or upper
+###### Boost
+Version 1.48.0 or upper  
+Components regex, system, filesystem, locale
+
+######  Swig
+Version 1.3.36 or upper  
+(for Python/Java Binding)
 
 #### To use specific library
 ###### Boost
-Add ```-DBOOST_ROOT=/path/to/your/boost/install``` to the cmake command.
+```
+cmake . -DBOOST_ROOT=/path/to/your/boost/install
+```
 
 #### Tested compilers
 ###### Linux
-GCC 4.4.1 on OpenSUSE 11.2 64bits
-GCC 4.6.2 on Fedora 20 64bits
+* GCC 4.4.1 on OpenSUSE 11.2 64bits
+* GCC 4.6.2 on Fedora 20 64bits
+
 ###### MacOS
+
 ###### Windows
