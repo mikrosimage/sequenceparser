@@ -206,7 +206,7 @@ public:
 	 * unknown padding = when no frame begins with a '0' padding character
 	 * seq.101.jpg
 	 * seq.102.jpg
-	 * seq.102.jpg
+	 * seq.103.jpg
 	 * variable padding = when not all frames have the same padding
 	 * seq.0101.jpg
 	 * seq.0100.jpg
