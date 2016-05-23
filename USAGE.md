@@ -1,13 +1,9 @@
 # How to use sequenceParser
 
 ## Definitions
-#### Sequence  
-It's many files with a common pattern of numbers.
-#### File  
-It's all file without numbers in the filname and sequences with only one file.
-#### Folders  
-Just folders.
-
+* Sequence: many files with a common pattern of numbers.
+* File: all file without numbers in the filename and sequences with only one file.
+* Folders: just folders.
 
 ## API
 The original code is in C++, but almost all the methods are translated into python/java without any changes.  
@@ -47,7 +43,7 @@ itemStat = sequenceParser.ItemStat(item)
 ```
 
 #### Sequence
-If an __Item__ represents several files with a common pattern, it holds a [__Sequence__](src/sequenceParser/Sequence.hpp).
+If the type of an __Item__ is a [__Sequence__](src/sequenceParser/Sequence.hpp), it means that the library detected a common pattern that represents several files, folders or links.
 ```python
 if item.getType() == sequenceParser.eTypeSequence:
     sequence = item.getSequence()
@@ -55,14 +51,50 @@ else:
     pass
 ```
 
-With this object, you have access to all the information you expect about a sequence:
+With this object, you have access to all the information you expect about a __Sequence__:
+* general information
 ```python
 firstTime = sequence.getFirstTime()
 lastTime = sequence.getLastTime()
 padding = sequence.getMaxPadding()
+```
 
+* frame ranges
+```python
+for range in sequence.getFrameRanges():
+    # do something...
+    pass
+```
+
+* files in the sequence
+```python
 nbFiles = sequence.getNbFiles()
 nbMissingFiles = sequence.getNbMissingFiles() # in case of holes
+
+# print absolute filepath of all files
+for filePath in sequence.getFiles():
+    print filePath
+```
+
+#### I don't need any browse: I known where is my sequence!
+And you are right! If you known exactly the path, the name and the padding of your sequence, no browse is needed. Instead, you can manually create a sequence from a given path:
+```python
+newSequence = sequenceParser.Sequence() # empty sequence
+isSequence = sequenceParser.browseSequence(newSequence, "/path/of/sequence-###.jpg")
+if isSequence:
+    print("I have my sequence!")
+```
+
+#### A list of Item instead of a Sequence
+Sometimes you have a list of filesystem elements, and you would like to manipulate them as separate __Item__ instead of a single __Sequence__.
+```python
+if item.getType() == sequenceParser.eTypeSequence:
+    # explode the sequence into atomic filesystem element
+    files = item.explode()
+    for f in files:
+        # do something...
+        pass
+else:
 ```
 
 #### Tell me a story about padding...
