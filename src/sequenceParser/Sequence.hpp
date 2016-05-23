@@ -61,10 +61,12 @@ public:
 		operator=( v );
 	}
 
+#ifndef SWIG
 	Sequence( const boost::filesystem::path& directory, const Sequence& v )
 	{
 		operator=( v );
 	}
+#endif
 
 	Sequence& operator=( const Sequence& other )
 	{
@@ -127,6 +129,7 @@ public:
 
 	inline std::string getSuffix() const;
 
+#ifndef SWIG
 	/**
 	 * @brief Check if the filename is inside the sequence and return it's time value.
 	 * @param[in] filename: filename to found
@@ -135,6 +138,7 @@ public:
 	 * @return if the filename is contained inside the sequence
 	 */
 	bool isIn( const std::string& filename, Time& time, std::string& timeStr );
+#endif
 
 	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
@@ -167,11 +171,13 @@ public:
 public:
 	std::vector<boost::filesystem::path> getFiles() const;
 
+#ifndef SWIG
 	/**
 	 * @brief Iterate over files name contained in Sequence and concatenates file name to parentPath
 	 * @param parentFolder
 	 */
 	std::vector<boost::filesystem::path> getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const;
+#endif
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
