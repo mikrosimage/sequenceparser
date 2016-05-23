@@ -88,6 +88,10 @@ private:
 	void init( const std::string& prefix, const std::size_t padding, const size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1 );
 
 public:
+	/**
+	 * @return A list of absolute path of all the files in the sequence.
+	 */
+	std::vector<std::string> getFiles() const;
 	std::string getFilenameAt( const Time time ) const;
 
 	inline std::string getFirstFilename() const;
@@ -169,7 +173,6 @@ public:
 	bool initFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
-	std::vector<boost::filesystem::path> getFiles() const;
 
 #ifndef SWIG
 	/**

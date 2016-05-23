@@ -328,9 +328,9 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 	_ranges.push_back(FrameRange(firstTime, lastTime, step));
 }
 
-std::vector<boost::filesystem::path> Sequence::getFiles() const
+std::vector<std::string> Sequence::getFiles() const
 {
-	std::vector<boost::filesystem::path> allPaths;
+	std::vector<std::string> allPaths;
 	BOOST_FOREACH(const FrameRange& range, _ranges)
 	{
 		for( Time t = range.first; t <= range.last; t += range.step )
