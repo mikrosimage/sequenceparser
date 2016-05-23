@@ -25,7 +25,11 @@ std::string utf8_to_latin1( const std::string& utf8_path )
 }
 #endif
 
-
+/**
+ * @brief Represents an element in the filesystem: file, folder or link.
+ * It could contain a Sequence.
+ * @see getSequence
+ */
 class Item
 {
 public:
