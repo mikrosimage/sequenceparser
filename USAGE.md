@@ -51,7 +51,8 @@ else:
     pass
 ```
 
-With this object, you have access to all the information you expect about a __Sequence__:
+The __Sequence__ object handles all the information you expect about a sequence of elements.
+:warning: It does not contain parent folder notion (but its corresponding __Item__ does).
 * general information
 ```python
 firstTime = sequence.getFirstTime()
