@@ -110,6 +110,11 @@ private:
 #ifndef SWIG
 EType getTypeFromPath( const boost::filesystem::path& path );
 #endif
+/**
+ * @warning The methods checks if the given path corresponds to a link, a file or a folder (in the filesystem).
+ * Else the method returns unknown type (it never returns a sequence).
+ * @see getTypeFromPath
+ */
 EType getTypeFromPath( const std::string& pathStr );
 
 
