@@ -66,7 +66,6 @@ public:
 	{
 		operator=( v );
 	}
-#endif
 
 	Sequence& operator=( const Sequence& other )
 	{
@@ -77,7 +76,8 @@ public:
 		_ranges = other._ranges;
 		return *this;
 	}
-	
+#endif
+
 	Sequence* clone() const { return new Sequence(*this); }
 
 private:
@@ -181,6 +181,7 @@ public:
 
 	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
+#ifndef SWIG
 	bool operator<(const Sequence& other ) const
 	{
 		return getFilenameWithStandardPattern() < other.getFilenameWithStandardPattern();
@@ -200,6 +201,7 @@ public:
 	{
 		return !operator==( other );
 	}
+#endif
 
 	/**
 	 * @brief Partial initialization, using only pattern informations.
@@ -218,7 +220,9 @@ public:
 #endif
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
+#ifndef SWIG
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
+#endif
 
 	const FrameRangesView getFramesIterable() const
 	{
@@ -251,9 +255,8 @@ public:
 	static const char _fillCar = '0'; ///< Filling character
 };
 
-std::ostream& operator<<(std::ostream& os, const Sequence& sequence);
-
 #ifndef SWIG
+std::ostream& operator<<(std::ostream& os, const Sequence& sequence);
 
 /**
  * @brief Extract step from a sorted vector of time values.
