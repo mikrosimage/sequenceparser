@@ -88,10 +88,13 @@ private:
 	void init( const std::string& prefix, const std::size_t padding, const size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1 );
 
 public:
-	/**
-	 * @return A list of absolute path of all the files in the sequence.
-	 */
+	/// @return A list of filenames contained in the sequence.
 	std::vector<std::string> getFiles() const;
+
+	/**
+	 * @return The path to the file at the given time.
+	 * @warning There is no check to validate that the given time exists.
+	 */
 	std::string getFilenameAt( const Time time ) const;
 
 	inline std::string getFirstFilename() const;
@@ -108,29 +111,59 @@ public:
 	/// @return a string pattern using C Style
 	std::string getCStylePattern() const;
 
+	/**
+	 * @return The frame range between first time and last time.
+	 * @warning The range could have holes.
+	 * @see hasMissingFile
+	 */
 	inline std::pair<Time, Time> getGlobalRange() const;
 
 	inline Time getFirstTime() const;
 
 	inline Time getLastTime() const;
 
+	/**
+	 * @return Times between first and last frame.
+	 * @warning The range could have holes.
+	 * @see getNbFiles
+	 */
 	inline std::size_t getDuration() const;
 
 	Time getNbFiles() const;
 
+	/**
+	 * @return The size of the padding (if fixed padding).
+	 * @note if 0, variable padding
+	 * @see getMaxPadding
+	 */
 	inline std::size_t getFixedPadding() const;
 
+	/**
+	 * @return The number max of common padding used to enumerate the sequence
+	 * @note For fixed sequences, it is equal to the padding
+	 * @note Useful for sequence with a variable or an unknown padding
+	 * unknown padding = when no frame begins with a '0' padding character
+	 * seq.101.jpg
+	 * seq.102.jpg
+	 * seq.103.jpg
+	 * variable padding = when not all frames have the same padding
+	 * seq.0101.jpg
+	 * seq.0100.jpg
+	 * seq.099.jpg
+	 */
 	inline std::size_t getMaxPadding() const;
 
 	inline bool hasMissingFile() const;
 
 	inline std::size_t getNbMissingFiles() const;
 
-	/// @brief filename without frame number
+	/// @return The filename without frame number (example: "sequence-.jpg" instead of "sequence-####.jpg")
 	inline std::string getIdentification() const;
 
+	/// @return The filename prefix (example: "sequence-" instead of "sequence-####.jpg")
 	inline std::string getPrefix() const;
 
+	/// @return The filename suffix (example: ".jpg" instead of "sequence-####.jpg")
 	inline std::string getSuffix() const;
 
 #ifndef SWIG
@@ -206,28 +239,12 @@ public:
 	std::string string() const;
 
 public:
-	std::string _prefix; ///< filename prefix
-	std::string _suffix; ///< filename suffix
-	/**
-	 * @brief Number max of common padding used to enumerate the sequence
-	 * @note For fixed sequences, it is equal to the padding
-	 * @note Useful for sequence with a variable or an unknown padding
-	 * unknown padding = when no frame begins with a '0' padding character
-	 * seq.101.jpg
-	 * seq.102.jpg
-	 * seq.103.jpg
-	 * variable padding = when not all frames have the same padding
-	 * seq.0101.jpg
-	 * seq.0100.jpg
-	 * seq.099.jpg
-	 */
+	std::string _prefix;
+	std::string _suffix;
+
 	std::size_t _maxPadding;
-	/**
-	 * @brief Fixed padding
-	 * @note if 0, variable padding
-	 * @see _maxPadding
-	 */
 	std::size_t _fixedPadding;
+
 	std::vector<FrameRange> _ranges;
 	static const char _fillCar = '0'; ///< Filling character
 };
