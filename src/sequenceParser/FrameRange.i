@@ -14,6 +14,8 @@
     {
         def __str__(self):
             return self.string()
+        def __eq__(self, other):
+            return self.first == other.first and self.last == other.last and self.step == other.step
     }
 }
 

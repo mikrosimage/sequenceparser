@@ -38,12 +38,14 @@ public:
 		BOOST_ASSERT( step >= 1 );
 		return ((last - first) / step) + 1;
 	}
+#ifndef SWIG
 	inline bool operator==( const FrameRange& other ) const
 	{
 		return (first == other.first) &&
 		       (last == other.last) &&
 		       (step == other.step);
 	}
+#endif
 	std::string string() const;
 
 	Time first;
@@ -51,7 +53,7 @@ public:
 	Time step;  // 1 >= step > N
 };
 
-
+#ifndef SWIG
 /**
  * @brief Convert FrameRange into a string.
  * FrameRange(1, 10, 2) => "1-10x2".
@@ -63,7 +65,7 @@ std::ostream& operator<<(std::ostream& os, const FrameRange& range);
 
 /// @brief Convert list of FrameRange into a string, like "1-10x2, 20-35, 55, 57".
 std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& range);
-
+#endif
 
 class FrameRangesConstIterator
 {
@@ -79,6 +81,7 @@ public:
 		: _rangeIterator(rangeIterator)
 		, _index(index)
 	{}
+#ifndef SWIG
 	inline self_type operator++()
 	{
 		if( _index >= 0 && _index < _rangeIterator->getNbFrames() - 1 )
@@ -92,10 +95,12 @@ public:
 		}
 		return *this;
 	}
+#endif
 	inline self_type next()
 	{
 		return this->operator++();
 	}
+#ifndef SWIG
 	inline self_type operator++(int junk)
 	{
 		self_type i = *this;
@@ -130,6 +135,7 @@ public:
 		--(*this);
 		return i;
 	}
+#endif
 	inline self_type previous()
 	{
 		return this->operator--();
@@ -151,6 +157,7 @@ public:
 			return _rangeIterator->getNbFrames() + _index;
 		return _index;
 	}
+#ifndef SWIG
 	inline bool operator==(const self_type& other) const
 	{
 		return _rangeIterator == other._rangeIterator && (_index == other._index || getRealIndex() == other.getRealIndex());
@@ -159,6 +166,7 @@ public:
 	{
 		return ! operator==(other);
 	}
+#endif
 
 public:
 	std::vector<FrameRange>::const_iterator _rangeIterator;
@@ -198,8 +206,9 @@ private:
 	const std::vector<FrameRange>& _data;
 };
 
+#ifndef SWIG
 std::ostream& operator<<(std::ostream& os, const FrameRangesView& frameRanges);
-
+#endif
 
 class FrameRangesSubView
 {
