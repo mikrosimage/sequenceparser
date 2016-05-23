@@ -14,6 +14,8 @@
     {
         def __str__(self):
             return self.string()
+        def __lt__(self, other):
+            return self.getAbsoluteFilepath() < other.getAbsoluteFilepath()
     }
 }
 

@@ -90,11 +90,13 @@ public:
 
 	std::string getAbsoluteFirstFilename() const;
 	std::string getFirstFilename() const;
-	
+
+#ifndef SWIG
 	bool operator<( const Item& other ) const
 	{
 		return _path < other._path;
 	}
+#endif
 
 	std::string string() const { return getType() == eTypeSequence ? getSequence().string() : _path.string(); }
 
@@ -117,9 +119,9 @@ EType getTypeFromPath( const boost::filesystem::path& path );
  */
 EType getTypeFromPath( const std::string& pathStr );
 
-
+#ifndef SWIG
 std::ostream& operator<<( std::ostream& os, const Item& item );
-
+#endif
 
 }
 
