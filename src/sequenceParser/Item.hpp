@@ -45,6 +45,7 @@ public:
 	{
 	}
 
+#ifndef SWIG
 	Item( const EType type, const boost::filesystem::path& filepath )
 	: _type(type)
 	, _path(filepath)
@@ -59,6 +60,7 @@ public:
 	{
 		_path /= sequence.getFilenameWithStandardPattern();
 	}
+#endif
 
 	Item( const Sequence& sequence, const std::string& folder )
 	: _type(eTypeSequence)
@@ -81,8 +83,10 @@ public:
 
 	const Sequence& getSequence() const { return _sequence; }
 
+#ifndef SWIG
 	const boost::filesystem::path& getPath() const { return _path; }
 	const boost::filesystem::path getFolderPath() const { return _path.parent_path(); }
+#endif
 
 	std::string getAbsoluteFirstFilename() const;
 	std::string getFirstFilename() const;
