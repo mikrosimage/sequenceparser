@@ -99,6 +99,8 @@ public:
 
 	inline std::string getFirstFilename() const;
 
+	inline std::string getLastFilename() const;
+
 	/// @return pattern character in standard style
 	inline char getPatternCharacter() const;
 
