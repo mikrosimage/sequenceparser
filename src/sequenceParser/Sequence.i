@@ -20,11 +20,15 @@ namespace std {
 
 %extend sequenceParser::Sequence
 {
-	%pythoncode
-	{
-		def __str__(self):
-			return self.string()
-	}
+        %pythoncode
+        {
+                def __str__(self):
+                    return self.string()
+                def __lt__(self, other):
+                    return self.getFilenameWithStandardPattern() < other.getFilenameWithStandardPattern()
+                def __eq__(self, other):
+                    return self._prefix == other._prefix and self._suffix == other._suffix and self._maxPadding == other._maxPadding and self._fixedPadding == other._fixedPadding and self._ranges == other._ranges
+        }
 }
 
 #endif
