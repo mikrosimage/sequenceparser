@@ -1,9 +1,10 @@
 # How to use sequenceParser
 
 ## Definitions
-* Sequence: many files with a common pattern of numbers.
-* File: all file without numbers in the filename and sequences with only one file.
-* Folders: just folders.
+* _Sequence_: a collection of files / links with a common prefix and suffix around a varying number.
+* _File_: a file alone which is not included in a file sequence.
+* _Link_: a link alone which is not included in a file sequence.
+* _Folder_: All folders. Folders are never considered as a sequence.
 
 ## API
 The original code is in C++, but almost all the methods are translated into python/java without any changes.  
@@ -43,7 +44,7 @@ itemStat = sequenceParser.ItemStat(item)
 ```
 
 #### Sequence
-If the type of an __Item__ is a [__Sequence__](src/sequenceParser/Sequence.hpp), it means that the library detected a common pattern that represents several files, folders or links.
+If the type of an __Item__ is a [__Sequence__](src/sequenceParser/Sequence.hpp), it means that the library detected a common pattern that represents several files or links.
 ```python
 if item.getType() == sequenceParser.eTypeSequence:
     sequence = item.getSequence()
