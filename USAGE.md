@@ -56,8 +56,8 @@ The __Sequence__ object handles all the information you expect about a sequence 
 :warning: It does not contain parent folder notion (but its corresponding __Item__ does).
 * general information
 ```python
-firstTime = sequence.getFirstTime()
-lastTime = sequence.getLastTime()
+firstFrame = sequence.getFirstTime()
+lastFrame = sequence.getLastTime()
 padding = sequence.getMaxPadding()
 ```
 
