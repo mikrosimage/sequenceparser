@@ -14,21 +14,20 @@ namespace std {
 %template(FrameRangeVector) vector< sequenceParser::FrameRange >;
 }
 
-%include "Sequence.hpp"
+#ifdef SWIGJAVA
 
-#ifdef SWIGPYTHON
+%rename (toString) sequenceParser::Sequence::string;
+%rename (equals) sequenceParser::Sequence::operator==;
+%ignore sequenceParser::Sequence::operator!=;
+%ignore sequenceParser::Sequence::operator<;
 
-%extend sequenceParser::Sequence
-{
-        %pythoncode
-        {
-                def __str__(self):
-                    return self.string()
-                def __lt__(self, other):
-                    return self.getFilenameWithStandardPattern() < other.getFilenameWithStandardPattern()
-                def __eq__(self, other):
-                    return self._prefix == other._prefix and self._suffix == other._suffix and self._maxPadding == other._maxPadding and self._fixedPadding == other._fixedPadding and self._ranges == other._ranges
-        }
-}
+#elif SWIGPYTHON
+
+%rename(__str__) sequenceParser::Sequence::string;
+%rename(__eq__) sequenceParser::Sequence::operator==;
+%rename(__ne__) sequenceParser::Sequence::operator!=;
+%rename(__lt__) sequenceParser::Sequence::operator<;
 
 #endif
+
+%include "Sequence.hpp"

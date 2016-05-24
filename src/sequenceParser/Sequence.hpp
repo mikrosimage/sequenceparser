@@ -181,7 +181,6 @@ public:
 
 	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
-#ifndef SWIG
 	bool operator<(const Sequence& other ) const
 	{
 		return getFilenameWithStandardPattern() < other.getFilenameWithStandardPattern();
@@ -201,7 +200,6 @@ public:
 	{
 		return !operator==( other );
 	}
-#endif
 
 	/**
 	 * @brief Partial initialization, using only pattern informations.
