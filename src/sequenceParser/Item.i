@@ -4,19 +4,16 @@
 #include "sequenceParser/Item.hpp"
 %}
 
-%include "Item.hpp"
+#ifdef SWIGJAVA
 
-#ifdef SWIGPYTHON
+%rename (toString) sequenceParser::Item::string;
+%ignore sequenceParser::Item::operator<;
 
-%extend sequenceParser::Item
-{
-    %pythoncode
-    {
-        def __str__(self):
-            return self.string()
-        def __lt__(self, other):
-            return self.getAbsoluteFilepath() < other.getAbsoluteFilepath()
-    }
-}
+#elif SWIGPYTHON
+
+%rename(__str__) sequenceParser::Item::string;
+%rename(__lt__) sequenceParser::Item::operator<;
 
 #endif
+
+%include "Item.hpp"
