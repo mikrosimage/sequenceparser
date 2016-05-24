@@ -46,6 +46,7 @@ public:
 	}
 	std::string string() const;
 
+public:
 	Time first;
 	Time last;
 	Time step;  // 1 >= step > N
