@@ -228,7 +228,11 @@ Time Sequence::getNbFiles() const
 
 bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeStr )
 {
-	std::size_t min = _prefix.size() + _suffix.size();
+	// initialize the output arguments
+	time = 0;
+	timeStr = "";
+
+	const std::size_t min = _prefix.size() + _suffix.size();
 
 	if( filename.size() <= min )
 		return false;
