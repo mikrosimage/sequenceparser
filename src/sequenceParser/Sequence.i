@@ -7,11 +7,15 @@
 
 namespace std {
 // Allow vector of object with no default constructor
-%ignore vector< sequenceParser::FrameRange >::vector(size_type); 
+%ignore vector< sequenceParser::FrameRange >::vector(size_type);
 %ignore vector< sequenceParser::FrameRange >::resize;
+
+// Ignore the default constructor
+%ignore pair::pair();
 
 // Create instantiations of a template classes
 %template(FrameRangeVector) vector< sequenceParser::FrameRange >;
+%template(TimePair) pair< sequenceParser::Time, sequenceParser::Time >;
 }
 
 #ifdef SWIGJAVA

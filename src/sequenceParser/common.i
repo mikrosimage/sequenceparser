@@ -1,3 +1,4 @@
+%include <std_pair.i>
 %include <std_vector.i>
 %include <std_string.i>
 %include <std_except.i>
@@ -13,7 +14,7 @@ namespace std {
 %}
 
 namespace sequenceParser {
-typedef int Time;
+typedef long int Time;
 }
 
 %exception {
