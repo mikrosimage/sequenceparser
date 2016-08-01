@@ -76,6 +76,27 @@ def testSingleSequence():
     assert_equals(len(listSequence), 1)
 
 
+@with_setup(setUpSingleSequence, tearDownOneTest)
+def testFilenameInSequence():
+    """
+    Check sequence detection with one sequence.
+    """
+    global path_bbb
+    listSequence = getSequencesFromPath(path_bbb, seq.eDetectionDefault)
+    sequence = listSequence[0].getSequence()
+
+    # check filenames which are not in the sequence
+    assert_equals(sequence.isIn(""), [False, 0, '']) # empty filename
+    assert_equals(sequence.isIn("toto"), [False, 0, '']) # completly different filename
+    assert_equals(sequence.isIn("a1c2.j2c"), [False, 0, '']) # different prefix
+    assert_equals(sequence.isIn("a1b2.jpg"), [False, 0, '']) # different suffix
+    assert_equals(sequence.isIn("a1b10.j2c"), [False, 0, '']) # not an existing time
+
+    # check a filename which is in the sequence
+    isIn = sequence.isIn("a1b2.j2c")
+    assert_equals(isIn, [True, 2, '2'])
+
+
 def setUpSingleSequenceMultiRanges():
     global path_bbb
     path_bbb = tempfile.mkdtemp('bbb', dir=root_aaa)
