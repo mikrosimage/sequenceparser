@@ -234,10 +234,28 @@ bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeS
 
 	const std::size_t min = _prefix.size() + _suffix.size();
 
+	// different size of the filename
 	if( filename.size() <= min )
 		return false;
 
+	// different prefix or suffix
 	if( filename.substr( 0, _prefix.size() ) != _prefix || filename.substr( filename.size() - _suffix.size(), _suffix.size() ) != _suffix )
+		return false;
+
+	// not an existing time
+	std::istringstream iss( filename.substr( _prefix.size(), filename.size() - _prefix.size() - _suffix.size() ) );
+	size_t expectedTime;
+	iss >> expectedTime;
+	bool timeIsIn = false;
+	BOOST_FOREACH( Time t, getFramesIterable() )
+	{
+		if(expectedTime == t)
+		{
+			timeIsIn = true;
+			break;
+		}
+	}
+	if( ! timeIsIn )
 		return false;
 
 	try
