@@ -25,7 +25,11 @@ std::string utf8_to_latin1( const std::string& utf8_path )
 }
 #endif
 
-
+/**
+ * @brief Represents an element in the filesystem: file, folder or link.
+ * It could contain a Sequence.
+ * @see getSequence
+ */
 class Item
 {
 public:
@@ -45,6 +49,7 @@ public:
 	{
 	}
 
+#ifndef SWIG
 	Item( const EType type, const boost::filesystem::path& filepath )
 	: _type(type)
 	, _path(filepath)
@@ -59,6 +64,7 @@ public:
 	{
 		_path /= sequence.getFilenameWithStandardPattern();
 	}
+#endif
 
 	Item( const Sequence& sequence, const std::string& folder )
 	: _type(eTypeSequence)
@@ -81,12 +87,14 @@ public:
 
 	const Sequence& getSequence() const { return _sequence; }
 
+#ifndef SWIG
 	const boost::filesystem::path& getPath() const { return _path; }
 	const boost::filesystem::path getFolderPath() const { return _path.parent_path(); }
+#endif
 
 	std::string getAbsoluteFirstFilename() const;
 	std::string getFirstFilename() const;
-	
+
 	bool operator<( const Item& other ) const
 	{
 		return _path < other._path;
@@ -106,11 +114,16 @@ private:
 #ifndef SWIG
 EType getTypeFromPath( const boost::filesystem::path& path );
 #endif
+/**
+ * @warning The methods checks if the given path corresponds to a link, a file or a folder (in the filesystem).
+ * Else the method returns unknown type (it never returns a sequence).
+ * @see getTypeFromPath
+ */
 EType getTypeFromPath( const std::string& pathStr );
 
-
+#ifndef SWIG
 std::ostream& operator<<( std::ostream& os, const Item& item );
-
+#endif
 
 }
 

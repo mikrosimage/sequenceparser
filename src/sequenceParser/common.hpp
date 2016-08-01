@@ -32,6 +32,7 @@ class path;
 
 namespace sequenceParser {
 
+#ifndef SWIG
 typedef ::std::ssize_t Time;
 
 #define SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(ENUM_TYPE) \
@@ -60,6 +61,7 @@ inline ENUM_TYPE operator|( const ENUM_TYPE& a, const ENUM_TYPE& b ) \
 { \
 	return (ENUM_TYPE)(int(b) | int(a)); \
 }
+#endif
 
 enum EType
 {
@@ -91,9 +93,10 @@ enum EDetection
 	eDetectionDefault = (eDetectionSequenceNeedAtLeastTwoFiles | eDetectionIgnoreDotFile | eDetectionSequenceFromFilename)
 };
 
+#ifndef SWIG
 SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EType)
 SEQUENCEPARSER_ENUM_BITWISE_OPERATORS(EDetection)
-
+#endif
 
 }
 

@@ -46,12 +46,13 @@ public:
 	}
 	std::string string() const;
 
+public:
 	Time first;
 	Time last;
 	Time step;  // 1 >= step > N
 };
 
-
+#ifndef SWIG
 /**
  * @brief Convert FrameRange into a string.
  * FrameRange(1, 10, 2) => "1-10x2".
@@ -63,7 +64,7 @@ std::ostream& operator<<(std::ostream& os, const FrameRange& range);
 
 /// @brief Convert list of FrameRange into a string, like "1-10x2, 20-35, 55, 57".
 std::ostream& operator<<(std::ostream& os, const std::vector<FrameRange>& range);
-
+#endif
 
 class FrameRangesConstIterator
 {
@@ -198,8 +199,9 @@ private:
 	const std::vector<FrameRange>& _data;
 };
 
+#ifndef SWIG
 std::ostream& operator<<(std::ostream& os, const FrameRangesView& frameRanges);
-
+#endif
 
 class FrameRangesSubView
 {

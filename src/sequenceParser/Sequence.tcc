@@ -4,6 +4,11 @@ inline std::string Sequence::getFirstFilename() const
 	return getFilenameAt( getFirstTime() );
 }
 
+inline std::string Sequence::getLastFilename() const
+{
+	return getFilenameAt( getLastTime() );
+}
+
 inline char Sequence::getPatternCharacter() const
 {
 	return getFixedPadding() ? '#' : '@';

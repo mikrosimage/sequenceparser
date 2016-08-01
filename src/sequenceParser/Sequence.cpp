@@ -228,12 +228,34 @@ Time Sequence::getNbFiles() const
 
 bool Sequence::isIn( const std::string& filename, Time& time, std::string& timeStr )
 {
-	std::size_t min = _prefix.size() + _suffix.size();
+	// initialize the output arguments
+	time = 0;
+	timeStr = "";
 
+	const std::size_t min = _prefix.size() + _suffix.size();
+
+	// different size of the filename
 	if( filename.size() <= min )
 		return false;
 
+	// different prefix or suffix
 	if( filename.substr( 0, _prefix.size() ) != _prefix || filename.substr( filename.size() - _suffix.size(), _suffix.size() ) != _suffix )
+		return false;
+
+	// not an existing time
+	std::istringstream iss( filename.substr( _prefix.size(), filename.size() - _prefix.size() - _suffix.size() ) );
+	size_t expectedTime;
+	iss >> expectedTime;
+	bool timeIsIn = false;
+	BOOST_FOREACH( Time t, getFramesIterable() )
+	{
+		if(expectedTime == t)
+		{
+			timeIsIn = true;
+			break;
+		}
+	}
+	if( ! timeIsIn )
 		return false;
 
 	try
@@ -328,9 +350,9 @@ void Sequence::init( const std::string& prefix, const std::size_t padding, const
 	_ranges.push_back(FrameRange(firstTime, lastTime, step));
 }
 
-std::vector<boost::filesystem::path> Sequence::getFiles() const
+std::vector<std::string> Sequence::getFiles() const
 {
-	std::vector<boost::filesystem::path> allPaths;
+	std::vector<std::string> allPaths;
 	BOOST_FOREACH(const FrameRange& range, _ranges)
 	{
 		for( Time t = range.first; t <= range.last; t += range.step )

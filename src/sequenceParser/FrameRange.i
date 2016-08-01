@@ -4,18 +4,31 @@
 #include "sequenceParser/FrameRange.hpp"
 %}
 
+#ifdef SWIGJAVA
+
+%rename(toString) sequenceParser::FrameRange::string;
+%rename(equals) sequenceParser::FrameRange::operator==;
+
+%ignore sequenceParser::FrameRangesConstIterator::operator++;
+%ignore sequenceParser::FrameRangesConstIterator::operator--;
+%rename(equals) sequenceParser::FrameRangesConstIterator::operator==;
+%ignore sequenceParser::FrameRangesConstIterator::operator!=;
+
+#elif SWIGPYTHON
+
+%rename(__str__) sequenceParser::FrameRange::string;
+%rename(__eq__) sequenceParser::FrameRange::operator==;
+
+%rename(__next__) sequenceParser::FrameRangesConstIterator::operator++;
+%rename(__previous__) sequenceParser::FrameRangesConstIterator::operator--;
+%rename(__eq__) sequenceParser::FrameRangesConstIterator::operator==;
+%rename(__ne__) sequenceParser::FrameRangesConstIterator::operator!=;
+
+#endif
+
 %include "FrameRange.hpp"
 
 #ifdef SWIGPYTHON
-
-%extend sequenceParser::FrameRange
-{
-    %pythoncode
-    {
-        def __str__(self):
-            return self.string()
-    }
-}
 
 %pythoncode
 {

@@ -4,17 +4,16 @@
 #include "sequenceParser/Item.hpp"
 %}
 
-%include "Item.hpp"
+#ifdef SWIGJAVA
 
-#ifdef SWIGPYTHON
+%rename (toString) sequenceParser::Item::string;
+%ignore sequenceParser::Item::operator<;
 
-%extend sequenceParser::Item
-{
-    %pythoncode
-    {
-        def __str__(self):
-            return self.string()
-    }
-}
+#elif SWIGPYTHON
+
+%rename(__str__) sequenceParser::Item::string;
+%rename(__lt__) sequenceParser::Item::operator<;
 
 #endif
+
+%include "Item.hpp"

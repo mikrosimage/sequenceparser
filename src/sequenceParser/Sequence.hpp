@@ -61,6 +61,7 @@ public:
 		operator=( v );
 	}
 
+#ifndef SWIG
 	Sequence( const boost::filesystem::path& directory, const Sequence& v )
 	{
 		operator=( v );
@@ -75,7 +76,8 @@ public:
 		_ranges = other._ranges;
 		return *this;
 	}
-	
+#endif
+
 	Sequence* clone() const { return new Sequence(*this); }
 
 private:
@@ -86,9 +88,18 @@ private:
 	void init( const std::string& prefix, const std::size_t padding, const size_t maxPadding, const std::string& suffix, const Time firstTime, const Time lastTime, const Time step = 1 );
 
 public:
+	/// @return A list of filenames contained in the sequence.
+	std::vector<std::string> getFiles() const;
+
+	/**
+	 * @return The path to the file at the given time.
+	 * @warning There is no check to validate that the given time exists.
+	 */
 	std::string getFilenameAt( const Time time ) const;
 
 	inline std::string getFirstFilename() const;
+
+	inline std::string getLastFilename() const;
 
 	/// @return pattern character in standard style
 	inline char getPatternCharacter() const;
@@ -102,29 +113,59 @@ public:
 	/// @return a string pattern using C Style
 	std::string getCStylePattern() const;
 
+	/**
+	 * @return The frame range between first time and last time.
+	 * @warning The range could have holes.
+	 * @see hasMissingFile
+	 */
 	inline std::pair<Time, Time> getGlobalRange() const;
 
 	inline Time getFirstTime() const;
 
 	inline Time getLastTime() const;
 
+	/**
+	 * @return Times between first and last frame.
+	 * @warning The range could have holes.
+	 * @see getNbFiles
+	 */
 	inline std::size_t getDuration() const;
 
 	Time getNbFiles() const;
 
+	/**
+	 * @return The size of the padding (if fixed padding).
+	 * @note if 0, variable padding
+	 * @see getMaxPadding
+	 */
 	inline std::size_t getFixedPadding() const;
 
+	/**
+	 * @return The number max of common padding used to enumerate the sequence
+	 * @note For fixed sequences, it is equal to the padding
+	 * @note Useful for sequence with a variable or an unknown padding
+	 * unknown padding = when no frame begins with a '0' padding character
+	 * seq.101.jpg
+	 * seq.102.jpg
+	 * seq.103.jpg
+	 * variable padding = when not all frames have the same padding
+	 * seq.0101.jpg
+	 * seq.0100.jpg
+	 * seq.099.jpg
+	 */
 	inline std::size_t getMaxPadding() const;
 
 	inline bool hasMissingFile() const;
 
 	inline std::size_t getNbMissingFiles() const;
 
-	/// @brief filename without frame number
+	/// @return The filename without frame number (example: "sequence-.jpg" instead of "sequence-####.jpg")
 	inline std::string getIdentification() const;
 
+	/// @return The filename prefix (example: "sequence-" instead of "sequence-####.jpg")
 	inline std::string getPrefix() const;
 
+	/// @return The filename suffix (example: ".jpg" instead of "sequence-####.jpg")
 	inline std::string getSuffix() const;
 
 	/**
@@ -134,7 +175,7 @@ public:
 	 * @param[out] timeStr: the time in string extracted from the filename (only if contained in the sequence)
 	 * @return if the filename is contained inside the sequence
 	 */
-	bool isIn( const std::string& filename, Time& time, std::string& timeStr );
+	bool isIn( const std::string& filename, Time& timeOut, std::string& timeStrOut );
 
 	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
@@ -165,16 +206,19 @@ public:
 	bool initFromPattern( const std::string& pattern, const EPattern& accept );
 
 public:
-	std::vector<boost::filesystem::path> getFiles() const;
 
+#ifndef SWIG
 	/**
 	 * @brief Iterate over files name contained in Sequence and concatenates file name to parentPath
 	 * @param parentFolder
 	 */
 	std::vector<boost::filesystem::path> getAbsoluteFilesPath(boost::filesystem::path const& parentPath) const;
+#endif
 
 	std::vector<FrameRange>& getFrameRanges() { return _ranges; }
+#ifndef SWIG
 	const std::vector<FrameRange>& getFrameRanges() const { return _ranges; }
+#endif
 
 	const FrameRangesView getFramesIterable() const
 	{
@@ -197,35 +241,18 @@ public:
 	std::string string() const;
 
 public:
-	std::string _prefix; ///< filename prefix
-	std::string _suffix; ///< filename suffix
-	/**
-	 * @brief Number max of common padding used to enumerate the sequence
-	 * @note For fixed sequences, it is equal to the padding
-	 * @note Useful for sequence with a variable or an unknown padding
-	 * unknown padding = when no frame begins with a '0' padding character
-	 * seq.101.jpg
-	 * seq.102.jpg
-	 * seq.103.jpg
-	 * variable padding = when not all frames have the same padding
-	 * seq.0101.jpg
-	 * seq.0100.jpg
-	 * seq.099.jpg
-	 */
+	std::string _prefix;
+	std::string _suffix;
+
 	std::size_t _maxPadding;
-	/**
-	 * @brief Fixed padding
-	 * @note if 0, variable padding
-	 * @see _maxPadding
-	 */
 	std::size_t _fixedPadding;
+
 	std::vector<FrameRange> _ranges;
 	static const char _fillCar = '0'; ///< Filling character
 };
 
-std::ostream& operator<<(std::ostream& os, const Sequence& sequence);
-
 #ifndef SWIG
+std::ostream& operator<<(std::ostream& os, const Sequence& sequence);
 
 /**
  * @brief Extract step from a sorted vector of time values.

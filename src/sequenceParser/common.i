@@ -1,7 +1,9 @@
+%include <std_pair.i>
 %include <std_vector.i>
 %include <std_string.i>
 %include <std_except.i>
 %include <exception.i>
+%include <typemaps.i>
 
 namespace std {
 %template(StringVector) vector<string>;
@@ -13,7 +15,7 @@ namespace std {
 %}
 
 namespace sequenceParser {
-typedef int Time;
+typedef long int Time;
 }
 
 %exception {
@@ -43,5 +45,29 @@ catch( ... )
 }
 
 }
+
+#ifdef SWIGJAVA
+// Define some typemaps to be applied to std::string& arguments
+%typemap(jstype) std::string& OUTPUT "String[]"
+%typemap(jtype) std::string& OUTPUT "String[]"
+%typemap(jni) std::string& OUTPUT "jobjectArray"
+%typemap(javain)  std::string& OUTPUT "$javainput"
+
+%typemap(in) std::string& OUTPUT (std::string temp) {
+  if (!$input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+    return $null;
+  }
+  if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+  }
+  $1 = &temp;
+}
+
+%typemap(argout) std::string& OUTPUT {
+  jstring jvalue = JCALL1(NewStringUTF, jenv, temp$argnum.c_str()); 
+  JCALL3(SetObjectArrayElement, jenv, $input, 0, jvalue);
+}
+#endif
 
 %include "common.hpp"
