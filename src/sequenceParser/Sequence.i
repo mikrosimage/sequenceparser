@@ -16,6 +16,10 @@ namespace std {
 // Create instantiations of a template classes
 %template(FrameRangeVector) vector< sequenceParser::FrameRange >;
 %template(TimePair) pair< sequenceParser::Time, sequenceParser::Time >;
+
+// Custom typemaps: apply a special type handling rule to a type
+%apply sequenceParser::Time& OUTPUT { sequenceParser::Time & timeOut };
+%apply string& OUTPUT { string & timeStrOut };
 }
 
 #ifdef SWIGJAVA
@@ -35,3 +39,7 @@ namespace std {
 #endif
 
 %include "Sequence.hpp"
+
+// Remove all typemaps
+%clear sequenceParser::Time & timeOut;
+%clear std::string & timeStrOut;

@@ -168,7 +168,6 @@ public:
 	/// @return The filename suffix (example: ".jpg" instead of "sequence-####.jpg")
 	inline std::string getSuffix() const;
 
-#ifndef SWIG
 	/**
 	 * @brief Check if the filename is inside the sequence and return it's time value.
 	 * @param[in] filename: filename to found
@@ -176,8 +175,7 @@ public:
 	 * @param[out] timeStr: the time in string extracted from the filename (only if contained in the sequence)
 	 * @return if the filename is contained inside the sequence
 	 */
-	bool isIn( const std::string& filename, Time& time, std::string& timeStr );
-#endif
+	bool isIn( const std::string& filename, Time& timeOut, std::string& timeStrOut );
 
 	EPattern checkPattern( const std::string& pattern, const EDetection detectionOptions );
 
