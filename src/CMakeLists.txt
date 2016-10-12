@@ -29,6 +29,7 @@ install(
 	DESTINATION "include"
 	FILES_MATCHING
 	PATTERN "*.hpp"
+	PATTERN "*.tcc"
 	PATTERN "*.i"
 )
 install(TARGETS sequenceparser-static DESTINATION lib/ OPTIONAL)
