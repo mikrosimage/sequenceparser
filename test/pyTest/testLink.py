@@ -34,9 +34,7 @@ def tearDown():
 
 def testLinkType():
     """
-    Check stats of a synbolic link folder.
-    - 2 hard links (. and ..)
-    - sizes
+    Check item types return by browse method.
     """
     items = seq.browse(root_path)
     for item in items:
