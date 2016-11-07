@@ -118,7 +118,7 @@ std::vector<Item> browse(
 
 		if( ! filepathRespectsAllFilters( iter->path(), reFilters, filename, detectOptions ) )
 			continue;
-		
+
 		// if at least one number detected
 		if( decomposeFilename( iter->path().filename().string(), tmpStringParts, tmpNumberParts, detectOptions ) )
 		{
@@ -154,7 +154,7 @@ std::vector<Item> browse(
 				// It's a sequence of directories, so it's not a sequence.
 				BOOST_FOREACH( Time t, s.getFramesIterable() )
 				{
-					output.push_back( Item( eTypeFolder, directory / s.getFilenameAt(t) ) );
+					output.push_back( Item( getTypeFromPath(directory / s.getFilenameAt(t)), directory / s.getFilenameAt(t) ) );
 				}
 			}
 			else
