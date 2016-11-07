@@ -98,7 +98,6 @@ def testFolderStat():
     #assert_equals(itemStat.realSize, itemStat.size) # 0L != -1L
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
 
-
 def testSequenceStat():
     """
     Check stats of a sequence.
