@@ -99,25 +99,6 @@ def testFolderStat():
     #assert_equals(itemStat.realSize, itemStat.size) # 0L != -1L
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
 
-def testFolderLinkStat():
-    """
-    Check stats of a synbolic link folder.
-    - 2 hard links (. and ..)
-    - sizes
-    """
-    print("testFolderLinkStat:")
-    print("===================")
-    items = seq.browse(root_path)
-    for item in items:
-        if item.getFilename() in ("plop_sym_link.txt", "dir2"):
-            assert_equals(item.getType(), seq.eTypeLink)
-        elif item.getFilename() == "plop.txt":
-            assert_equals(item.getType(), seq.eTypeFile)
-        elif item.getFilename() == "foo.###.png":
-            assert_equals(item.getType(), seq.eTypeSequence)
-        elif item.getFilename() == "dir1":
-            assert_equals(item.getType(), seq.eTypeFolder)
-
 def testSequenceStat():
     """
     Check stats of a sequence.
