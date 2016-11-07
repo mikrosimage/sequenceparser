@@ -154,7 +154,8 @@ std::vector<Item> browse(
 				// It's a sequence of directories, so it's not a sequence.
 				BOOST_FOREACH( Time t, s.getFramesIterable() )
 				{
-					output.push_back( Item( getTypeFromPath(directory / s.getFilenameAt(t)), directory / s.getFilenameAt(t) ) );
+          boost::filesystem::path folderPath = directory / s.getFilenameAt(t);
+					output.push_back( Item( getTypeFromPath(folderPath), folderPath ) );
 				}
 			}
 			else
@@ -162,6 +163,7 @@ std::vector<Item> browse(
 				// if it's a sequence of 1 file, it could be considered as a sequence or as a single file
 				if( isConsideredAsSingleFile( s, detectOptions ) )
 				{
+
 					output.push_back( Item( getTypeFromPath( directory / s.getFirstFilename() ), directory / s.getFirstFilename() ) );
 				}
 				else
