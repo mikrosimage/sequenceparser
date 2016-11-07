@@ -38,8 +38,6 @@ def testLinkType():
     - 2 hard links (. and ..)
     - sizes
     """
-    print("testFolderLinkStat:")
-    print("===================")
     items = seq.browse(root_path)
     for item in items:
         if item.getFilename() in ("plop_sym_link.txt", "dir2"):
