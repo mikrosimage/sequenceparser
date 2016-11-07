@@ -154,7 +154,7 @@ std::vector<Item> browse(
 				// It's a sequence of directories, so it's not a sequence.
 				BOOST_FOREACH( Time t, s.getFramesIterable() )
 				{
-          boost::filesystem::path folderPath = directory / s.getFilenameAt(t);
+					boost::filesystem::path folderPath = directory / s.getFilenameAt(t);
 					output.push_back( Item( getTypeFromPath(folderPath), folderPath ) );
 				}
 			}
