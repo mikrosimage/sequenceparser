@@ -30,7 +30,6 @@ def setUp():
 
     # create sym link
     os.symlink(os.path.join(root_path, "plop.txt"), os.path.join(root_path, "plop_sym_link.txt"))
-    os.symlink(os.path.join(root_path, "dir1"), os.path.join(root_path, "dir2"))
 
 
 def tearDown():
