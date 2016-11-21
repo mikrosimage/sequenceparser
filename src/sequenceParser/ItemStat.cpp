@@ -34,7 +34,8 @@ ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, cons
 		}
 		case eTypeUndefined:
 		case eTypeSequence:
-			BOOST_ASSERT(false);
+			setDefaultValues();
+			break;
 	}
 }
 
@@ -63,7 +64,8 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 			break;
 		}
 		case eTypeUndefined:
-			BOOST_ASSERT(false);
+			setDefaultValues();
+			break;
 	}
 }
 
