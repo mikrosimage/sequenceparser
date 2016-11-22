@@ -19,6 +19,15 @@ def createFolder(path, folderName):
     os.mkdir(dd)
 
 
+def createSymLink(path, target, symLinkName):
+    """
+    Create a symbolic link.
+    """
+    src = os.path.join(path, target)
+    dst = os.path.join(path, symLinkName)
+    os.symlink(src, dst)
+
+
 def getSequencesFromPath(path, detectionOptions, filters=[]):
     """
     Get a list of sequences found thanks to a browse with the given parameters.

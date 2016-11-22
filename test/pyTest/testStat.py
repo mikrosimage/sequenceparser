@@ -6,7 +6,7 @@ import getpass
 import grp
 
 from pySequenceParser import sequenceParser as seq
-from . import createFile, createFolder, getSequencesFromPath
+from . import createFile, createFolder, createSymLink, getSequencesFromPath
 
 from nose.tools import *
 
@@ -33,7 +33,7 @@ def setUp():
     createFolder(root_path, "dir1")
 
     # create sym link
-    os.symlink(os.path.join(root_path, "plop.txt"), os.path.join(root_path, "plop_sym_link.txt"))
+    createSymLink(root_path, "plop.txt", "plop_sym_link.txt")
 
 
 def tearDown():
