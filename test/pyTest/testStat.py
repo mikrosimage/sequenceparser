@@ -87,7 +87,7 @@ def testFolderStat():
     - 2 hard links (. and ..)
     - sizes
     """
-    itemFile = seq.Item(seq.eTypeFile, os.path.join(root_path, "dir1"))
+    itemFile = seq.Item(seq.eTypeFolder, os.path.join(root_path, "dir1"))
     itemStat = seq.ItemStat(itemFile)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 2)
@@ -95,7 +95,7 @@ def testFolderStat():
     # check size
     assert_equals(itemStat.size, itemStat.minSize)
     assert_equals(itemStat.size, itemStat.maxSize)
-    #assert_equals(itemStat.realSize, itemStat.size) # 0L != -1L
+    assert_equals(itemStat.realSize, itemStat.size)
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
 
 def testSequenceStat():
