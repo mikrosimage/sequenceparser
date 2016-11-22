@@ -13,55 +13,6 @@ namespace bfs = boost::filesystem;
 
 namespace sequenceParser {
 
-ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative )
-	: statStatus(-1)
-	, deviceId(0)
-	, inodeId(0)
-	, nbHardLinks(0)
-	, fullNbHardLinks(0)
-	, userId(0)
-	, groupId(0)
-	, size(0)
-	, minSize(0)
-	, maxSize(0)
-	, realSize(0)
-	, sizeOnDisk(0)
-	, accessTime(0)
-	, modificationTime(-1)
-	, lastChangeTime(-1)
-	, ownerCanRead(false)
-	, ownerCanWrite(false)
-	, ownerCanExecute(false)
-	, groupCanRead(false)
-	, groupCanWrite(false)
-	, groupCanExecute(false)
-	, otherCanRead(false)
-	, otherCanWrite(false)
-	, otherCanExecute(false)
-{
-	switch(type)
-	{
-		case eTypeFolder:
-		{
-			statFolder(path);
-			break;
-		}
-		case eTypeFile:
-		{
-			statFile(path);
-			break;
-		}
-		case eTypeLink:
-		{
-			statLink(path);
-			break;
-		}
-		case eTypeUndefined:
-		case eTypeSequence:
-			break;
-	}
-}
-
 ItemStat::ItemStat( const Item& item, const bool approximative )
 	: statStatus(-1)
 	, deviceId(0)
@@ -287,15 +238,9 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	// else
 	//   TODO: stat on a subset of files
 
-	bfs::path folder = item.getFolderPath();
-
-	BOOST_FOREACH( Time t, seq.getFramesIterable() )
+	BOOST_FOREACH(Item item, item.explode() )
 	{
-		boost::filesystem::path filepath = folder / seq.getFilenameAt(t);
-
-		EType type = getTypeFromPath(filepath);
-
-		ItemStat fileStat(type, filepath);
+		const ItemStat fileStat(item);
 
 		// use the most restrictive permissions in the sequence
 #ifdef __UNIX__

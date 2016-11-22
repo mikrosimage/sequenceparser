@@ -16,9 +16,6 @@ class ItemStat
 {
 public:
 	ItemStat( const Item& item, const bool approximative=true );
-#ifndef SWIG
-	ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative=true );
-#endif
 
 	std::string getUserName() const;
 	std::string getGroupName() const;
