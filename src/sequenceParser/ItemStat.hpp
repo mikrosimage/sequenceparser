@@ -28,7 +28,6 @@ private:
 	void statFile( const boost::filesystem::path& path );
 	void statSequence( const Item& item, const bool approximative );
 	void statLink( const boost::filesystem::path& path );
-	void setDefaultValues();
 #ifdef __UNIX__
 	void setPermissions( const mode_t& protection );
 #endif
