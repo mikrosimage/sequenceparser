@@ -2,6 +2,8 @@ import time
 import tempfile
 import os
 import shutil
+import getpass
+import grp
 
 from pySequenceParser import sequenceParser as seq
 from . import createFile, createFolder, getSequencesFromPath
@@ -9,6 +11,8 @@ from . import createFile, createFolder, getSequencesFromPath
 from nose.tools import *
 
 root_path = ''
+user_name = getpass.getuser()
+grp_name = grp.getgrnam(user_name).gr_name
 
 
 def setUp():
@@ -46,6 +50,9 @@ def testFileStat():
     """
     itemFile = seq.Item(seq.eTypeFile, os.path.join(root_path, "plop.txt"))
     itemStat = seq.ItemStat(itemFile)
+    # user and group
+    assert_equals(itemStat.getUserName(), user_name)
+    assert_equals(itemStat.getGroupName(), grp_name)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 1)
@@ -71,6 +78,9 @@ def testSymLinkStat():
     dst = os.path.join(root_path, "plop.txt")
     itemFile = seq.Item(seq.eTypeLink, src)
     itemStat = seq.ItemStat(itemFile)
+    # user and group
+    assert_equals(itemStat.getUserName(), user_name)
+    assert_equals(itemStat.getGroupName(), grp_name)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 1)
@@ -89,6 +99,9 @@ def testFolderStat():
     """
     itemFile = seq.Item(seq.eTypeFolder, os.path.join(root_path, "dir1"))
     itemStat = seq.ItemStat(itemFile)
+    # user and group
+    assert_equals(itemStat.getUserName(), user_name)
+    assert_equals(itemStat.getGroupName(), grp_name)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 2)
     assert_equals(itemStat.fullNbHardLinks, 2)
@@ -97,6 +110,7 @@ def testFolderStat():
     assert_equals(itemStat.size, itemStat.maxSize)
     assert_equals(itemStat.realSize, itemStat.size)
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
+
 
 def testSequenceStat():
     """
@@ -107,6 +121,9 @@ def testSequenceStat():
     itemSequence = getSequencesFromPath(root_path, seq.eDetectionDefault)[0]
     nbFilesInSequence = itemSequence.getSequence().getNbFiles()
     itemStat = seq.ItemStat(itemSequence)
+    # user and group
+    assert_equals(itemStat.getUserName(), user_name)
+    assert_equals(itemStat.getGroupName(), grp_name)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 3)
