@@ -41,6 +41,25 @@ def tearDown():
     shutil.rmtree(root_path)
 
 
+def checkCommonParameters(itemStat):
+    """
+    Check attributes which are common to several ItemStats.
+    """
+    # user and group
+    assert_equals(itemStat.getUserName(), user_name)
+    assert_equals(itemStat.getGroupName(), grp_name)
+    # permissions
+    assert_equals(itemStat.ownerCanRead, True)
+    assert_equals(itemStat.ownerCanWrite, True)
+    assert_equals(itemStat.ownerCanExecute, False)
+    assert_equals(itemStat.groupCanRead, True)
+    assert_equals(itemStat.groupCanWrite, True)
+    assert_equals(itemStat.groupCanExecute, False)
+    assert_equals(itemStat.otherCanRead, True)
+    assert_equals(itemStat.otherCanWrite, False)
+    assert_equals(itemStat.otherCanExecute, False)
+
+
 def testFileStat():
     """
     Check stats of a single file.
@@ -50,9 +69,7 @@ def testFileStat():
     """
     itemFile = seq.Item(seq.eTypeFile, os.path.join(root_path, "plop.txt"))
     itemStat = seq.ItemStat(itemFile)
-    # user and group
-    assert_equals(itemStat.getUserName(), user_name)
-    assert_equals(itemStat.getGroupName(), grp_name)
+    checkCommonParameters(itemStat)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 1)
@@ -121,9 +138,7 @@ def testSequenceStat():
     itemSequence = getSequencesFromPath(root_path, seq.eDetectionDefault)[0]
     nbFilesInSequence = itemSequence.getSequence().getNbFiles()
     itemStat = seq.ItemStat(itemSequence)
-    # user and group
-    assert_equals(itemStat.getUserName(), user_name)
-    assert_equals(itemStat.getGroupName(), grp_name)
+    checkCommonParameters(itemStat)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 3)
@@ -161,7 +176,7 @@ def testUndefinedStat():
     assert_equals(itemStat.accessTime, 0)
     assert_equals(itemStat.modificationTime, -1)
     assert_equals(itemStat.lastChangeTime, -1)
-    # access
+    # permissions
     assert_equals(itemStat.ownerCanRead, False)
     assert_equals(itemStat.ownerCanWrite, False)
     assert_equals(itemStat.ownerCanExecute, False)

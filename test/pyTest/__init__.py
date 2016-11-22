@@ -3,12 +3,12 @@ import os
 from pySequenceParser import sequenceParser as seq
 
 
-def createFile(path, filename):
+def createFile(path, filename, mode=os.O_RDWR|os.O_CREAT):
     """
     Create an empty file.
     """
     ff = os.path.join(path, filename)
-    open(ff, 'w').close()
+    open(ff, 'w', mode).close()
 
 
 def createFolder(path, folderName):
