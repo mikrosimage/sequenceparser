@@ -106,6 +106,17 @@ def testSymLinkStat():
     assert_equals(itemStat.size, itemStat.minSize)
     assert_equals(itemStat.size, itemStat.maxSize)
     assert_equals(itemStat.realSize, itemStat.size / itemStat.nbHardLinks)
+    # permissions
+    # On Linux, the permissions are always 0777 and can't be changed.
+    assert_equals(itemStat.ownerCanRead, True)
+    assert_equals(itemStat.ownerCanWrite, True)
+    assert_equals(itemStat.ownerCanExecute, True)
+    assert_equals(itemStat.groupCanRead, True)
+    assert_equals(itemStat.groupCanWrite, True)
+    assert_equals(itemStat.groupCanExecute, True)
+    assert_equals(itemStat.otherCanRead, True)
+    assert_equals(itemStat.otherCanWrite, True)
+    assert_equals(itemStat.otherCanExecute, True)
 
 
 def testFolderStat():
