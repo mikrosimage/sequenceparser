@@ -127,9 +127,7 @@ def testFolderStat():
     """
     itemFile = seq.Item(seq.eTypeFolder, os.path.join(root_path, "dir1"))
     itemStat = seq.ItemStat(itemFile)
-    # user and group
-    assert_equals(itemStat.getUserName(), user_name)
-    assert_equals(itemStat.getGroupName(), grp_name)
+    checkCommonParameters(itemStat)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 2)
     assert_equals(itemStat.fullNbHardLinks, 2)

@@ -3,7 +3,7 @@ import os
 from pySequenceParser import sequenceParser as seq
 
 
-def createFile(path, filename, mode=os.O_RDWR|os.O_CREAT):
+def createFile(path, filename, mode=0664):
     """
     Create an empty file.
     """
@@ -11,12 +11,13 @@ def createFile(path, filename, mode=os.O_RDWR|os.O_CREAT):
     open(ff, 'w', mode).close()
 
 
-def createFolder(path, folderName):
+def createFolder(path, folderName, mode=0664):
     """
     Create an empty folder.
     """
     dd = os.path.join(path, folderName)
     os.mkdir(dd)
+    os.chmod(dd, mode)
 
 
 def createSymLink(path, target, symLinkName):
