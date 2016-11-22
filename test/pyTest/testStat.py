@@ -115,3 +115,39 @@ def testSequenceStat():
     assert_equals(itemStat.size, itemStat.maxSize * nbFilesInSequence)
     assert_equals(itemStat.realSize, itemStat.size / itemStat.nbHardLinks)
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
+
+
+def testUndefinedStat():
+    """
+    Check stats of a file which is tagged as undefined.
+    """
+    itemFile = seq.Item(seq.eTypeUndefined, os.path.join(root_path, "plop.txt"))
+    itemStat = seq.ItemStat(itemFile)
+    # check id
+    assert_equals(itemStat.deviceId, 0)
+    assert_equals(itemStat.inodeId, 0)
+    assert_equals(itemStat.userId, 0)
+    assert_equals(itemStat.groupId, 0)
+    # nb hard links
+    assert_equals(itemStat.nbHardLinks, 0)
+    assert_equals(itemStat.fullNbHardLinks, 0)
+    # check size
+    assert_equals(itemStat.size, 0)
+    assert_equals(itemStat.minSize, 0)
+    assert_equals(itemStat.maxSize, 0)
+    assert_equals(itemStat.realSize, 0)
+    assert_equals(itemStat.sizeOnDisk, 0)
+    # time
+    assert_equals(itemStat.accessTime, 0)
+    assert_equals(itemStat.modificationTime, -1)
+    assert_equals(itemStat.lastChangeTime, -1)
+    # access
+    assert_equals(itemStat.ownerCanRead, False)
+    assert_equals(itemStat.ownerCanWrite, False)
+    assert_equals(itemStat.ownerCanExecute, False)
+    assert_equals(itemStat.groupCanRead, False)
+    assert_equals(itemStat.groupCanWrite, False)
+    assert_equals(itemStat.groupCanExecute, False)
+    assert_equals(itemStat.otherCanRead, False)
+    assert_equals(itemStat.otherCanWrite, False)
+    assert_equals(itemStat.otherCanExecute, False)

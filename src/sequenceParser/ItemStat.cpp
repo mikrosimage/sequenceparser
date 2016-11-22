@@ -152,17 +152,18 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 void ItemStat::setDefaultValues(){
 	deviceId = 0;
 	inodeId = 0;
+	nbHardLinks = 0;
+	fullNbHardLinks = 0;
 	userId = 0;
 	groupId = 0;
-	accessTime = 0;
-	lastChangeTime = -1;
-	sizeOnDisk = 0;
 	size = 0;
 	minSize = 0;
 	maxSize = 0;
 	realSize = 0;
-	fullNbHardLinks = 0;
+	sizeOnDisk = 0;
+	accessTime = 0;
 	modificationTime = -1;
+	lastChangeTime = -1;
 	ownerCanRead = false;
 	ownerCanWrite = false;
 	ownerCanExecute = false;
