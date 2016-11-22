@@ -133,7 +133,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	minSize = size;
 	maxSize = size;
 	// size on hard-drive (takes hardlinks into account)
-	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
+	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
 #else
 	fullNbHardLinks = nbHardLinks = 1;
@@ -200,8 +200,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	size = statInfos.st_size;
 	minSize = size;
 	maxSize = size;
-	// size on hard-drive (takes hardlinks into account)
-	sizeOnDisk = statInfos.st_blocks * 512;
+	sizeOnDisk = statInfos.st_blocks * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
 #else
 	deviceId = 0;
@@ -245,7 +244,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	accessTime = statInfos.st_atime;
 	lastChangeTime = statInfos.st_ctime;
 	// size on hard-drive (takes hardlinks into account)
-	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
+	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
 #else
 	deviceId = 0;
