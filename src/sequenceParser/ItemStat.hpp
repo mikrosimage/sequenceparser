@@ -33,6 +33,14 @@ private:
 	void setPermissions( const mode_t& protection );
 #endif
 
+private:
+	/**
+	 * @brief Status returned by the stat command.
+	 * @note lstat in case of UNIX
+	 * @note always -1 in case of Windows
+	 */
+	int statStatus;
+
 public:
 	// See the following doc to get file status on UNIX system
 	// See http://linux.die.net/man/2/stat

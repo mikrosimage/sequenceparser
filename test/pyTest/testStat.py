@@ -140,6 +140,9 @@ def testUndefinedStat():
     """
     itemFile = seq.Item(seq.eTypeUndefined, os.path.join(root_path, "plop.txt"))
     itemStat = seq.ItemStat(itemFile)
+    # user and group
+    assert_equals(itemStat.getUserName(), "unknown")
+    assert_equals(itemStat.getGroupName(), "unknown")
     # check id
     assert_equals(itemStat.deviceId, 0)
     assert_equals(itemStat.inodeId, 0)

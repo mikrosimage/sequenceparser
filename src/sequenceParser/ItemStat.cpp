@@ -14,6 +14,7 @@ namespace bfs = boost::filesystem;
 namespace sequenceParser {
 
 ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative )
+	: statStatus(-1)
 {
 	switch(type)
 	{
@@ -40,6 +41,7 @@ ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, cons
 }
 
 ItemStat::ItemStat( const Item& item, const bool approximative )
+	: statStatus(-1)
 {
 	switch(item.getType())
 	{
@@ -72,10 +74,13 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 std::string ItemStat::getUserName() const
 {
 #ifdef __UNIX__
-	passwd* user = getpwuid(userId);
-	if(user == NULL)
-		return std::string("unknown");
-	return std::string(user->pw_name ? user->pw_name : "unknown");
+	if(statStatus == 0) // success
+	{
+		passwd* user = getpwuid(userId);
+		if(user && user->pw_name)
+			return std::string(user->pw_name);
+	}
+	return std::string("unknown");
 #else
 	return std::string("not implemented");
 #endif
@@ -84,10 +89,13 @@ std::string ItemStat::getUserName() const
 std::string ItemStat::getGroupName() const
 {
 #ifdef __UNIX__
-	group* group = getgrgid(groupId);
-	if(group == NULL)
-		return std::string("unknown");
-	return std::string(group->gr_name ? group->gr_name : "unknown");
+    if(statStatus == 0) // success
+	{
+		group* group = getgrgid(groupId);
+		if(group && group->gr_name)
+			return std::string(group->gr_name);
+	}
+	return std::string("unknown");
 #else
 	return std::string("not implemented");
 #endif
@@ -112,12 +120,11 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 {
 	boost::system::error_code errorCode;
 	modificationTime = bfs::last_write_time(path, errorCode);
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat(path.c_str(), &statInfos);
-	if (stat_status == -1)
+	statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 	{
 		setDefaultValues();
 		return;
@@ -149,7 +156,8 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	realSize = size / nbHardLinks;
 }
 
-void ItemStat::setDefaultValues(){
+void ItemStat::setDefaultValues()
+{
 	deviceId = 0;
 	inodeId = 0;
 	nbHardLinks = 0;
@@ -182,12 +190,11 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( path.c_str(), &statInfos );
-	if (stat_status == -1)
+	statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 	{
 		setDefaultValues();
 		return;
@@ -228,12 +235,11 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	minSize = size;
 	maxSize = size;
 	modificationTime = bfs::last_write_time( path, errorCode );
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( path.c_str(), &statInfos );
-	if (stat_status == -1)
+	statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 	{
 		setDefaultValues();
 		return;
@@ -266,13 +272,11 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 {
 	using namespace boost::filesystem;
 	using namespace sequenceParser;
-	boost::system::error_code errorCode;
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
-	if (stat_status == -1)
+	statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
+	if (statStatus == -1)
 	{
 		setDefaultValues();
 		return;
