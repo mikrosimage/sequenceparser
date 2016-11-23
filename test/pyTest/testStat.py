@@ -46,8 +46,8 @@ def checkCommonParameters(itemStat):
     Check attributes which are common to several ItemStats.
     """
     # user and group
-    assert_equals(itemStat.getUserName(), user_name)
-    assert_equals(itemStat.getGroupName(), grp_name)
+    assert_equals(itemStat.userName, user_name)
+    assert_equals(itemStat.groupName, grp_name)
     # permissions
     assert_equals(itemStat.ownerCanRead, True)
     assert_equals(itemStat.ownerCanWrite, True)
@@ -96,8 +96,8 @@ def testSymLinkStat():
     itemFile = seq.Item(seq.eTypeLink, src)
     itemStat = seq.ItemStat(itemFile)
     # user and group
-    assert_equals(itemStat.getUserName(), user_name)
-    assert_equals(itemStat.getGroupName(), grp_name)
+    assert_equals(itemStat.userName, user_name)
+    assert_equals(itemStat.groupName, grp_name)
     # nb hard links
     assert_equals(itemStat.nbHardLinks, 1)
     assert_equals(itemStat.fullNbHardLinks, 1)
@@ -165,8 +165,8 @@ def testUndefinedStat():
     itemFile = seq.Item(seq.eTypeUndefined, os.path.join(root_path, "plop.txt"))
     itemStat = seq.ItemStat(itemFile)
     # user and group
-    assert_equals(itemStat.getUserName(), "unknown")
-    assert_equals(itemStat.getGroupName(), "unknown")
+    assert_equals(itemStat.userName, "unknown")
+    assert_equals(itemStat.groupName, "unknown")
     # check id
     assert_equals(itemStat.deviceId, 0)
     assert_equals(itemStat.inodeId, 0)

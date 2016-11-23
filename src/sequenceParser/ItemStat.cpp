@@ -14,13 +14,14 @@ namespace bfs = boost::filesystem;
 namespace sequenceParser {
 
 ItemStat::ItemStat( const Item& item, const bool approximative )
-	: statStatus(-1)
-	, deviceId(0)
+	: deviceId(0)
 	, inodeId(0)
 	, nbHardLinks(0)
 	, fullNbHardLinks(0)
 	, userId(0)
 	, groupId(0)
+	, userName("unknown")
+	, groupName("unknown")
 	, size(0)
 	, minSize(0)
 	, maxSize(0)
@@ -66,37 +67,8 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 	}
 }
 
-std::string ItemStat::getUserName() const
-{
 #ifdef __UNIX__
-	if(statStatus == 0) // success
-	{
-		passwd* user = getpwuid(userId);
-		if(user && user->pw_name)
-			return std::string(user->pw_name);
-	}
-	return std::string("unknown");
-#else
-	return std::string("not implemented");
-#endif
-}
 
-std::string ItemStat::getGroupName() const
-{
-#ifdef __UNIX__
-	if(statStatus == 0) // success
-	{
-		group* group = getgrgid(groupId);
-		if(group && group->gr_name)
-			return std::string(group->gr_name);
-	}
-	return std::string("unknown");
-#else
-	return std::string("not implemented");
-#endif
-}
-
-#ifdef __UNIX__
 void ItemStat::setPermissions( const mode_t& protection )
 {
 	ownerCanRead = protection & S_IRUSR;
@@ -109,6 +81,21 @@ void ItemStat::setPermissions( const mode_t& protection )
 	otherCanWrite = protection & S_IWOTH;
 	otherCanExecute = protection & S_IXOTH;
 }
+
+void ItemStat::setUserName()
+{
+    passwd* user = getpwuid(userId);
+    if(user && user->pw_name)
+        userName = std::string(user->pw_name);
+}
+
+void ItemStat::setGroupName()
+{
+    group* group = getgrgid(groupId);
+    if(group && group->gr_name)
+        groupName = std::string(group->gr_name);
+}
+
 #endif
 
 void ItemStat::statLink( const boost::filesystem::path& path )
@@ -118,7 +105,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	statStatus = lstat(path.c_str(), &statInfos);
+	const int statStatus = lstat(path.c_str(), &statInfos);
 	if (statStatus == -1)
 		return;
 
@@ -135,6 +122,8 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
 	setPermissions(statInfos.st_mode);
+	setUserName();
+	setGroupName();
 #else
 	fullNbHardLinks = nbHardLinks = 1;
 #endif
@@ -151,7 +140,7 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	statStatus = lstat(path.c_str(), &statInfos);
+	const int statStatus = lstat(path.c_str(), &statInfos);
 	if (statStatus == -1)
 		return;
 
@@ -167,6 +156,8 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = statInfos.st_blocks * 512;
 	setPermissions(statInfos.st_mode);
+	setUserName();
+	setGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -185,7 +176,7 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	statStatus = lstat(path.c_str(), &statInfos);
+	const int statStatus = lstat(path.c_str(), &statInfos);
 	if (statStatus == -1)
 		return;
 
@@ -198,6 +189,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * 512;
 	setPermissions(statInfos.st_mode);
+	setUserName();
+	setGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -211,7 +204,7 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
+	const int statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
 	if (statStatus == -1)
 		return;
 
@@ -221,6 +214,8 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
 	setPermissions(statInfos.st_mode);
+	setUserName();
+	setGroupName();
 #endif
 
 	modificationTime = 0;

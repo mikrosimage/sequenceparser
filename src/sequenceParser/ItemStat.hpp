@@ -17,9 +17,6 @@ class ItemStat
 public:
 	ItemStat( const Item& item, const bool approximative=true );
 
-	std::string getUserName() const;
-	std::string getGroupName() const;
-
 private:
 	void statFolder( const boost::filesystem::path& path );
 	void statFile( const boost::filesystem::path& path );
@@ -27,15 +24,9 @@ private:
 	void statLink( const boost::filesystem::path& path );
 #ifdef __UNIX__
 	void setPermissions( const mode_t& protection );
+	void setUserName();
+	void setGroupName();
 #endif
-
-private:
-	/**
-	 * @brief Status returned by the stat command.
-	 * @note lstat in case of UNIX
-	 * @note always -1 in case of Windows
-	 */
-	int statStatus;
 
 public:
 	// See the following doc to get file status on UNIX system
@@ -46,6 +37,9 @@ public:
 	long long fullNbHardLinks; /// total number of hard links in a sequence (otherwise, same value as nbHardLinks)
 	long long userId; /// user ID of owner
 	long long groupId; /// group ID of owner
+
+	std::string userName; /// user name of owner
+	std::string groupName; /// group name of owner
 
 	/**
 	 * @brief total size, in bytes
