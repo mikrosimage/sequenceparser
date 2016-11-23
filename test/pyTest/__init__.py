@@ -3,7 +3,7 @@ import os
 from pySequenceParser import sequenceParser as seq
 
 
-def createFile(path, filename, mode=0664):
+def createFile(path, filename, mode=0o664):
     """
     Create an empty file.
     """
@@ -11,7 +11,7 @@ def createFile(path, filename, mode=0664):
     open(ff, 'w', mode).close()
 
 
-def createFolder(path, folderName, mode=0664):
+def createFolder(path, folderName, mode=0o664):
     """
     Create an empty folder.
     """
