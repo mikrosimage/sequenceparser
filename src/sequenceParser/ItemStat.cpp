@@ -62,7 +62,7 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 			statSequence( item, approximative );
 			break;
 		}
-		case eTypeUndefined:
+		default:
 			break;
 	}
 }
