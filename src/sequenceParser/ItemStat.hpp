@@ -16,21 +16,16 @@ class ItemStat
 {
 public:
 	ItemStat( const Item& item, const bool approximative=true );
-#ifndef SWIG
-	ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative=true );
-#endif
-
-	std::string getUserName() const;
-	std::string getGroupName() const;
 
 private:
 	void statFolder( const boost::filesystem::path& path );
 	void statFile( const boost::filesystem::path& path );
 	void statSequence( const Item& item, const bool approximative );
 	void statLink( const boost::filesystem::path& path );
-	void setDefaultValues();
 #ifdef __UNIX__
 	void setPermissions( const mode_t& protection );
+	void setUserName();
+	void setGroupName();
 #endif
 
 public:
@@ -42,6 +37,9 @@ public:
 	long long fullNbHardLinks; /// total number of hard links in a sequence (otherwise, same value as nbHardLinks)
 	long long userId; /// user ID of owner
 	long long groupId; /// group ID of owner
+
+	std::string userName; /// user name of owner
+	std::string groupName; /// group name of owner
 
 	/**
 	 * @brief total size, in bytes

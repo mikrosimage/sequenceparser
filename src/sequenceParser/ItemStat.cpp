@@ -13,33 +13,32 @@ namespace bfs = boost::filesystem;
 
 namespace sequenceParser {
 
-ItemStat::ItemStat( const EType& type, const boost::filesystem::path& path, const bool approximative )
-{
-	switch(type)
-	{
-		case eTypeFolder:
-		{
-			statFolder(path);
-			break;
-		}
-		case eTypeFile:
-		{
-			statFile(path);
-			break;
-		}
-		case eTypeLink:
-		{
-			statLink(path);
-			break;
-		}
-		case eTypeUndefined:
-		case eTypeSequence:
-			setDefaultValues();
-			break;
-	}
-}
-
 ItemStat::ItemStat( const Item& item, const bool approximative )
+	: deviceId(0)
+	, inodeId(0)
+	, nbHardLinks(0)
+	, fullNbHardLinks(0)
+	, userId(0)
+	, groupId(0)
+	, userName("unknown")
+	, groupName("unknown")
+	, size(0)
+	, minSize(0)
+	, maxSize(0)
+	, realSize(0)
+	, sizeOnDisk(0)
+	, accessTime(0)
+	, modificationTime(-1)
+	, lastChangeTime(-1)
+	, ownerCanRead(false)
+	, ownerCanWrite(false)
+	, ownerCanExecute(false)
+	, groupCanRead(false)
+	, groupCanWrite(false)
+	, groupCanExecute(false)
+	, otherCanRead(false)
+	, otherCanWrite(false)
+	, otherCanExecute(false)
 {
 	switch(item.getType())
 	{
@@ -64,36 +63,12 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 			break;
 		}
 		case eTypeUndefined:
-			setDefaultValues();
 			break;
 	}
 }
 
-std::string ItemStat::getUserName() const
-{
 #ifdef __UNIX__
-	passwd* user = getpwuid(userId);
-	if(user == NULL)
-		return std::string("unknown");
-	return std::string(user->pw_name ? user->pw_name : "unknown");
-#else
-	return std::string("not implemented");
-#endif
-}
 
-std::string ItemStat::getGroupName() const
-{
-#ifdef __UNIX__
-	group* group = getgrgid(groupId);
-	if(group == NULL)
-		return std::string("unknown");
-	return std::string(group->gr_name ? group->gr_name : "unknown");
-#else
-	return std::string("not implemented");
-#endif
-}
-
-#ifdef __UNIX__
 void ItemStat::setPermissions( const mode_t& protection )
 {
 	ownerCanRead = protection & S_IRUSR;
@@ -106,22 +81,34 @@ void ItemStat::setPermissions( const mode_t& protection )
 	otherCanWrite = protection & S_IWOTH;
 	otherCanExecute = protection & S_IXOTH;
 }
+
+void ItemStat::setUserName()
+{
+    passwd* user = getpwuid(userId);
+    if(user && user->pw_name)
+        userName = std::string(user->pw_name);
+}
+
+void ItemStat::setGroupName()
+{
+    group* group = getgrgid(groupId);
+    if(group && group->gr_name)
+        groupName = std::string(group->gr_name);
+}
+
 #endif
 
 void ItemStat::statLink( const boost::filesystem::path& path )
 {
 	boost::system::error_code errorCode;
 	modificationTime = bfs::last_write_time(path, errorCode);
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat(path.c_str(), &statInfos);
-	if (stat_status == -1)
-	{
-		setDefaultValues();
+	const int statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 		return;
-	}
+
 	fullNbHardLinks = nbHardLinks = statInfos.st_nlink;
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
@@ -135,43 +122,12 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
+	setUserName();
+	setGroupName();
 #else
 	fullNbHardLinks = nbHardLinks = 1;
-	deviceId = 0;
-	inodeId = 0;
-	userId = 0;
-	groupId = 0;
-	accessTime = 0;
-	lastChangeTime = 0;
-	sizeOnDisk = 0;
-	size = 0;
 #endif
 	realSize = size / nbHardLinks;
-}
-
-void ItemStat::setDefaultValues(){
-	deviceId = 0;
-	inodeId = 0;
-	userId = 0;
-	groupId = 0;
-	accessTime = 0;
-	lastChangeTime = -1;
-	sizeOnDisk = 0;
-	size = 0;
-	minSize = 0;
-	maxSize = 0;
-	realSize = 0;
-	fullNbHardLinks = 0;
-	modificationTime = -1;
-	ownerCanRead = false;
-	ownerCanWrite = false;
-	ownerCanExecute = false;
-	groupCanRead = false;
-	groupCanWrite = false;
-	groupCanExecute = false;
-	otherCanRead = false;
-	otherCanWrite = false;
-	otherCanExecute = false;
 }
 
 void ItemStat::statFolder( const boost::filesystem::path& path )
@@ -181,16 +137,13 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( path.c_str(), &statInfos );
-	if (stat_status == -1)
-	{
-		setDefaultValues();
+	const int statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 		return;
-	}
+
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
 	userId = statInfos.st_uid;
@@ -202,15 +155,8 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	maxSize = size;
 	sizeOnDisk = statInfos.st_blocks * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
-#else
-	deviceId = 0;
-	inodeId = 0;
-	userId = 0;
-	groupId = 0;
-	accessTime = 0;
-	lastChangeTime = 0;
-	sizeOnDisk = 0;
-	size = 0;
+	setUserName();
+	setGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -226,16 +172,12 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	minSize = size;
 	maxSize = size;
 	modificationTime = bfs::last_write_time( path, errorCode );
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( path.c_str(), &statInfos );
-	if (stat_status == -1)
-	{
-		setDefaultValues();
+	const int statStatus = lstat(path.c_str(), &statInfos);
+	if (statStatus == -1)
 		return;
-	}
 
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
@@ -246,14 +188,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
-#else
-	deviceId = 0;
-	inodeId = 0;
-	userId = 0;
-	groupId = 0;
-	accessTime = 0;
-	lastChangeTime = 0;
-	sizeOnDisk = 0;
+	setUserName();
+	setGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -264,29 +200,21 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 {
 	using namespace boost::filesystem;
 	using namespace sequenceParser;
-	boost::system::error_code errorCode;
-	int stat_status = -1;
 
 #ifdef __UNIX__
 	struct stat statInfos;
-	stat_status = lstat( item.getAbsoluteFirstFilename().c_str(), &statInfos );
-	if (stat_status == -1)
-	{
-		setDefaultValues();
+	const int statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
+	if (statStatus == -1)
 		return;
-	}
+
 	deviceId = statInfos.st_dev;
 	inodeId = statInfos.st_ino;
 	userId = statInfos.st_uid;
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
 	setPermissions(statInfos.st_mode);
-#else
-	deviceId = 0;
-	inodeId = 0;
-	userId = 0;
-	groupId = 0;
-	accessTime = 0;
+	setUserName();
+	setGroupName();
 #endif
 
 	modificationTime = 0;
@@ -304,15 +232,9 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	// else
 	//   TODO: stat on a subset of files
 
-	bfs::path folder = item.getFolderPath();
-
-	BOOST_FOREACH( Time t, seq.getFramesIterable() )
+	BOOST_FOREACH(Item item, item.explode() )
 	{
-		boost::filesystem::path filepath = folder / seq.getFilenameAt(t);
-
-		EType type = getTypeFromPath(filepath);
-
-		ItemStat fileStat(type, filepath);
+		const ItemStat fileStat(item);
 
 		// use the most restrictive permissions in the sequence
 #ifdef __UNIX__
