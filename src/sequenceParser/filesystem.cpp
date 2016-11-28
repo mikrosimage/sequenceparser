@@ -23,27 +23,26 @@ using detail::SeqIdHash;
 namespace bfs = boost::filesystem;
 
 
-boost::filesystem::path getDirectoryFromPath( const boost::filesystem::path& p )
+bfs::path getDirectoryFromPath( const bfs::path& p )
 {
 	// if it's not a directory, use the parent directory of the file
 	bfs::path directory = p.parent_path();
 	if( directory.empty() ) // relative path
 	{
-		directory = boost::filesystem::current_path();
+		directory = bfs::current_path();
 	}
 	return directory;
 }
 
-
 bool browseSequence( Sequence& outSequence, const std::string& pattern, const EPattern accept )
 {
 	outSequence.clear();
-	boost::filesystem::path directory = getDirectoryFromPath( pattern );
+	bfs::path directory = getDirectoryFromPath( pattern );
 
-	if( !outSequence.initFromPattern( boost::filesystem::path( pattern ).filename().string(), accept ) )
+	if( !outSequence.initFromPattern( bfs::path( pattern ).filename().string(), accept ) )
 		return false; // not recognized as a pattern, maybe a still file
 
-	if( !boost::filesystem::exists( directory ) )
+	if( !bfs::exists( directory ) )
 		return false; // an empty sequence
 
 	std::vector<std::string> allTimesStr;
@@ -87,7 +86,7 @@ bool isConsideredAsSingleFile( const Sequence& s, const EDetection detectOptions
 }
 
 std::vector<Item> browse(
-		const boost::filesystem::path& dir,
+		const bfs::path& dir,
 		const EDetection detectOptions,
 		const std::vector<std::string>& filters )
 {
@@ -154,7 +153,7 @@ std::vector<Item> browse(
 				// It's a sequence of directories, so it's not a sequence.
 				BOOST_FOREACH( Time t, s.getFramesIterable() )
 				{
-					boost::filesystem::path folderPath = directory / s.getFilenameAt(t);
+					bfs::path folderPath = directory / s.getFilenameAt(t);
 					output.push_back( Item( getTypeFromPath(folderPath), folderPath ) );
 				}
 			}

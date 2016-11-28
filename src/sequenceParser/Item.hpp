@@ -6,24 +6,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-#ifdef SWIGJAVA
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/categories.hpp> 
-#include <boost/iostreams/code_converter.hpp>
-#include <boost/locale.hpp>
-#endif
-
 namespace sequenceParser {
-
-
-#ifdef SWIGJAVA
-std::string utf8_to_latin1( const std::string& utf8_path )
-{
-	using namespace boost::locale::conv;
-	std::string latin1_path = from_utf<char>(utf8_path, "Latin1");
-	return latin1_path;
-}
-#endif
 
 /**
  * @brief Represents an element in the filesystem: file, folder or link.
@@ -40,8 +23,6 @@ public:
 	Item( const EType type, const std::string& filepath )
 	: _type(type)
 #ifdef SWIGJAVA
-	// Strings are retrieved from JNI using GetStringUTFChars.
-	// So there is an implicit UTF8 conversion.
 	, _path(utf8_to_latin1(filepath))
 #else
 	, _path(filepath)
