@@ -82,7 +82,7 @@ def checkUnsetItemStat(itemStat):
     assert_equals(itemStat.realSize, 0)
     assert_equals(itemStat.sizeOnDisk, 0)
     # time
-    assert_equals(itemStat.accessTime, 0)
+    assert_equals(itemStat.accessTime, -1)
     assert_equals(itemStat.modificationTime, -1)
     assert_equals(itemStat.lastChangeTime, -1)
     # permissions
