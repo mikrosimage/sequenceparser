@@ -60,6 +60,43 @@ def checkCommonParameters(itemStat):
     assert_equals(itemStat.otherCanExecute, False)
 
 
+def checkUnsetItemStat(itemStat):
+    """
+    Check attributes of the given itemStat that should not be set.
+    """
+    # user and group
+    assert_equals(itemStat.userName, "unknown")
+    assert_equals(itemStat.groupName, "unknown")
+    # check id
+    assert_equals(itemStat.deviceId, 0)
+    assert_equals(itemStat.inodeId, 0)
+    assert_equals(itemStat.userId, 0)
+    assert_equals(itemStat.groupId, 0)
+    # nb hard links
+    assert_equals(itemStat.nbHardLinks, 0)
+    assert_equals(itemStat.fullNbHardLinks, 0)
+    # check size
+    assert_equals(itemStat.size, 0)
+    assert_equals(itemStat.minSize, 0)
+    assert_equals(itemStat.maxSize, 0)
+    assert_equals(itemStat.realSize, 0)
+    assert_equals(itemStat.sizeOnDisk, 0)
+    # time
+    assert_equals(itemStat.accessTime, -1)
+    assert_equals(itemStat.modificationTime, -1)
+    assert_equals(itemStat.lastChangeTime, -1)
+    # permissions
+    assert_equals(itemStat.ownerCanRead, False)
+    assert_equals(itemStat.ownerCanWrite, False)
+    assert_equals(itemStat.ownerCanExecute, False)
+    assert_equals(itemStat.groupCanRead, False)
+    assert_equals(itemStat.groupCanWrite, False)
+    assert_equals(itemStat.groupCanExecute, False)
+    assert_equals(itemStat.otherCanRead, False)
+    assert_equals(itemStat.otherCanWrite, False)
+    assert_equals(itemStat.otherCanExecute, False)
+
+
 def testFileStat():
     """
     Check stats of a single file.
@@ -83,6 +120,25 @@ def testFileStat():
     assert_less_equal(itemStat.accessTime, currentTime)
     assert_less_equal(itemStat.modificationTime, currentTime)
     assert_less_equal(itemStat.lastChangeTime, currentTime)
+
+
+def testFileDeleted():
+    """
+    Check stats of a file which is deleted between the browse and the stat.
+    """
+    # create new elements
+    fileToDelete = "fileToDelete.txt"
+    createFile(root_path, fileToDelete)
+    # browse the all directory
+    items = seq.browse(root_path)
+    # remove the last file created and get the stats of this file
+    itemStat = None
+    for item in items:
+        if item.getFilename() == fileToDelete:
+            os.remove(os.path.join(root_path, fileToDelete))
+            itemStat = seq.ItemStat(item)
+            break
+    checkUnsetItemStat(itemStat)
 
 
 def testSymLinkStat():
@@ -119,6 +175,25 @@ def testSymLinkStat():
     assert_equals(itemStat.otherCanExecute, True)
 
 
+def testSymLinkDeleted():
+    """
+    Check stats of a symbolic link which is deleted between the browse and the stat.
+    """
+    # create new symbolic link
+    linkToDelete = "linkToDelete.txt"
+    createSymLink(root_path, "plop.txt", linkToDelete)
+    # browse the all directory
+    items = seq.browse(root_path)
+    # remove the last file created and get the stats of this symbolic link
+    itemStat = None
+    for item in items:
+        if item.getFilename() == linkToDelete:
+            os.remove(os.path.join(root_path, linkToDelete))
+            itemStat = seq.ItemStat(item)
+            break
+    checkUnsetItemStat(itemStat)
+
+
 def testFolderStat():
     """
     Check stats of a folder.
@@ -136,6 +211,25 @@ def testFolderStat():
     assert_equals(itemStat.size, itemStat.maxSize)
     assert_equals(itemStat.realSize, itemStat.size)
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
+
+
+def testFolderDeleted():
+    """
+    Check stats of a folder which is deleted between the browse and the stat.
+    """
+    # create new folder
+    folderToDelete = "folderToDelete"
+    createFolder(root_path, folderToDelete)
+    # browse the all directory
+    items = seq.browse(root_path)
+    # remove the last file created and get the stats of this folder
+    itemStat = None
+    for item in items:
+        if item.getFilename() == folderToDelete:
+            shutil.rmtree(os.path.join(root_path, folderToDelete))
+            itemStat = seq.ItemStat(item)
+            break
+    checkUnsetItemStat(itemStat)
 
 
 def testSequenceStat():
@@ -158,40 +252,36 @@ def testSequenceStat():
     assert_greater_equal(itemStat.sizeOnDisk, itemStat.size)
 
 
+def testSequenceDeleted():
+    """
+    Check stats of a sequence which is deleted between the browse and the stat.
+    """
+    # create new sequence
+    files_to_create = [
+        "bar.001.jpg",
+        "bar.002.jpg",
+        "bar.003.jpg",
+    ]
+    for f in files_to_create:
+        createFile(root_path, f)
+    # browse the all directory
+    items = seq.browse(root_path)
+    # remove the last file created and get the stats of this symbolic link
+    itemStat = None
+    for item in items:
+        if item.getFilename() == "bar.###.jpg":
+            os.remove(os.path.join(root_path, "bar.001.jpg"))
+            os.remove(os.path.join(root_path, "bar.002.jpg"))
+            os.remove(os.path.join(root_path, "bar.003.jpg"))
+            itemStat = seq.ItemStat(item)
+            break
+    checkUnsetItemStat(itemStat)
+
+
 def testUndefinedStat():
     """
     Check stats of a file which is tagged as undefined.
     """
     itemFile = seq.Item(seq.eTypeUndefined, os.path.join(root_path, "plop.txt"))
     itemStat = seq.ItemStat(itemFile)
-    # user and group
-    assert_equals(itemStat.userName, "unknown")
-    assert_equals(itemStat.groupName, "unknown")
-    # check id
-    assert_equals(itemStat.deviceId, 0)
-    assert_equals(itemStat.inodeId, 0)
-    assert_equals(itemStat.userId, 0)
-    assert_equals(itemStat.groupId, 0)
-    # nb hard links
-    assert_equals(itemStat.nbHardLinks, 0)
-    assert_equals(itemStat.fullNbHardLinks, 0)
-    # check size
-    assert_equals(itemStat.size, 0)
-    assert_equals(itemStat.minSize, 0)
-    assert_equals(itemStat.maxSize, 0)
-    assert_equals(itemStat.realSize, 0)
-    assert_equals(itemStat.sizeOnDisk, 0)
-    # time
-    assert_equals(itemStat.accessTime, 0)
-    assert_equals(itemStat.modificationTime, -1)
-    assert_equals(itemStat.lastChangeTime, -1)
-    # permissions
-    assert_equals(itemStat.ownerCanRead, False)
-    assert_equals(itemStat.ownerCanWrite, False)
-    assert_equals(itemStat.ownerCanExecute, False)
-    assert_equals(itemStat.groupCanRead, False)
-    assert_equals(itemStat.groupCanWrite, False)
-    assert_equals(itemStat.groupCanExecute, False)
-    assert_equals(itemStat.otherCanRead, False)
-    assert_equals(itemStat.otherCanWrite, False)
-    assert_equals(itemStat.otherCanExecute, False)
+    checkUnsetItemStat(itemStat)

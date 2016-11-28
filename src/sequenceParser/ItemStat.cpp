@@ -27,7 +27,7 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 	, maxSize(0)
 	, realSize(0)
 	, sizeOnDisk(0)
-	, accessTime(0)
+	, accessTime(-1)
 	, modificationTime(-1)
 	, lastChangeTime(-1)
 	, ownerCanRead(false)
@@ -62,7 +62,7 @@ ItemStat::ItemStat( const Item& item, const bool approximative )
 			statSequence( item, approximative );
 			break;
 		}
-		case eTypeUndefined:
+		default:
 			break;
 	}
 }
@@ -101,7 +101,11 @@ void ItemStat::setGroupName()
 void ItemStat::statLink( const boost::filesystem::path& path )
 {
 	boost::system::error_code errorCode;
-	modificationTime = bfs::last_write_time(path, errorCode);
+	const long long last_write_time = bfs::last_write_time(path, errorCode);
+	if(errorCode == boost::system::errc::success)
+	{
+		modificationTime = last_write_time;
+	}
 
 #ifdef __UNIX__
 	struct stat statInfos;
@@ -132,11 +136,13 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 
 void ItemStat::statFolder( const boost::filesystem::path& path )
 {
-	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
-
-	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
-	modificationTime = bfs::last_write_time( path, errorCode );
+	const size_t hard_link_count = bfs::hard_link_count(path, errorCode);
+	if(errorCode == boost::system::errc::success)
+	{
+		fullNbHardLinks = nbHardLinks = hard_link_count;
+		modificationTime = bfs::last_write_time(path, errorCode);
+	}
 
 #ifdef __UNIX__
 	struct stat statInfos;
@@ -165,13 +171,16 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 void ItemStat::statFile( const boost::filesystem::path& path )
 {
-	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
-	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
-	size = bfs::file_size( path, errorCode );
-	minSize = size;
-	maxSize = size;
-	modificationTime = bfs::last_write_time( path, errorCode );
+	const size_t hard_link_count = bfs::hard_link_count(path, errorCode);
+	if(errorCode == boost::system::errc::success)
+	{
+		fullNbHardLinks = nbHardLinks = hard_link_count;
+		size = bfs::file_size(path, errorCode);
+		minSize = size;
+		maxSize = size;
+		modificationTime = bfs::last_write_time(path, errorCode);
+	}
 
 #ifdef __UNIX__
 	struct stat statInfos;
@@ -198,9 +207,6 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 
 void ItemStat::statSequence( const Item& item, const bool approximative )
 {
-	using namespace boost::filesystem;
-	using namespace sequenceParser;
-
 #ifdef __UNIX__
 	struct stat statInfos;
 	const int statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
