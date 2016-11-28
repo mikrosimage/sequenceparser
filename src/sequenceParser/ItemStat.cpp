@@ -132,9 +132,7 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 
 void ItemStat::statFolder( const boost::filesystem::path& path )
 {
-	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
-
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	modificationTime = bfs::last_write_time( path, errorCode );
 
@@ -165,7 +163,6 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 
 void ItemStat::statFile( const boost::filesystem::path& path )
 {
-	using namespace boost::filesystem;
 	boost::system::error_code errorCode;
 	fullNbHardLinks = nbHardLinks = bfs::hard_link_count( path, errorCode );
 	size = bfs::file_size( path, errorCode );
@@ -198,9 +195,6 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 
 void ItemStat::statSequence( const Item& item, const bool approximative )
 {
-	using namespace boost::filesystem;
-	using namespace sequenceParser;
-
 #ifdef __UNIX__
 	struct stat statInfos;
 	const int statStatus = lstat(item.getAbsoluteFirstFilename().c_str(), &statInfos);
