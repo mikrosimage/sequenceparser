@@ -403,8 +403,11 @@ std::size_t decomposeFilename( const std::string& filename, FileStrings& stringP
 		stringParts.getId().push_back( *m++ );
 		if( m != end ) // if end with a string and not a number
 		{
-//			std::cout << "numberPart: " << *m << std::endl;
-			numberParts.push_back( *m++ );
+			const std::string numberPart = *m++;
+//			std::cout << "numberPart: " << numberPart << std::endl;
+			if( numberPart == "-0" )
+				continue;
+			numberParts.push_back( numberPart );
 		}
 	}
 	if( stringParts.getId().size() == numberParts.size() )
