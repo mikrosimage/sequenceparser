@@ -44,7 +44,11 @@ inline std::vector<Item> browse(
 		const EDetection detectOptions = eDetectionDefault,
 		const std::vector<std::string>& filters = std::vector<std::string>() )
 {
+#ifdef SWIGJAVA
+	return browse( boost::filesystem::path(utf8_to_latin1(directory)), detectOptions, filters );
+#else
 	return browse( boost::filesystem::path(directory), detectOptions, filters );
+#endif
 }
 
 
