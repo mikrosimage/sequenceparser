@@ -40,6 +40,10 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -O3")
 endif()
 
+if (APPLE)
+	set(CMAKE_MACOSX_RPATH ON)
+endif (APPLE)
+
 # CPP flag to create code coverage report
 if(SEQUENCEPARSER_COVERAGE)
 	message("Add coverage build option.")
