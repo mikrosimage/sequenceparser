@@ -30,6 +30,8 @@ public class StatLibraryTestMain {
         System.out.println("Full Hard links : " + itemStat.getFullNbHardLinks());
         System.out.println("Hardlinks : " + itemStat.getNbHardLinks());
         System.out.println("Device : " + itemStat.getDeviceId());
+        System.out.println("Group : " + itemStat.getGroupName());
+        System.out.println("User : " + itemStat.getUserName());
     }
 }
 

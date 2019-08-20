@@ -82,14 +82,14 @@ void ItemStat::setPermissions( const mode_t& protection )
 	otherCanExecute = protection & S_IXOTH;
 }
 
-void ItemStat::setUserName()
+void ItemStat::updateUserName()
 {
     passwd* user = getpwuid(userId);
     if(user && user->pw_name)
         userName = std::string(user->pw_name);
 }
 
-void ItemStat::setGroupName()
+void ItemStat::updateGroupName()
 {
     group* group = getgrgid(groupId);
     if(group && group->gr_name)
@@ -126,8 +126,8 @@ void ItemStat::statLink( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
-	setUserName();
-	setGroupName();
+	updateUserName();
+	updateGroupName();
 #else
 	fullNbHardLinks = nbHardLinks = 1;
 #endif
@@ -161,8 +161,8 @@ void ItemStat::statFolder( const boost::filesystem::path& path )
 	maxSize = size;
 	sizeOnDisk = statInfos.st_blocks * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
-	setUserName();
-	setGroupName();
+	updateUserName();
+	updateGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -197,8 +197,8 @@ void ItemStat::statFile( const boost::filesystem::path& path )
 	// size on hard-drive (takes hardlinks into account)
 	sizeOnDisk = (statInfos.st_blocks / nbHardLinks) * statInfos.st_blksize;
 	setPermissions(statInfos.st_mode);
-	setUserName();
-	setGroupName();
+	updateUserName();
+	updateGroupName();
 #endif
 
 	// size (takes hardlinks into account)
@@ -219,8 +219,8 @@ void ItemStat::statSequence( const Item& item, const bool approximative )
 	groupId = statInfos.st_gid;
 	accessTime = statInfos.st_atime;
 	setPermissions(statInfos.st_mode);
-	setUserName();
-	setGroupName();
+	updateUserName();
+	updateGroupName();
 #endif
 
 	modificationTime = 0;

@@ -24,8 +24,10 @@ private:
 	void statLink( const boost::filesystem::path& path );
 #ifdef __UNIX__
 	void setPermissions( const mode_t& protection );
-	void setUserName();
-	void setGroupName();
+    /// @brief Update user name from filesystem
+	void updateUserName();
+    /// @brief Update group name from filesystem
+	void updateGroupName();
 #endif
 
 public:

@@ -378,7 +378,7 @@ std::vector<Sequence> buildSequences( const boost::filesystem::path& directory, 
 
 std::size_t decomposeFilename( const std::string& filename, FileStrings& stringParts, FileNumbers& numberParts, const EDetection& options )
 {
-	static const std::size_t max = std::numeric_limits<std::size_t>::digits10;
+	static const std::size_t max = std::numeric_limits<Time>::digits10;
 	std::string regex;
 	if( options & eDetectionNegative )
 	{
